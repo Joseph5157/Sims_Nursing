@@ -1,0 +1,3360 @@
+{
+    "name":  "sims-dms",
+    "description":  "A web-based mobile-first PWA discipline management system for SIMS College of Pharmacy that digitizes scheduling of faculty duty slots, attendance check-in/check-out monitoring, and real-time student violation logging with Telegram OTP authentication. Note: this project has over 100 source files; consider scoping analysis to a subdirectory for faster results.",
+    "languages":  [
+                      "css",
+                      "html",
+                      "javascript",
+                      "json",
+                      "markdown",
+                      "powershell",
+                      "prisma",
+                      "shell",
+                      "sql",
+                      "toml",
+                      "typescript",
+                      "yaml"
+                  ],
+    "frameworks":  [
+                       "React",
+                       "Vite",
+                       "Vite PWA",
+                       "TanStack React Query",
+                       "Tailwind CSS",
+                       "Express",
+                       "Prisma",
+                       "Zod",
+                       "Vitest",
+                       "GitHub Actions"
+                   ],
+    "files":  [
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/_adherence.oxlintrc.json",
+                      "language":  "json",
+                      "sizeLines":  457,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/_ds_bundle.js",
+                      "language":  "javascript",
+                      "sizeLines":  3667,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/_ds_manifest.json",
+                      "language":  "json",
+                      "sizeLines":  0,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Avatar.d.ts",
+                      "language":  "typescript",
+                      "sizeLines":  15,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Avatar.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  35,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Avatar.prompt.md",
+                      "language":  "markdown",
+                      "sizeLines":  9,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Badge.d.ts",
+                      "language":  "typescript",
+                      "sizeLines":  27,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Badge.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  69,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Badge.prompt.md",
+                      "language":  "markdown",
+                      "sizeLines":  14,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Button.d.ts",
+                      "language":  "typescript",
+                      "sizeLines":  20,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Button.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  83,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Button.prompt.md",
+                      "language":  "markdown",
+                      "sizeLines":  10,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Card.d.ts",
+                      "language":  "typescript",
+                      "sizeLines":  32,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Card.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  42,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Card.prompt.md",
+                      "language":  "markdown",
+                      "sizeLines":  11,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/core.card.html",
+                      "language":  "html",
+                      "sizeLines":  72,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/StatCard.d.ts",
+                      "language":  "typescript",
+                      "sizeLines":  22,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/StatCard.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  50,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/StatCard.prompt.md",
+                      "language":  "markdown",
+                      "sizeLines":  10,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Table.d.ts",
+                      "language":  "typescript",
+                      "sizeLines":  27,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Table.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  71,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/core/Table.prompt.md",
+                      "language":  "markdown",
+                      "sizeLines":  29,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/feedback/Alert.d.ts",
+                      "language":  "typescript",
+                      "sizeLines":  24,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/feedback/Alert.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  44,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/feedback/Alert.prompt.md",
+                      "language":  "markdown",
+                      "sizeLines":  14,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/feedback/feedback.card.html",
+                      "language":  "html",
+                      "sizeLines":  34,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/forms/forms.card.html",
+                      "language":  "html",
+                      "sizeLines":  33,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/forms/Input.d.ts",
+                      "language":  "typescript",
+                      "sizeLines":  17,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/forms/Input.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  43,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/forms/Input.prompt.md",
+                      "language":  "markdown",
+                      "sizeLines":  9,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/forms/Select.d.ts",
+                      "language":  "typescript",
+                      "sizeLines":  18,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/forms/Select.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  53,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/forms/Select.prompt.md",
+                      "language":  "markdown",
+                      "sizeLines":  11,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/patterns/BrandMark.d.ts",
+                      "language":  "typescript",
+                      "sizeLines":  15,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/patterns/BrandMark.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  39,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/patterns/BrandMark.prompt.md",
+                      "language":  "markdown",
+                      "sizeLines":  9,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/patterns/EmptyState.d.ts",
+                      "language":  "typescript",
+                      "sizeLines":  17,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/patterns/EmptyState.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  18,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/patterns/EmptyState.prompt.md",
+                      "language":  "markdown",
+                      "sizeLines":  7,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/patterns/MobileCard.d.ts",
+                      "language":  "typescript",
+                      "sizeLines":  23,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/patterns/MobileCard.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  47,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/patterns/MobileCard.prompt.md",
+                      "language":  "markdown",
+                      "sizeLines":  12,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/patterns/patterns.card.html",
+                      "language":  "html",
+                      "sizeLines":  52,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/patterns/SectionHeader.d.ts",
+                      "language":  "typescript",
+                      "sizeLines":  13,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/patterns/SectionHeader.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  18,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/components/patterns/SectionHeader.prompt.md",
+                      "language":  "markdown",
+                      "sizeLines":  5,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/guidelines/brand-mark.card.html",
+                      "language":  "html",
+                      "sizeLines":  31,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/guidelines/colors-brand.card.html",
+                      "language":  "html",
+                      "sizeLines":  41,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/guidelines/colors-slate.card.html",
+                      "language":  "html",
+                      "sizeLines":  39,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/guidelines/colors-status.card.html",
+                      "language":  "html",
+                      "sizeLines":  53,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/guidelines/colors-surfaces.card.html",
+                      "language":  "html",
+                      "sizeLines":  36,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/guidelines/spacing-radius.card.html",
+                      "language":  "html",
+                      "sizeLines":  29,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/guidelines/spacing-scale.card.html",
+                      "language":  "html",
+                      "sizeLines":  29,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/guidelines/spacing-shadows.card.html",
+                      "language":  "html",
+                      "sizeLines":  26,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/guidelines/type-families.card.html",
+                      "language":  "html",
+                      "sizeLines":  40,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/guidelines/type-scale.card.html",
+                      "language":  "html",
+                      "sizeLines":  24,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/readme.md",
+                      "language":  "markdown",
+                      "sizeLines":  197,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  30,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/styles.css",
+                      "language":  "css",
+                      "sizeLines":  10,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/templates/faculty-app/ds-base.js",
+                      "language":  "javascript",
+                      "sizeLines":  19,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/templates/faculty-app/index.html",
+                      "language":  "html",
+                      "sizeLines":  60,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/templates/faculty-app/screens.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  252,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/templates/faculty-app/shell.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  119,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/tokens/base.css",
+                      "language":  "css",
+                      "sizeLines":  57,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/tokens/colors.css",
+                      "language":  "css",
+                      "sizeLines":  83,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/tokens/fonts.css",
+                      "language":  "css",
+                      "sizeLines":  8,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/tokens/spacing.css",
+                      "language":  "css",
+                      "sizeLines":  56,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/tokens/typography.css",
+                      "language":  "css",
+                      "sizeLines":  44,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/ui_kits/admin-desktop/AdminScreens.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  422,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/ui_kits/admin-desktop/AdminShell.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  163,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/ui_kits/admin-desktop/index.html",
+                      "language":  "html",
+                      "sizeLines":  44,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/ui_kits/faculty-pwa/index.html",
+                      "language":  "html",
+                      "sizeLines":  61,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/ui_kits/faculty-pwa/README.md",
+                      "language":  "markdown",
+                      "sizeLines":  28,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/ui_kits/faculty-pwa/screens.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  252,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/SIMS DMS Design System/ui_kits/faculty-pwa/shell.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  119,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-agent-context-update/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  30,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-analyze/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  260,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-checklist/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  374,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-clarify/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  286,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-constitution/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  157,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-git-commit/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  52,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-git-feature/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  71,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-git-initialize/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  53,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-git-remote/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  49,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-git-validate/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  53,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-implement/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  224,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-plan/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  171,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-specify/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  345,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-tasks/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  215,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".claude/skills/speckit-taskstoissues/SKILL.md",
+                      "language":  "markdown",
+                      "sizeLines":  107,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".env.example",
+                      "language":  "config",
+                      "sizeLines":  47,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".github/workflows/ci.yml",
+                      "language":  "yaml",
+                      "sizeLines":  39,
+                      "fileCategory":  "infra"
+                  },
+                  {
+                      "path":  ".node-version",
+                      "language":  "unknown",
+                      "sizeLines":  1,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".npmrc",
+                      "language":  "unknown",
+                      "sizeLines":  8,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".specify/extensions.yml",
+                      "language":  "yaml",
+                      "sizeLines":  164,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".specify/extensions/.registry",
+                      "language":  "unknown",
+                      "sizeLines":  36,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  ".specify/extensions/agent-context/agent-context-config.yml",
+                      "language":  "yaml",
+                      "sizeLines":  4,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".specify/extensions/agent-context/commands/speckit.agent-context.update.md",
+                      "language":  "markdown",
+                      "sizeLines":  26,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/extensions/agent-context/extension.yml",
+                      "language":  "yaml",
+                      "sizeLines":  34,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".specify/extensions/agent-context/README.md",
+                      "language":  "markdown",
+                      "sizeLines":  57,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/extensions/agent-context/scripts/bash/update-agent-context.sh",
+                      "language":  "shell",
+                      "sizeLines":  200,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/extensions/agent-context/scripts/powershell/update-agent-context.ps1",
+                      "language":  "powershell",
+                      "sizeLines":  237,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/commands/speckit.git.commit.md",
+                      "language":  "markdown",
+                      "sizeLines":  48,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/commands/speckit.git.feature.md",
+                      "language":  "markdown",
+                      "sizeLines":  67,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/commands/speckit.git.initialize.md",
+                      "language":  "markdown",
+                      "sizeLines":  49,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/commands/speckit.git.remote.md",
+                      "language":  "markdown",
+                      "sizeLines":  45,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/commands/speckit.git.validate.md",
+                      "language":  "markdown",
+                      "sizeLines":  49,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/config-template.yml",
+                      "language":  "yaml",
+                      "sizeLines":  62,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/extension.yml",
+                      "language":  "yaml",
+                      "sizeLines":  140,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/git-config.yml",
+                      "language":  "yaml",
+                      "sizeLines":  62,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/README.md",
+                      "language":  "markdown",
+                      "sizeLines":  100,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/scripts/bash/auto-commit.sh",
+                      "language":  "shell",
+                      "sizeLines":  140,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/scripts/bash/create-new-feature.sh",
+                      "language":  "shell",
+                      "sizeLines":  453,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/scripts/bash/git-common.sh",
+                      "language":  "shell",
+                      "sizeLines":  54,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/scripts/bash/initialize-repo.sh",
+                      "language":  "shell",
+                      "sizeLines":  54,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/scripts/powershell/auto-commit.ps1",
+                      "language":  "powershell",
+                      "sizeLines":  169,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/scripts/powershell/create-new-feature.ps1",
+                      "language":  "powershell",
+                      "sizeLines":  403,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/scripts/powershell/git-common.ps1",
+                      "language":  "powershell",
+                      "sizeLines":  51,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/extensions/git/scripts/powershell/initialize-repo.ps1",
+                      "language":  "powershell",
+                      "sizeLines":  69,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/feature.json",
+                      "language":  "json",
+                      "sizeLines":  3,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".specify/init-options.json",
+                      "language":  "json",
+                      "sizeLines":  8,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".specify/integration.json",
+                      "language":  "json",
+                      "sizeLines":  15,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".specify/integrations/claude.manifest.json",
+                      "language":  "json",
+                      "sizeLines":  16,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".specify/integrations/speckit.manifest.json",
+                      "language":  "json",
+                      "sizeLines":  17,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".specify/memory/constitution.md",
+                      "language":  "markdown",
+                      "sizeLines":  44,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/scripts/powershell/check-prerequisites.ps1",
+                      "language":  "powershell",
+                      "sizeLines":  152,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/scripts/powershell/common.ps1",
+                      "language":  "powershell",
+                      "sizeLines":  695,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/scripts/powershell/create-new-feature.ps1",
+                      "language":  "powershell",
+                      "sizeLines":  385,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/scripts/powershell/setup-plan.ps1",
+                      "language":  "powershell",
+                      "sizeLines":  73,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/scripts/powershell/setup-tasks.ps1",
+                      "language":  "powershell",
+                      "sizeLines":  76,
+                      "fileCategory":  "script"
+                  },
+                  {
+                      "path":  ".specify/templates/checklist-template.md",
+                      "language":  "markdown",
+                      "sizeLines":  40,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/templates/constitution-template.md",
+                      "language":  "markdown",
+                      "sizeLines":  50,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/templates/plan-template.md",
+                      "language":  "markdown",
+                      "sizeLines":  113,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/templates/spec-template.md",
+                      "language":  "markdown",
+                      "sizeLines":  131,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/templates/tasks-template.md",
+                      "language":  "markdown",
+                      "sizeLines":  252,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  ".specify/workflows/speckit/workflow.yml",
+                      "language":  "yaml",
+                      "sizeLines":  77,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".specify/workflows/workflow-registry.json",
+                      "language":  "json",
+                      "sizeLines":  12,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  ".understand-anything/.understandignore",
+                      "language":  "unknown",
+                      "sizeLines":  39,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "check-admin.sql",
+                      "language":  "sql",
+                      "sizeLines":  4,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "CLAUDE.md",
+                      "language":  "markdown",
+                      "sizeLines":  8,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "client/.env.example",
+                      "language":  "config",
+                      "sizeLines":  2,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  "client/components.json",
+                      "language":  "json",
+                      "sizeLines":  25,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  "client/eslint.config.js",
+                      "language":  "javascript",
+                      "sizeLines":  21,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/index.html",
+                      "language":  "html",
+                      "sizeLines":  20,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  "client/package.json",
+                      "language":  "json",
+                      "sizeLines":  50,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  "client/public/manifest.json",
+                      "language":  "json",
+                      "sizeLines":  33,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  "client/README.md",
+                      "language":  "markdown",
+                      "sizeLines":  16,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "client/scripts/generate-icons.mjs",
+                      "language":  "javascript",
+                      "sizeLines":  78,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/App.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  133,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/Breadcrumb.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  28,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ComposeDrawer.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  264,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/CreateUserDrawer.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  294,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ErrorBoundary.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  22,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/Layout.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  294,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/Layout.module.css",
+                      "language":  "css",
+                      "sizeLines":  92,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  "client/src/components/NotificationBell.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  297,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/OfflineBanner.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  79,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ProtectedRoute.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  46,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/PWAUpdatePrompt.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  27,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ui/Alert.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  44,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ui/Badge.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  46,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ui/ConfirmDialog.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  46,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ui/EmptyState.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  23,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ui/FormModal.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  59,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ui/PageHeader.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  23,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ui/Pagination.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  16,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ui/Skeleton.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  32,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ui/StatCard.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  66,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ui/Table.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  92,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ui/Toast.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  96,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/UploadStudentsDrawer.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  232,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/components/ViolationTypeDrawer.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  167,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useAttendance.js",
+                      "language":  "javascript",
+                      "sizeLines":  59,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useAuth.js",
+                      "language":  "javascript",
+                      "sizeLines":  56,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useCalendar.js",
+                      "language":  "javascript",
+                      "sizeLines":  67,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useCoverRequests.js",
+                      "language":  "javascript",
+                      "sizeLines":  86,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useDebounce.js",
+                      "language":  "javascript",
+                      "sizeLines":  12,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useDutySlots.js",
+                      "language":  "javascript",
+                      "sizeLines":  57,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useInvites.js",
+                      "language":  "javascript",
+                      "sizeLines":  39,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useMessages.js",
+                      "language":  "javascript",
+                      "sizeLines":  53,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useNotifications.js",
+                      "language":  "javascript",
+                      "sizeLines":  137,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useOnline.js",
+                      "language":  "javascript",
+                      "sizeLines":  38,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useReports.js",
+                      "language":  "javascript",
+                      "sizeLines":  29,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useStudents.js",
+                      "language":  "javascript",
+                      "sizeLines":  70,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useSyncQueue.js",
+                      "language":  "javascript",
+                      "sizeLines":  77,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useUsers.js",
+                      "language":  "javascript",
+                      "sizeLines":  61,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useViolations.js",
+                      "language":  "javascript",
+                      "sizeLines":  68,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/hooks/useViolationTypes.js",
+                      "language":  "javascript",
+                      "sizeLines":  44,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/index.css",
+                      "language":  "css",
+                      "sizeLines":  551,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  "client/src/lib/auth.js",
+                      "language":  "javascript",
+                      "sizeLines":  17,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/lib/cache.js",
+                      "language":  "javascript",
+                      "sizeLines":  83,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/lib/theme.js",
+                      "language":  "javascript",
+                      "sizeLines":  156,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/lib/utils.ts",
+                      "language":  "typescript",
+                      "sizeLines":  6,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/main.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  17,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/admin/AdminDashboardPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  250,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/admin/AttendanceLivePage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  195,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/admin/CalendarPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  311,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/admin/CoverRequestsPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  171,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/admin/DutySlotsPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  139,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/admin/ReportsPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  410,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/admin/StudentsPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  193,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/admin/UsersPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  446,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/admin/ViolationsPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  211,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/admin/ViolationTypesPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  119,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/auth/ChangePasswordPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  353,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/auth/LoginPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  306,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/faculty/AttendancePage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  106,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/faculty/CoverRequestsPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  150,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/faculty/DashboardPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  221,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/faculty/SlotPickerPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  436,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/faculty/ViolationRecorderPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  274,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/NotificationsPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  250,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/shared/MessagesPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  216,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/super-admin/AuditLogsPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  115,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/super-admin/SessionResetPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  127,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/pages/super-admin/SuperAdminDashboardPage.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  101,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/utils/api.js",
+                      "language":  "javascript",
+                      "sizeLines":  46,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/src/utils/constants.js",
+                      "language":  "javascript",
+                      "sizeLines":  64,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/tailwind.config.js",
+                      "language":  "javascript",
+                      "sizeLines":  19,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "client/tsconfig.json",
+                      "language":  "json",
+                      "sizeLines":  26,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  "client/tsconfig.node.json",
+                      "language":  "json",
+                      "sizeLines":  10,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  "client/vite.config.js",
+                      "language":  "javascript",
+                      "sizeLines":  84,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "COMPLETE_FRONTEND_AUDIT.md",
+                      "language":  "markdown",
+                      "sizeLines":  1558,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "CONSTITUTION.md",
+                      "language":  "markdown",
+                      "sizeLines":  319,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "CreateUserDrawer.jsx",
+                      "language":  "javascript",
+                      "sizeLines":  343,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "DEPLOYMENT_VERIFICATION_CHECKLIST.md",
+                      "language":  "markdown",
+                      "sizeLines":  594,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "DESIGN_FIX_PROMPT.md",
+                      "language":  "markdown",
+                      "sizeLines":  304,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "FEATURE_IMPLEMENTATION_SUMMARY.md",
+                      "language":  "markdown",
+                      "sizeLines":  346,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "fixes-001.md",
+                      "language":  "markdown",
+                      "sizeLines":  113,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "FRONTEND_ARCHITECTURE_AUDIT.md",
+                      "language":  "markdown",
+                      "sizeLines":  535,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "IMPLEMENTATION_SUMMARY.md",
+                      "language":  "markdown",
+                      "sizeLines":  406,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "MAJOR_FEATURES_PLAN.md",
+                      "language":  "markdown",
+                      "sizeLines":  509,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "MOBILE_DESIGN_RULES.md",
+                      "language":  "markdown",
+                      "sizeLines":  160,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "MOBILE_UI_FIXES.md",
+                      "language":  "markdown",
+                      "sizeLines":  323,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "mobile-nav-preview.html",
+                      "language":  "html",
+                      "sizeLines":  589,
+                      "fileCategory":  "markup"
+                  },
+                  {
+                      "path":  "package.json",
+                      "language":  "json",
+                      "sizeLines":  32,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260606080800_init/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  371,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260607124509_add_otp_failed_attempts/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  2,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260607132810_add_system_config/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  18,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260609114500_add_telegram_invite_flow/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  9,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260610000000_phase1_auth_hardening/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  2,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260610000001_duty_slot_unique_constraint/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  3,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260610000002_message_indexes/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  4,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260610000003_cover_request_open_unique/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  7,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260610000007_add_session_start_to_system_config/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  7,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260610000008_fk_indexes_violations_messages/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  6,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260611152920_add_pending_invite_relink_token/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  44,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260613114022_add_last_password_reset_at/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  26,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260613170323_add_password_auth/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  6,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/20260613173500_add_last_password_reset_at/migration.sql",
+                      "language":  "sql",
+                      "sizeLines":  2,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/migrations/migration_lock.toml",
+                      "language":  "toml",
+                      "sizeLines":  2,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  "prisma/schema.prisma",
+                      "language":  "prisma",
+                      "sizeLines":  445,
+                      "fileCategory":  "data"
+                  },
+                  {
+                      "path":  "prisma/seed-students.js",
+                      "language":  "javascript",
+                      "sizeLines":  86,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "prisma/seed-violation-types.js",
+                      "language":  "javascript",
+                      "sizeLines":  78,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "prisma/seed.js",
+                      "language":  "javascript",
+                      "sizeLines":  74,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "QUICK_REFERENCE.md",
+                      "language":  "markdown",
+                      "sizeLines":  331,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "railway.toml",
+                      "language":  "toml",
+                      "sizeLines":  10,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  "README.md",
+                      "language":  "markdown",
+                      "sizeLines":  377,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "server/controllers/attendance.controller.js",
+                      "language":  "javascript",
+                      "sizeLines":  255,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/controllers/auth.controller.js",
+                      "language":  "javascript",
+                      "sizeLines":  158,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/controllers/calendar.controller.js",
+                      "language":  "javascript",
+                      "sizeLines":  399,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/controllers/cover-requests.controller.js",
+                      "language":  "javascript",
+                      "sizeLines":  453,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/controllers/duty-slots.controller.js",
+                      "language":  "javascript",
+                      "sizeLines":  342,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/controllers/invites.controller.js",
+                      "language":  "javascript",
+                      "sizeLines":  229,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/controllers/messages.controller.js",
+                      "language":  "javascript",
+                      "sizeLines":  161,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/controllers/reports.controller.js",
+                      "language":  "javascript",
+                      "sizeLines":  350,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/controllers/students.controller.js",
+                      "language":  "javascript",
+                      "sizeLines":  402,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/controllers/users.controller.js",
+                      "language":  "javascript",
+                      "sizeLines":  554,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/controllers/violation-types.controller.js",
+                      "language":  "javascript",
+                      "sizeLines":  128,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/controllers/violations.controller.js",
+                      "language":  "javascript",
+                      "sizeLines":  371,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/index.js",
+                      "language":  "javascript",
+                      "sizeLines":  211,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/lib/bot.js",
+                      "language":  "javascript",
+                      "sizeLines":  360,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/lib/cookieOptions.js",
+                      "language":  "javascript",
+                      "sizeLines":  32,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/lib/cron.js",
+                      "language":  "javascript",
+                      "sizeLines":  118,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/lib/logger.js",
+                      "language":  "javascript",
+                      "sizeLines":  29,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/lib/password.js",
+                      "language":  "javascript",
+                      "sizeLines":  33,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/lib/prisma.js",
+                      "language":  "javascript",
+                      "sizeLines":  7,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/lib/telegram.js",
+                      "language":  "javascript",
+                      "sizeLines":  14,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/lib/time.js",
+                      "language":  "javascript",
+                      "sizeLines":  68,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/middleware/asyncHandler.js",
+                      "language":  "javascript",
+                      "sizeLines":  1,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/middleware/authenticate.js",
+                      "language":  "javascript",
+                      "sizeLines":  35,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/middleware/authorize.js",
+                      "language":  "javascript",
+                      "sizeLines":  11,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/middleware/csrf.js",
+                      "language":  "javascript",
+                      "sizeLines":  33,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/middleware/validate.js",
+                      "language":  "javascript",
+                      "sizeLines":  14,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/middleware/validateQuery.js",
+                      "language":  "javascript",
+                      "sizeLines":  14,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/package.json",
+                      "language":  "json",
+                      "sizeLines":  36,
+                      "fileCategory":  "config"
+                  },
+                  {
+                      "path":  "server/routes/admin.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  29,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/routes/attendance.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  28,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/routes/auth.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  30,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/routes/bot.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  50,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/routes/calendar.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  37,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/routes/cover-requests.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  48,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/routes/duty-slots.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  33,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/routes/invites.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  43,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/routes/messages.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  32,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/routes/reports.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  34,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/routes/students.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  62,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/routes/users.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  62,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/routes/violation-types.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  28,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/routes/violations.routes.js",
+                      "language":  "javascript",
+                      "sizeLines":  48,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/schemas/attendance.schema.js",
+                      "language":  "javascript",
+                      "sizeLines":  16,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/schemas/auth.schema.js",
+                      "language":  "javascript",
+                      "sizeLines":  13,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/schemas/calendar.schema.js",
+                      "language":  "javascript",
+                      "sizeLines":  28,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/schemas/cover-requests.schema.js",
+                      "language":  "javascript",
+                      "sizeLines":  14,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/schemas/duty-slots.schema.js",
+                      "language":  "javascript",
+                      "sizeLines":  16,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/schemas/invites.schema.js",
+                      "language":  "javascript",
+                      "sizeLines":  12,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/schemas/messages.schema.js",
+                      "language":  "javascript",
+                      "sizeLines":  9,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/schemas/reports.schema.js",
+                      "language":  "javascript",
+                      "sizeLines":  28,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/schemas/settings.schema.js",
+                      "language":  "javascript",
+                      "sizeLines":  20,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/schemas/students.schema.js",
+                      "language":  "javascript",
+                      "sizeLines":  8,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/schemas/users.schema.js",
+                      "language":  "javascript",
+                      "sizeLines":  20,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/schemas/violation-types.schema.js",
+                      "language":  "javascript",
+                      "sizeLines":  18,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/schemas/violations.schema.js",
+                      "language":  "javascript",
+                      "sizeLines":  33,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/scripts/backfill-passwords.mjs",
+                      "language":  "javascript",
+                      "sizeLines":  88,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/services/audit.service.js",
+                      "language":  "javascript",
+                      "sizeLines":  25,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/services/settings.service.js",
+                      "language":  "javascript",
+                      "sizeLines":  55,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/tests/auth.test.mjs",
+                      "language":  "javascript",
+                      "sizeLines":  256,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/tests/bot.test.mjs",
+                      "language":  "javascript",
+                      "sizeLines":  38,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/tests/cron.test.mjs",
+                      "language":  "javascript",
+                      "sizeLines":  47,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/tests/csrf.test.mjs",
+                      "language":  "javascript",
+                      "sizeLines":  73,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/tests/duty-slots.test.mjs",
+                      "language":  "javascript",
+                      "sizeLines":  74,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/tests/invites.test.mjs",
+                      "language":  "javascript",
+                      "sizeLines":  168,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "server/vitest.config.mjs",
+                      "language":  "javascript",
+                      "sizeLines":  15,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "SESSION_COMPLETION_REPORT.md",
+                      "language":  "markdown",
+                      "sizeLines":  367,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "Sims ui plan Â· MD",
+                      "language":  "unknown",
+                      "sizeLines":  529,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "SIMS_API_Endpoints_v2.0.md",
+                      "language":  "markdown",
+                      "sizeLines":  199,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "SIMS_BOOTSTRAP_SUPER_ADMIN_INSTRUCTIONS.md",
+                      "language":  "markdown",
+                      "sizeLines":  341,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "SIMS_Database_Schema_v2.0.md",
+                      "language":  "markdown",
+                      "sizeLines":  341,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "SIMS_Database_Schema_v2.1.md",
+                      "language":  "markdown",
+                      "sizeLines":  439,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "SIMS_DMS_PRODUCTION_FIX_PLAN.md",
+                      "language":  "markdown",
+                      "sizeLines":  1448,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "SIMS_DMS_Production_Readiness_Report (1).md",
+                      "language":  "markdown",
+                      "sizeLines":  389,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "SIMS_TELEGRAM_PENDING_INVITE_CODEX_CLAUDE_INSTRUCTIONS.md",
+                      "language":  "markdown",
+                      "sizeLines":  1117,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "specs/001-auth-user-accounts/checklists/requirements.md",
+                      "language":  "markdown",
+                      "sizeLines":  34,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "specs/001-auth-user-accounts/plan.md",
+                      "language":  "markdown",
+                      "sizeLines":  440,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "specs/001-auth-user-accounts/spec.md",
+                      "language":  "markdown",
+                      "sizeLines":  147,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "TELEGRAM_INVITE_FLOW_TESTING.md",
+                      "language":  "markdown",
+                      "sizeLines":  320,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "TELEGRAM_WEBHOOK_REGISTRATION_GUIDE.md",
+                      "language":  "markdown",
+                      "sizeLines":  545,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "telegram-invite-flow-plan.md",
+                      "language":  "markdown",
+                      "sizeLines":  317,
+                      "fileCategory":  "docs"
+                  },
+                  {
+                      "path":  "test-invite-flow.js",
+                      "language":  "javascript",
+                      "sizeLines":  212,
+                      "fileCategory":  "code"
+                  },
+                  {
+                      "path":  "TESTING_CHECKLIST.md",
+                      "language":  "markdown",
+                      "sizeLines":  261,
+                      "fileCategory":  "docs"
+                  }
+              ],
+    "totalFiles":  340,
+    "filteredByIgnore":  0,
+    "estimatedComplexity":  "large",
+    "importMap":  {
+                      ".claude/skills/SIMS DMS Design System/components/core/Badge.prompt.md":  [
+
+                                                                                                ],
+                      "MOBILE_UI_FIXES.md":  [
+
+                                             ],
+                      ".specify/feature.json":  [
+
+                                                ],
+                      "server/routes/bot.routes.js":  [
+                                                          "server/lib/bot.js",
+                                                          "server/lib/logger.js",
+                                                          "server/middleware/asyncHandler.js"
+                                                      ],
+                      "prisma/seed-violation-types.js":  [
+
+                                                         ],
+                      "client/src/lib/auth.js":  [
+
+                                                 ],
+                      ".specify/templates/plan-template.md":  [
+
+                                                              ],
+                      "prisma/migrations/20260606080800_init/migration.sql":  [
+
+                                                                              ],
+                      "client/public/manifest.json":  [
+
+                                                      ],
+                      "client/src/pages/faculty/DashboardPage.jsx":  [
+                                                                         "client/src/components/Layout.jsx",
+                                                                         "client/src/components/ui/Alert.jsx",
+                                                                         "client/src/components/ui/Badge.jsx",
+                                                                         "client/src/components/ui/StatCard.jsx",
+                                                                         "client/src/hooks/useCoverRequests.js",
+                                                                         "client/src/hooks/useDutySlots.js",
+                                                                         "client/src/hooks/useMessages.js",
+                                                                         "client/src/hooks/useViolations.js",
+                                                                         "client/src/utils/constants.js"
+                                                                     ],
+                      ".claude/skills/SIMS DMS Design System/guidelines/brand-mark.card.html":  [
+
+                                                                                                ],
+                      "client/src/pages/faculty/ViolationRecorderPage.jsx":  [
+                                                                                 "client/src/components/Layout.jsx",
+                                                                                 "client/src/components/ui/Badge.jsx",
+                                                                                 "client/src/components/ui/FormModal.jsx",
+                                                                                 "client/src/components/ui/Pagination.jsx",
+                                                                                 "client/src/components/ui/Table.jsx",
+                                                                                 "client/src/components/ui/Toast.jsx",
+                                                                                 "client/src/hooks/useDutySlots.js",
+                                                                                 "client/src/hooks/useStudents.js",
+                                                                                 "client/src/hooks/useViolations.js",
+                                                                                 "client/src/hooks/useViolationTypes.js"
+                                                                             ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Button.jsx":  [
+
+                                                                                           ],
+                      "test-invite-flow.js":  [
+
+                                              ],
+                      ".claude/skills/SIMS DMS Design System/components/patterns/EmptyState.jsx":  [
+
+                                                                                                   ],
+                      "client/src/pages/auth/ChangePasswordPage.jsx":  [
+                                                                           "client/src/hooks/useAuth.js",
+                                                                           "client/src/utils/api.js"
+                                                                       ],
+                      ".node-version":  [
+
+                                        ],
+                      "prisma/migrations/20260611152920_add_pending_invite_relink_token/migration.sql":  [
+
+                                                                                                         ],
+                      ".claude/skills/SIMS DMS Design System/components/feedback/Alert.jsx":  [
+
+                                                                                              ],
+                      ".claude/skills/SIMS DMS Design System/components/patterns/BrandMark.jsx":  [
+
+                                                                                                  ],
+                      "client/src/main.jsx":  [
+                                                  "client/src/App.jsx",
+                                                  "client/src/index.css"
+                                              ],
+                      ".specify/extensions/git/commands/speckit.git.initialize.md":  [
+
+                                                                                     ],
+                      ".claude/skills/speckit-tasks/SKILL.md":  [
+
+                                                                ],
+                      "server/routes/invites.routes.js":  [
+                                                              "server/controllers/invites.controller.js",
+                                                              "server/middleware/asyncHandler.js",
+                                                              "server/middleware/authenticate.js",
+                                                              "server/middleware/authorize.js",
+                                                              "server/middleware/validate.js",
+                                                              "server/schemas/invites.schema.js"
+                                                          ],
+                      "client/src/hooks/useOnline.js":  [
+
+                                                        ],
+                      ".specify/extensions/agent-context/extension.yml":  [
+
+                                                                          ],
+                      "server/schemas/auth.schema.js":  [
+
+                                                        ],
+                      "Sims ui plan Ã‚Â· MD":  [
+
+                                               ],
+                      ".claude/skills/speckit-git-feature/SKILL.md":  [
+
+                                                                      ],
+                      ".claude/skills/SIMS DMS Design System/components/forms/Select.prompt.md":  [
+
+                                                                                                  ],
+                      "server/middleware/csrf.js":  [
+
+                                                    ],
+                      ".npmrc":  [
+
+                                 ],
+                      "fixes-001.md":  [
+
+                                       ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Button.prompt.md":  [
+
+                                                                                                 ],
+                      ".claude/skills/SIMS DMS Design System/components/forms/Input.jsx":  [
+
+                                                                                           ],
+                      "QUICK_REFERENCE.md":  [
+
+                                             ],
+                      "client/src/pages/super-admin/SessionResetPage.jsx":  [
+                                                                                "client/src/components/Layout.jsx",
+                                                                                "client/src/components/ui/Badge.jsx",
+                                                                                "client/src/components/ui/Table.jsx",
+                                                                                "client/src/components/ui/Toast.jsx",
+                                                                                "client/src/hooks/useUsers.js"
+                                                                            ],
+                      "prisma/migrations/20260607132810_add_system_config/migration.sql":  [
+
+                                                                                           ],
+                      "prisma/migrations/20260610000007_add_session_start_to_system_config/migration.sql":  [
+
+                                                                                                            ],
+                      "client/src/pages/admin/CalendarPage.jsx":  [
+                                                                      "client/src/components/Layout.jsx",
+                                                                      "client/src/components/ui/Badge.jsx",
+                                                                      "client/src/components/ui/ConfirmDialog.jsx",
+                                                                      "client/src/components/ui/FormModal.jsx",
+                                                                      "client/src/components/ui/Table.jsx",
+                                                                      "client/src/components/ui/Toast.jsx",
+                                                                      "client/src/hooks/useCalendar.js"
+                                                                  ],
+                      "prisma/migrations/20260613114022_add_last_password_reset_at/migration.sql":  [
+
+                                                                                                    ],
+                      "client/src/index.css":  [
+
+                                               ],
+                      "client/src/components/Breadcrumb.jsx":  [
+                                                                   "client/src/lib/utils.ts"
+                                                               ],
+                      "client/src/App.jsx":  [
+                                                 "client/src/components/ErrorBoundary.jsx",
+                                                 "client/src/components/OfflineBanner.jsx",
+                                                 "client/src/components/ProtectedRoute.jsx",
+                                                 "client/src/components/PWAUpdatePrompt.jsx",
+                                                 "client/src/components/ui/Toast.jsx",
+                                                 "client/src/hooks/useAuth.js",
+                                                 "client/src/lib/theme.js",
+                                                 "client/src/pages/admin/AdminDashboardPage.jsx",
+                                                 "client/src/pages/admin/AttendanceLivePage.jsx",
+                                                 "client/src/pages/admin/CalendarPage.jsx",
+                                                 "client/src/pages/admin/CoverRequestsPage.jsx",
+                                                 "client/src/pages/admin/DutySlotsPage.jsx",
+                                                 "client/src/pages/admin/ReportsPage.jsx",
+                                                 "client/src/pages/admin/StudentsPage.jsx",
+                                                 "client/src/pages/admin/UsersPage.jsx",
+                                                 "client/src/pages/admin/ViolationsPage.jsx",
+                                                 "client/src/pages/admin/ViolationTypesPage.jsx",
+                                                 "client/src/pages/auth/ChangePasswordPage.jsx",
+                                                 "client/src/pages/auth/LoginPage.jsx",
+                                                 "client/src/pages/faculty/AttendancePage.jsx",
+                                                 "client/src/pages/faculty/CoverRequestsPage.jsx",
+                                                 "client/src/pages/faculty/DashboardPage.jsx",
+                                                 "client/src/pages/faculty/SlotPickerPage.jsx",
+                                                 "client/src/pages/faculty/ViolationRecorderPage.jsx",
+                                                 "client/src/pages/NotificationsPage.jsx",
+                                                 "client/src/pages/shared/MessagesPage.jsx",
+                                                 "client/src/pages/super-admin/AuditLogsPage.jsx",
+                                                 "client/src/pages/super-admin/SessionResetPage.jsx",
+                                                 "client/src/pages/super-admin/SuperAdminDashboardPage.jsx",
+                                                 "client/src/utils/constants.js"
+                                             ],
+                      "server/middleware/validate.js":  [
+
+                                                        ],
+                      ".specify/extensions/.registry":  [
+
+                                                        ],
+                      ".claude/skills/SIMS DMS Design System/ui_kits/faculty-pwa/README.md":  [
+
+                                                                                              ],
+                      ".specify/extensions/git/git-config.yml":  [
+
+                                                                 ],
+                      ".claude/skills/SIMS DMS Design System/guidelines/colors-status.card.html":  [
+
+                                                                                                   ],
+                      ".claude/skills/SIMS DMS Design System/components/feedback/Alert.prompt.md":  [
+
+                                                                                                    ],
+                      "SESSION_COMPLETION_REPORT.md":  [
+
+                                                       ],
+                      "prisma/migrations/20260610000003_cover_request_open_unique/migration.sql":  [
+
+                                                                                                   ],
+                      "client/src/components/NotificationBell.jsx":  [
+                                                                         "client/src/hooks/useNotifications.js"
+                                                                     ],
+                      ".claude/skills/speckit-taskstoissues/SKILL.md":  [
+
+                                                                        ],
+                      "client/components.json":  [
+
+                                                 ],
+                      "client/src/lib/utils.ts":  [
+
+                                                  ],
+                      ".claude/skills/SIMS DMS Design System/components/patterns/EmptyState.d.ts":  [
+
+                                                                                                    ],
+                      ".specify/extensions/git/commands/speckit.git.validate.md":  [
+
+                                                                                   ],
+                      ".claude/skills/SIMS DMS Design System/components/patterns/SectionHeader.prompt.md":  [
+
+                                                                                                            ],
+                      ".specify/extensions/git/config-template.yml":  [
+
+                                                                      ],
+                      "client/src/components/ui/FormModal.jsx":  [
+
+                                                                 ],
+                      ".claude/skills/SIMS DMS Design System/components/patterns/BrandMark.prompt.md":  [
+
+                                                                                                        ],
+                      ".specify/extensions/agent-context/agent-context-config.yml":  [
+
+                                                                                     ],
+                      ".claude/skills/SIMS DMS Design System/components/feedback/Alert.d.ts":  [
+
+                                                                                               ],
+                      "client/src/components/ui/Alert.jsx":  [
+
+                                                             ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Button.d.ts":  [
+
+                                                                                            ],
+                      ".claude/skills/SIMS DMS Design System/ui_kits/faculty-pwa/screens.jsx":  [
+
+                                                                                                ],
+                      "server/tests/cron.test.mjs":  [
+
+                                                     ],
+                      "server/lib/cookieOptions.js":  [
+
+                                                      ],
+                      "client/src/components/ComposeDrawer.jsx":  [
+                                                                      "client/src/components/ui/Toast.jsx",
+                                                                      "client/src/hooks/useMessages.js",
+                                                                      "client/src/hooks/useUsers.js"
+                                                                  ],
+                      "client/src/components/ui/Toast.jsx":  [
+
+                                                             ],
+                      "client/src/components/OfflineBanner.jsx":  [
+                                                                      "client/src/hooks/useOnline.js"
+                                                                  ],
+                      "client/src/components/ui/ConfirmDialog.jsx":  [
+
+                                                                     ],
+                      "server/controllers/users.controller.js":  [
+                                                                     "server/lib/logger.js",
+                                                                     "server/lib/prisma.js",
+                                                                     "server/services/audit.service.js",
+                                                                     "server/services/settings.service.js"
+                                                                 ],
+                      "server/schemas/invites.schema.js":  [
+
+                                                           ],
+                      "server/controllers/students.controller.js":  [
+                                                                        "server/lib/logger.js",
+                                                                        "server/lib/prisma.js",
+                                                                        "server/services/audit.service.js"
+                                                                    ],
+                      "client/src/pages/super-admin/SuperAdminDashboardPage.jsx":  [
+                                                                                       "client/src/components/Layout.jsx",
+                                                                                       "client/src/components/ui/StatCard.jsx",
+                                                                                       "client/src/hooks/useUsers.js"
+                                                                                   ],
+                      "client/package.json":  [
+
+                                              ],
+                      "client/src/hooks/useViolations.js":  [
+                                                                "client/src/utils/api.js"
+                                                            ],
+                      "server/routes/students.routes.js":  [
+                                                               "server/controllers/students.controller.js",
+                                                               "server/middleware/asyncHandler.js",
+                                                               "server/middleware/authenticate.js",
+                                                               "server/middleware/authorize.js",
+                                                               "server/middleware/validate.js",
+                                                               "server/schemas/students.schema.js"
+                                                           ],
+                      ".specify/integrations/claude.manifest.json":  [
+
+                                                                     ],
+                      "TELEGRAM_INVITE_FLOW_TESTING.md":  [
+
+                                                          ],
+                      "client/src/utils/constants.js":  [
+
+                                                        ],
+                      ".claude/skills/SIMS DMS Design System/guidelines/colors-slate.card.html":  [
+
+                                                                                                  ],
+                      "server/routes/reports.routes.js":  [
+                                                              "server/controllers/reports.controller.js",
+                                                              "server/middleware/asyncHandler.js",
+                                                              "server/middleware/authenticate.js",
+                                                              "server/middleware/authorize.js",
+                                                              "server/middleware/validateQuery.js",
+                                                              "server/schemas/reports.schema.js"
+                                                          ],
+                      "server/lib/cron.js":  [
+                                                 "server/lib/logger.js",
+                                                 "server/lib/prisma.js",
+                                                 "server/lib/time.js",
+                                                 "server/services/settings.service.js"
+                                             ],
+                      "client/src/components/ui/PageHeader.jsx":  [
+
+                                                                  ],
+                      "CONSTITUTION.md":  [
+
+                                          ],
+                      "IMPLEMENTATION_SUMMARY.md":  [
+
+                                                    ],
+                      "client/src/pages/super-admin/AuditLogsPage.jsx":  [
+                                                                             "client/src/components/Layout.jsx",
+                                                                             "client/src/components/ui/Pagination.jsx",
+                                                                             "client/src/components/ui/Table.jsx",
+                                                                             "client/src/hooks/useUsers.js"
+                                                                         ],
+                      ".claude/skills/SIMS DMS Design System/components/forms/Input.prompt.md":  [
+
+                                                                                                 ],
+                      "COMPLETE_FRONTEND_AUDIT.md":  [
+
+                                                     ],
+                      "server/tests/bot.test.mjs":  [
+
+                                                    ],
+                      ".claude/skills/SIMS DMS Design System/templates/faculty-app/screens.jsx":  [
+
+                                                                                                  ],
+                      ".specify/extensions/agent-context/scripts/powershell/update-agent-context.ps1":  [
+
+                                                                                                        ],
+                      "client/src/hooks/useCoverRequests.js":  [
+                                                                   "client/src/utils/api.js"
+                                                               ],
+                      "server/tests/csrf.test.mjs":  [
+                                                         "server/middleware/csrf.js"
+                                                     ],
+                      ".claude/skills/SIMS DMS Design System/components/forms/Input.d.ts":  [
+
+                                                                                            ],
+                      "server/tests/duty-slots.test.mjs":  [
+
+                                                           ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Card.jsx":  [
+
+                                                                                         ],
+                      "client/tsconfig.json":  [
+
+                                               ],
+                      "server/routes/violation-types.routes.js":  [
+                                                                      "server/controllers/violation-types.controller.js",
+                                                                      "server/middleware/asyncHandler.js",
+                                                                      "server/middleware/authenticate.js",
+                                                                      "server/middleware/authorize.js",
+                                                                      "server/middleware/validate.js",
+                                                                      "server/schemas/violation-types.schema.js"
+                                                                  ],
+                      ".claude/skills/speckit-git-remote/SKILL.md":  [
+
+                                                                     ],
+                      "server/routes/admin.routes.js":  [
+                                                            "server/controllers/users.controller.js",
+                                                            "server/middleware/asyncHandler.js",
+                                                            "server/middleware/authenticate.js",
+                                                            "server/middleware/authorize.js",
+                                                            "server/middleware/validate.js",
+                                                            "server/schemas/settings.schema.js"
+                                                        ],
+                      "FEATURE_IMPLEMENTATION_SUMMARY.md":  [
+
+                                                            ],
+                      "SIMS_DMS_PRODUCTION_FIX_PLAN.md":  [
+
+                                                          ],
+                      ".specify/extensions/git/commands/speckit.git.remote.md":  [
+
+                                                                                 ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Avatar.jsx":  [
+
+                                                                                           ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Table.prompt.md":  [
+
+                                                                                                ],
+                      "prisma/migrations/20260607124509_add_otp_failed_attempts/migration.sql":  [
+
+                                                                                                 ],
+                      "specs/001-auth-user-accounts/checklists/requirements.md":  [
+
+                                                                                  ],
+                      "server/schemas/students.schema.js":  [
+
+                                                            ],
+                      ".specify/templates/spec-template.md":  [
+
+                                                              ],
+                      ".claude/skills/SIMS DMS Design System/guidelines/spacing-scale.card.html":  [
+
+                                                                                                   ],
+                      "SIMS_TELEGRAM_PENDING_INVITE_CODEX_CLAUDE_INSTRUCTIONS.md":  [
+
+                                                                                    ],
+                      ".claude/skills/SIMS DMS Design System/components/patterns/SectionHeader.jsx":  [
+
+                                                                                                      ],
+                      ".specify/extensions/git/scripts/powershell/create-new-feature.ps1":  [
+
+                                                                                            ],
+                      "prisma/seed-students.js":  [
+
+                                                  ],
+                      ".claude/skills/SIMS DMS Design System/tokens/colors.css":  [
+
+                                                                                  ],
+                      ".claude/skills/SIMS DMS Design System/components/core/StatCard.d.ts":  [
+
+                                                                                              ],
+                      ".claude/skills/speckit-plan/SKILL.md":  [
+
+                                                               ],
+                      ".claude/skills/speckit-clarify/SKILL.md":  [
+
+                                                                  ],
+                      "SIMS_DMS_Production_Readiness_Report (1).md":  [
+
+                                                                      ],
+                      ".claude/skills/speckit-git-commit/SKILL.md":  [
+
+                                                                     ],
+                      "client/src/components/ui/Table.jsx":  [
+
+                                                             ],
+                      "client/src/components/UploadStudentsDrawer.jsx":  [
+                                                                             "client/src/components/ui/Toast.jsx",
+                                                                             "client/src/hooks/useStudents.js"
+                                                                         ],
+                      "server/services/audit.service.js":  [
+                                                               "server/lib/prisma.js"
+                                                           ],
+                      ".claude/skills/SIMS DMS Design System/components/patterns/BrandMark.d.ts":  [
+
+                                                                                                   ],
+                      ".claude/skills/speckit-implement/SKILL.md":  [
+
+                                                                    ],
+                      "server/routes/duty-slots.routes.js":  [
+                                                                 "server/controllers/duty-slots.controller.js",
+                                                                 "server/middleware/asyncHandler.js",
+                                                                 "server/middleware/authenticate.js",
+                                                                 "server/middleware/authorize.js",
+                                                                 "server/middleware/validate.js",
+                                                                 "server/schemas/duty-slots.schema.js"
+                                                             ],
+                      ".specify/extensions/git/scripts/bash/create-new-feature.sh":  [
+
+                                                                                     ],
+                      "CLAUDE.md":  [
+
+                                    ],
+                      ".specify/extensions/git/README.md":  [
+
+                                                            ],
+                      "client/src/utils/api.js":  [
+
+                                                  ],
+                      ".specify/scripts/powershell/common.ps1":  [
+
+                                                                 ],
+                      "prisma/migrations/migration_lock.toml":  [
+
+                                                                ],
+                      "server/tests/invites.test.mjs":  [
+
+                                                        ],
+                      "client/src/components/Layout.module.css":  [
+
+                                                                  ],
+                      ".claude/skills/SIMS DMS Design System/templates/faculty-app/ds-base.js":  [
+
+                                                                                                 ],
+                      "server/routes/violations.routes.js":  [
+                                                                 "server/controllers/violations.controller.js",
+                                                                 "server/middleware/asyncHandler.js",
+                                                                 "server/middleware/authenticate.js",
+                                                                 "server/middleware/authorize.js",
+                                                                 "server/middleware/validate.js",
+                                                                 "server/schemas/violations.schema.js"
+                                                             ],
+                      "server/services/settings.service.js":  [
+                                                                  "server/lib/prisma.js"
+                                                              ],
+                      "prisma/seed.js":  [
+
+                                         ],
+                      ".claude/skills/SIMS DMS Design System/ui_kits/admin-desktop/AdminScreens.jsx":  [
+
+                                                                                                       ],
+                      ".specify/templates/constitution-template.md":  [
+
+                                                                      ],
+                      "prisma/migrations/20260610000008_fk_indexes_violations_messages/migration.sql":  [
+
+                                                                                                        ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Badge.d.ts":  [
+
+                                                                                           ],
+                      "telegram-invite-flow-plan.md":  [
+
+                                                       ],
+                      "client/src/hooks/useAuth.js":  [
+                                                          "client/src/lib/auth.js",
+                                                          "client/src/utils/api.js"
+                                                      ],
+                      "client/src/components/ViolationTypeDrawer.jsx":  [
+                                                                            "client/src/components/ui/Toast.jsx",
+                                                                            "client/src/hooks/useViolationTypes.js"
+                                                                        ],
+                      ".specify/extensions/git/scripts/powershell/git-common.ps1":  [
+
+                                                                                    ],
+                      "client/src/pages/admin/StudentsPage.jsx":  [
+                                                                      "client/src/components/Breadcrumb.jsx",
+                                                                      "client/src/components/Layout.jsx",
+                                                                      "client/src/components/ui/Badge.jsx",
+                                                                      "client/src/components/ui/ConfirmDialog.jsx",
+                                                                      "client/src/components/ui/FormModal.jsx",
+                                                                      "client/src/components/ui/Pagination.jsx",
+                                                                      "client/src/components/ui/Skeleton.jsx",
+                                                                      "client/src/components/ui/Table.jsx",
+                                                                      "client/src/components/ui/Toast.jsx",
+                                                                      "client/src/components/UploadStudentsDrawer.jsx",
+                                                                      "client/src/hooks/useDebounce.js",
+                                                                      "client/src/hooks/useStudents.js",
+                                                                      "client/src/utils/constants.js"
+                                                                  ],
+                      "server/lib/time.js":  [
+
+                                             ],
+                      ".claude/skills/SIMS DMS Design System/components/patterns/SectionHeader.d.ts":  [
+
+                                                                                                       ],
+                      "server/controllers/invites.controller.js":  [
+                                                                       "server/lib/prisma.js",
+                                                                       "server/services/audit.service.js"
+                                                                   ],
+                      "SIMS_BOOTSTRAP_SUPER_ADMIN_INSTRUCTIONS.md":  [
+
+                                                                     ],
+                      "client/src/components/ui/Skeleton.jsx":  [
+
+                                                                ],
+                      "SIMS_Database_Schema_v2.0.md":  [
+
+                                                       ],
+                      "prisma/migrations/20260613170323_add_password_auth/migration.sql":  [
+
+                                                                                           ],
+                      "client/src/hooks/useUsers.js":  [
+                                                           "client/src/lib/cache.js",
+                                                           "client/src/utils/api.js"
+                                                       ],
+                      "server/routes/calendar.routes.js":  [
+                                                               "server/controllers/calendar.controller.js",
+                                                               "server/middleware/asyncHandler.js",
+                                                               "server/middleware/authenticate.js",
+                                                               "server/middleware/authorize.js",
+                                                               "server/middleware/validate.js",
+                                                               "server/schemas/calendar.schema.js"
+                                                           ],
+                      "client/src/hooks/useCalendar.js":  [
+                                                              "client/src/utils/api.js"
+                                                          ],
+                      ".claude/skills/speckit-constitution/SKILL.md":  [
+
+                                                                       ],
+                      "prisma/migrations/20260610000001_duty_slot_unique_constraint/migration.sql":  [
+
+                                                                                                     ],
+                      "client/src/hooks/useSyncQueue.js":  [
+
+                                                           ],
+                      "client/src/pages/auth/LoginPage.jsx":  [
+                                                                  "client/src/hooks/useAuth.js",
+                                                                  "client/src/utils/constants.js"
+                                                              ],
+                      ".claude/skills/speckit-specify/SKILL.md":  [
+
+                                                                  ],
+                      ".claude/skills/speckit-analyze/SKILL.md":  [
+
+                                                                  ],
+                      "client/src/pages/shared/MessagesPage.jsx":  [
+                                                                       "client/src/components/ComposeDrawer.jsx",
+                                                                       "client/src/components/Layout.jsx",
+                                                                       "client/src/components/ui/Pagination.jsx",
+                                                                       "client/src/components/ui/Toast.jsx",
+                                                                       "client/src/hooks/useMessages.js"
+                                                                   ],
+                      ".claude/skills/SIMS DMS Design System/_ds_manifest.json":  [
+
+                                                                                  ],
+                      ".claude/skills/SIMS DMS Design System/components/forms/forms.card.html":  [
+
+                                                                                                 ],
+                      ".claude/skills/SIMS DMS Design System/components/patterns/patterns.card.html":  [
+
+                                                                                                       ],
+                      ".claude/skills/SIMS DMS Design System/guidelines/type-scale.card.html":  [
+
+                                                                                                ],
+                      ".specify/extensions/git/commands/speckit.git.commit.md":  [
+
+                                                                                 ],
+                      ".claude/skills/SIMS DMS Design System/guidelines/spacing-shadows.card.html":  [
+
+                                                                                                     ],
+                      "client/src/pages/admin/UsersPage.jsx":  [
+                                                                   "client/src/components/CreateUserDrawer.jsx",
+                                                                   "client/src/components/Layout.jsx",
+                                                                   "client/src/components/ui/Badge.jsx",
+                                                                   "client/src/components/ui/ConfirmDialog.jsx",
+                                                                   "client/src/components/ui/Pagination.jsx",
+                                                                   "client/src/components/ui/Table.jsx",
+                                                                   "client/src/components/ui/Toast.jsx",
+                                                                   "client/src/hooks/useInvites.js",
+                                                                   "client/src/hooks/useUsers.js"
+                                                               ],
+                      ".specify/scripts/powershell/setup-plan.ps1":  [
+
+                                                                     ],
+                      ".claude/skills/SIMS DMS Design System/guidelines/type-families.card.html":  [
+
+                                                                                                   ],
+                      ".specify/extensions/agent-context/commands/speckit.agent-context.update.md":  [
+
+                                                                                                     ],
+                      "prisma/migrations/20260613173500_add_last_password_reset_at/migration.sql":  [
+
+                                                                                                    ],
+                      "server/vitest.config.mjs":  [
+
+                                                   ],
+                      ".github/workflows/ci.yml":  [
+
+                                                   ],
+                      "specs/001-auth-user-accounts/plan.md":  [
+
+                                                               ],
+                      "client/src/components/ui/Badge.jsx":  [
+                                                                 "client/src/utils/constants.js"
+                                                             ],
+                      "client/src/pages/admin/AdminDashboardPage.jsx":  [
+                                                                            "client/src/components/Layout.jsx",
+                                                                            "client/src/components/ui/Alert.jsx",
+                                                                            "client/src/components/ui/Badge.jsx",
+                                                                            "client/src/components/ui/StatCard.jsx",
+                                                                            "client/src/hooks/useAttendance.js",
+                                                                            "client/src/hooks/useCoverRequests.js",
+                                                                            "client/src/hooks/useReports.js",
+                                                                            "client/src/hooks/useUsers.js",
+                                                                            "client/src/utils/constants.js"
+                                                                        ],
+                      "client/src/pages/NotificationsPage.jsx":  [
+                                                                     "client/src/components/Breadcrumb.jsx",
+                                                                     "client/src/components/Layout.jsx",
+                                                                     "client/src/components/ui/Pagination.jsx",
+                                                                     "client/src/components/ui/Skeleton.jsx",
+                                                                     "client/src/components/ui/Table.jsx",
+                                                                     "client/src/components/ui/Toast.jsx",
+                                                                     "client/src/utils/constants.js"
+                                                                 ],
+                      ".env.example":  [
+
+                                       ],
+                      "client/src/components/ui/EmptyState.jsx":  [
+
+                                                                  ],
+                      "server/schemas/violation-types.schema.js":  [
+
+                                                                   ],
+                      ".specify/integration.json":  [
+
+                                                    ],
+                      "server/controllers/messages.controller.js":  [
+                                                                        "server/lib/prisma.js"
+                                                                    ],
+                      "client/src/components/Layout.jsx":  [
+                                                               "client/src/components/Layout.module.css",
+                                                               "client/src/hooks/useAuth.js",
+                                                               "client/src/utils/constants.js"
+                                                           ],
+                      ".specify/extensions/agent-context/README.md":  [
+
+                                                                      ],
+                      "railway.toml":  [
+
+                                       ],
+                      "server/index.js":  [
+                                              "server/lib/cron.js",
+                                              "server/lib/logger.js",
+                                              "server/lib/prisma.js",
+                                              "server/middleware/csrf.js",
+                                              "server/routes/admin.routes.js",
+                                              "server/routes/attendance.routes.js",
+                                              "server/routes/auth.routes.js",
+                                              "server/routes/bot.routes.js",
+                                              "server/routes/calendar.routes.js",
+                                              "server/routes/cover-requests.routes.js",
+                                              "server/routes/duty-slots.routes.js",
+                                              "server/routes/invites.routes.js",
+                                              "server/routes/messages.routes.js",
+                                              "server/routes/reports.routes.js",
+                                              "server/routes/students.routes.js",
+                                              "server/routes/users.routes.js",
+                                              "server/routes/violation-types.routes.js",
+                                              "server/routes/violations.routes.js"
+                                          ],
+                      "client/src/hooks/useInvites.js":  [
+                                                             "client/src/utils/api.js"
+                                                         ],
+                      "client/src/hooks/useDutySlots.js":  [
+                                                               "client/src/utils/api.js"
+                                                           ],
+                      "client/src/components/ui/StatCard.jsx":  [
+
+                                                                ],
+                      "server/controllers/cover-requests.controller.js":  [
+                                                                              "server/lib/logger.js",
+                                                                              "server/lib/prisma.js",
+                                                                              "server/lib/telegram.js",
+                                                                              "server/services/settings.service.js"
+                                                                          ],
+                      "server/tests/auth.test.mjs":  [
+
+                                                     ],
+                      "server/routes/auth.routes.js":  [
+                                                           "server/controllers/auth.controller.js",
+                                                           "server/middleware/asyncHandler.js",
+                                                           "server/middleware/authenticate.js",
+                                                           "server/middleware/validate.js",
+                                                           "server/schemas/auth.schema.js"
+                                                       ],
+                      ".claude/skills/SIMS DMS Design System/ui_kits/faculty-pwa/index.html":  [
+
+                                                                                               ],
+                      "client/src/components/ProtectedRoute.jsx":  [
+
+                                                                   ],
+                      ".claude/skills/SIMS DMS Design System/ui_kits/faculty-pwa/shell.jsx":  [
+
+                                                                                              ],
+                      ".claude/skills/SIMS DMS Design System/components/core/StatCard.jsx":  [
+
+                                                                                             ],
+                      ".specify/extensions/git/scripts/powershell/initialize-repo.ps1":  [
+
+                                                                                         ],
+                      "client/src/hooks/useDebounce.js":  [
+
+                                                          ],
+                      ".specify/extensions/git/scripts/bash/git-common.sh":  [
+
+                                                                             ],
+                      ".claude/skills/speckit-checklist/SKILL.md":  [
+
+                                                                    ],
+                      "server/routes/cover-requests.routes.js":  [
+                                                                     "server/controllers/cover-requests.controller.js",
+                                                                     "server/middleware/asyncHandler.js",
+                                                                     "server/middleware/authenticate.js",
+                                                                     "server/middleware/authorize.js",
+                                                                     "server/middleware/validate.js",
+                                                                     "server/schemas/cover-requests.schema.js"
+                                                                 ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Avatar.d.ts":  [
+
+                                                                                            ],
+                      ".claude/skills/SIMS DMS Design System/components/core/StatCard.prompt.md":  [
+
+                                                                                                   ],
+                      "prisma/migrations/20260610000002_message_indexes/migration.sql":  [
+
+                                                                                         ],
+                      "client/src/hooks/useMessages.js":  [
+                                                              "client/src/utils/api.js"
+                                                          ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Table.d.ts":  [
+
+                                                                                           ],
+                      ".claude/skills/SIMS DMS Design System/guidelines/colors-brand.card.html":  [
+
+                                                                                                  ],
+                      ".specify/memory/constitution.md":  [
+
+                                                          ],
+                      "client/src/components/ErrorBoundary.jsx":  [
+
+                                                                  ],
+                      "server/controllers/attendance.controller.js":  [
+                                                                          "server/lib/prisma.js",
+                                                                          "server/lib/time.js",
+                                                                          "server/services/settings.service.js"
+                                                                      ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Avatar.prompt.md":  [
+
+                                                                                                 ],
+                      "server/schemas/duty-slots.schema.js":  [
+
+                                                              ],
+                      "server/lib/prisma.js":  [
+
+                                               ],
+                      ".specify/scripts/powershell/check-prerequisites.ps1":  [
+
+                                                                              ],
+                      "client/src/components/PWAUpdatePrompt.jsx":  [
+
+                                                                    ],
+                      "README.md":  [
+
+                                    ],
+                      "server/controllers/violations.controller.js":  [
+                                                                          "server/lib/prisma.js",
+                                                                          "server/lib/time.js"
+                                                                      ],
+                      "server/controllers/reports.controller.js":  [
+                                                                       "server/lib/prisma.js"
+                                                                   ],
+                      ".understand-anything/.understandignore":  [
+
+                                                                 ],
+                      "server/middleware/asyncHandler.js":  [
+
+                                                            ],
+                      ".specify/scripts/powershell/setup-tasks.ps1":  [
+
+                                                                      ],
+                      ".specify/extensions/git/scripts/bash/initialize-repo.sh":  [
+
+                                                                                  ],
+                      ".claude/skills/SIMS DMS Design System/components/core/core.card.html":  [
+
+                                                                                               ],
+                      "client/src/hooks/useReports.js":  [
+                                                             "client/src/utils/api.js"
+                                                         ],
+                      "server/schemas/reports.schema.js":  [
+
+                                                           ],
+                      "server/controllers/duty-slots.controller.js":  [
+                                                                          "server/lib/logger.js",
+                                                                          "server/lib/prisma.js"
+                                                                      ],
+                      "client/src/pages/faculty/CoverRequestsPage.jsx":  [
+                                                                             "client/src/components/Layout.jsx",
+                                                                             "client/src/components/ui/Badge.jsx",
+                                                                             "client/src/components/ui/FormModal.jsx",
+                                                                             "client/src/components/ui/Table.jsx",
+                                                                             "client/src/components/ui/Toast.jsx",
+                                                                             "client/src/hooks/useCoverRequests.js",
+                                                                             "client/src/hooks/useDutySlots.js"
+                                                                         ],
+                      "client/src/pages/admin/DutySlotsPage.jsx":  [
+                                                                       "client/src/components/Layout.jsx",
+                                                                       "client/src/components/ui/Badge.jsx",
+                                                                       "client/src/components/ui/Table.jsx",
+                                                                       "client/src/hooks/useDutySlots.js"
+                                                                   ],
+                      ".specify/extensions/git/scripts/bash/auto-commit.sh":  [
+
+                                                                              ],
+                      "DEPLOYMENT_VERIFICATION_CHECKLIST.md":  [
+
+                                                               ],
+                      ".claude/skills/speckit-git-initialize/SKILL.md":  [
+
+                                                                         ],
+                      ".specify/templates/checklist-template.md":  [
+
+                                                                   ],
+                      ".claude/skills/SIMS DMS Design System/tokens/spacing.css":  [
+
+                                                                                   ],
+                      "server/middleware/authenticate.js":  [
+                                                                "server/lib/prisma.js"
+                                                            ],
+                      "client/tsconfig.node.json":  [
+
+                                                    ],
+                      "server/lib/telegram.js":  [
+
+                                                 ],
+                      "prisma/schema.prisma":  [
+
+                                               ],
+                      ".claude/skills/SIMS DMS Design System/SKILL.md":  [
+
+                                                                         ],
+                      ".claude/skills/SIMS DMS Design System/tokens/base.css":  [
+
+                                                                                ],
+                      "FRONTEND_ARCHITECTURE_AUDIT.md":  [
+
+                                                         ],
+                      "server/lib/logger.js":  [
+
+                                               ],
+                      "client/src/lib/theme.js":  [
+
+                                                  ],
+                      ".specify/extensions/git/extension.yml":  [
+
+                                                                ],
+                      "server/package.json":  [
+
+                                              ],
+                      "server/schemas/users.schema.js":  [
+
+                                                         ],
+                      ".claude/skills/SIMS DMS Design System/guidelines/spacing-radius.card.html":  [
+
+                                                                                                    ],
+                      "client/tailwind.config.js":  [
+
+                                                    ],
+                      "server/schemas/settings.schema.js":  [
+
+                                                            ],
+                      "server/controllers/violation-types.controller.js":  [
+                                                                               "server/lib/prisma.js"
+                                                                           ],
+                      "TESTING_CHECKLIST.md":  [
+
+                                               ],
+                      "client/src/pages/faculty/AttendancePage.jsx":  [
+                                                                          "client/src/components/Layout.jsx",
+                                                                          "client/src/components/ui/Badge.jsx",
+                                                                          "client/src/components/ui/EmptyState.jsx",
+                                                                          "client/src/components/ui/Toast.jsx",
+                                                                          "client/src/hooks/useAttendance.js",
+                                                                          "client/src/hooks/useDutySlots.js"
+                                                                      ],
+                      "client/src/components/ui/Pagination.jsx":  [
+
+                                                                  ],
+                      ".claude/skills/SIMS DMS Design System/components/patterns/MobileCard.prompt.md":  [
+
+                                                                                                         ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Card.prompt.md":  [
+
+                                                                                               ],
+                      ".claude/skills/SIMS DMS Design System/templates/faculty-app/shell.jsx":  [
+
+                                                                                                ],
+                      ".specify/extensions/agent-context/scripts/bash/update-agent-context.sh":  [
+
+                                                                                                 ],
+                      "client/src/pages/admin/AttendanceLivePage.jsx":  [
+                                                                            "client/src/components/Layout.jsx",
+                                                                            "client/src/components/ui/Badge.jsx",
+                                                                            "client/src/components/ui/FormModal.jsx",
+                                                                            "client/src/components/ui/Toast.jsx",
+                                                                            "client/src/hooks/useAttendance.js"
+                                                                        ],
+                      ".specify/workflows/speckit/workflow.yml":  [
+
+                                                                  ],
+                      "server/schemas/attendance.schema.js":  [
+
+                                                              ],
+                      ".claude/skills/SIMS DMS Design System/tokens/fonts.css":  [
+
+                                                                                 ],
+                      "client/.env.example":  [
+
+                                              ],
+                      "client/index.html":  [
+
+                                            ],
+                      "server/lib/bot.js":  [
+                                                "server/lib/logger.js",
+                                                "server/lib/password.js",
+                                                "server/lib/prisma.js",
+                                                "server/services/audit.service.js"
+                                            ],
+                      "server/schemas/messages.schema.js":  [
+
+                                                            ],
+                      ".claude/skills/speckit-git-validate/SKILL.md":  [
+
+                                                                       ],
+                      "client/src/hooks/useAttendance.js":  [
+                                                                "client/src/utils/api.js"
+                                                            ],
+                      ".specify/extensions/git/scripts/powershell/auto-commit.ps1":  [
+
+                                                                                     ],
+                      "client/README.md":  [
+
+                                           ],
+                      ".claude/skills/SIMS DMS Design System/components/forms/Select.jsx":  [
+
+                                                                                            ],
+                      ".claude/skills/SIMS DMS Design System/components/patterns/MobileCard.d.ts":  [
+
+                                                                                                    ],
+                      "server/schemas/cover-requests.schema.js":  [
+
+                                                                  ],
+                      "prisma/migrations/20260609114500_add_telegram_invite_flow/migration.sql":  [
+
+                                                                                                  ],
+                      "server/routes/messages.routes.js":  [
+                                                               "server/controllers/messages.controller.js",
+                                                               "server/middleware/asyncHandler.js",
+                                                               "server/middleware/authenticate.js",
+                                                               "server/middleware/validate.js",
+                                                               "server/schemas/messages.schema.js"
+                                                           ],
+                      "server/routes/users.routes.js":  [
+                                                            "server/controllers/users.controller.js",
+                                                            "server/middleware/asyncHandler.js",
+                                                            "server/middleware/authenticate.js",
+                                                            "server/middleware/authorize.js",
+                                                            "server/middleware/validate.js",
+                                                            "server/schemas/users.schema.js"
+                                                        ],
+                      "server/middleware/authorize.js":  [
+
+                                                         ],
+                      ".claude/skills/SIMS DMS Design System/ui_kits/admin-desktop/index.html":  [
+
+                                                                                                 ],
+                      "client/eslint.config.js":  [
+
+                                                  ],
+                      ".specify/scripts/powershell/create-new-feature.ps1":  [
+
+                                                                             ],
+                      ".claude/skills/SIMS DMS Design System/components/forms/Select.d.ts":  [
+
+                                                                                             ],
+                      ".claude/skills/SIMS DMS Design System/readme.md":  [
+
+                                                                          ],
+                      "check-admin.sql":  [
+
+                                          ],
+                      "SIMS_API_Endpoints_v2.0.md":  [
+
+                                                     ],
+                      "specs/001-auth-user-accounts/spec.md":  [
+
+                                                               ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Table.jsx":  [
+
+                                                                                          ],
+                      ".claude/skills/SIMS DMS Design System/_adherence.oxlintrc.json":  [
+
+                                                                                         ],
+                      ".claude/skills/SIMS DMS Design System/components/patterns/EmptyState.prompt.md":  [
+
+                                                                                                         ],
+                      "MOBILE_DESIGN_RULES.md":  [
+
+                                                 ],
+                      "package.json":  [
+
+                                       ],
+                      "server/scripts/backfill-passwords.mjs":  [
+                                                                    "server/lib/bot.js",
+                                                                    "server/lib/logger.js",
+                                                                    "server/lib/password.js",
+                                                                    "server/lib/prisma.js"
+                                                                ],
+                      "client/src/lib/cache.js":  [
+
+                                                  ],
+                      ".specify/integrations/speckit.manifest.json":  [
+
+                                                                      ],
+                      ".specify/templates/tasks-template.md":  [
+
+                                                               ],
+                      "client/src/hooks/useStudents.js":  [
+                                                              "client/src/lib/cache.js",
+                                                              "client/src/utils/api.js"
+                                                          ],
+                      ".claude/skills/SIMS DMS Design System/components/feedback/feedback.card.html":  [
+
+                                                                                                       ],
+                      ".specify/extensions/git/commands/speckit.git.feature.md":  [
+
+                                                                                  ],
+                      "client/src/pages/admin/ViolationsPage.jsx":  [
+                                                                        "client/src/components/Layout.jsx",
+                                                                        "client/src/components/ui/Badge.jsx",
+                                                                        "client/src/components/ui/ConfirmDialog.jsx",
+                                                                        "client/src/components/ui/FormModal.jsx",
+                                                                        "client/src/components/ui/Pagination.jsx",
+                                                                        "client/src/components/ui/Table.jsx",
+                                                                        "client/src/components/ui/Toast.jsx",
+                                                                        "client/src/hooks/useViolations.js"
+                                                                    ],
+                      ".specify/init-options.json":  [
+
+                                                     ],
+                      ".specify/workflows/workflow-registry.json":  [
+
+                                                                    ],
+                      "client/src/pages/admin/ViolationTypesPage.jsx":  [
+                                                                            "client/src/components/Layout.jsx",
+                                                                            "client/src/components/ui/Badge.jsx",
+                                                                            "client/src/components/ui/Table.jsx",
+                                                                            "client/src/components/ui/Toast.jsx",
+                                                                            "client/src/components/ViolationTypeDrawer.jsx",
+                                                                            "client/src/hooks/useViolationTypes.js"
+                                                                        ],
+                      "client/src/hooks/useViolationTypes.js":  [
+                                                                    "client/src/utils/api.js"
+                                                                ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Card.d.ts":  [
+
+                                                                                          ],
+                      "client/src/pages/admin/CoverRequestsPage.jsx":  [
+                                                                           "client/src/components/Layout.jsx",
+                                                                           "client/src/components/ui/Badge.jsx",
+                                                                           "client/src/components/ui/Pagination.jsx",
+                                                                           "client/src/components/ui/Table.jsx",
+                                                                           "client/src/components/ui/Toast.jsx",
+                                                                           "client/src/hooks/useCoverRequests.js",
+                                                                           "client/src/hooks/useUsers.js"
+                                                                       ],
+                      "client/vite.config.js":  [
+
+                                                ],
+                      ".claude/skills/SIMS DMS Design System/components/core/Badge.jsx":  [
+
+                                                                                          ],
+                      "client/src/pages/faculty/SlotPickerPage.jsx":  [
+                                                                          "client/src/components/Layout.jsx",
+                                                                          "client/src/components/ui/Badge.jsx",
+                                                                          "client/src/components/ui/Toast.jsx",
+                                                                          "client/src/hooks/useDutySlots.js"
+                                                                      ],
+                      "MAJOR_FEATURES_PLAN.md":  [
+
+                                                 ],
+                      "prisma/migrations/20260610000000_phase1_auth_hardening/migration.sql":  [
+
+                                                                                               ],
+                      "DESIGN_FIX_PROMPT.md":  [
+
+                                               ],
+                      "server/schemas/violations.schema.js":  [
+
+                                                              ],
+                      "client/src/components/CreateUserDrawer.jsx":  [
+
+                                                                     ],
+                      "client/src/hooks/useNotifications.js":  [
+
+                                                               ],
+                      "SIMS_Database_Schema_v2.1.md":  [
+
+                                                       ],
+                      "CreateUserDrawer.jsx":  [
+
+                                               ],
+                      "mobile-nav-preview.html":  [
+
+                                                  ],
+                      ".specify/extensions.yml":  [
+
+                                                  ],
+                      "client/src/pages/admin/ReportsPage.jsx":  [
+                                                                     "client/src/components/Layout.jsx",
+                                                                     "client/src/components/ui/Badge.jsx",
+                                                                     "client/src/components/ui/Table.jsx",
+                                                                     "client/src/hooks/useReports.js"
+                                                                 ],
+                      ".claude/skills/SIMS DMS Design System/tokens/typography.css":  [
+
+                                                                                      ],
+                      "server/controllers/calendar.controller.js":  [
+                                                                        "server/lib/logger.js",
+                                                                        "server/lib/prisma.js",
+                                                                        "server/lib/telegram.js",
+                                                                        "server/services/audit.service.js"
+                                                                    ],
+                      "server/schemas/calendar.schema.js":  [
+
+                                                            ],
+                      "server/controllers/auth.controller.js":  [
+                                                                    "server/lib/cookieOptions.js",
+                                                                    "server/lib/logger.js",
+                                                                    "server/lib/prisma.js",
+                                                                    "server/services/audit.service.js"
+                                                                ],
+                      ".claude/skills/speckit-agent-context-update/SKILL.md":  [
+
+                                                                               ],
+                      "server/routes/attendance.routes.js":  [
+                                                                 "server/controllers/attendance.controller.js",
+                                                                 "server/middleware/asyncHandler.js",
+                                                                 "server/middleware/authenticate.js",
+                                                                 "server/middleware/authorize.js",
+                                                                 "server/middleware/validate.js",
+                                                                 "server/schemas/attendance.schema.js"
+                                                             ],
+                      "server/middleware/validateQuery.js":  [
+
+                                                             ],
+                      ".claude/skills/SIMS DMS Design System/components/patterns/MobileCard.jsx":  [
+
+                                                                                                   ],
+                      ".claude/skills/SIMS DMS Design System/guidelines/colors-surfaces.card.html":  [
+
+                                                                                                     ],
+                      ".claude/skills/SIMS DMS Design System/styles.css":  [
+
+                                                                           ],
+                      ".claude/skills/SIMS DMS Design System/ui_kits/admin-desktop/AdminShell.jsx":  [
+
+                                                                                                     ],
+                      "server/lib/password.js":  [
+
+                                                 ],
+                      ".claude/skills/SIMS DMS Design System/_ds_bundle.js":  [
+
+                                                                              ],
+                      ".claude/skills/SIMS DMS Design System/templates/faculty-app/index.html":  [
+
+                                                                                                 ],
+                      "client/scripts/generate-icons.mjs":  [
+
+                                                            ],
+                      "TELEGRAM_WEBHOOK_REGISTRATION_GUIDE.md":  [
+
+                                                                 ]
+                  }
+}

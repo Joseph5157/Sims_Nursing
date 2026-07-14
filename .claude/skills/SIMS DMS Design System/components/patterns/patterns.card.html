@@ -1,0 +1,52 @@
+<!-- @dsCard group="Components" viewport="700x380" name="Patterns — Rows, Sections, Empty, Brand" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; background: var(--surface-page); padding: 24px; font-family: var(--font-sans); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  .list { background: #fff; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+  .panel { background: #fff; border-radius: 16px; border: 1px solid var(--border); }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { MobileCard, Badge, SectionHeader, EmptyState, BrandMark, Button } = window.SIMSDMSDesignSystem_019e12;
+  function Demo() {
+    return (
+      <div>
+        <div className="cols">
+          <div>
+            <SectionHeader title="Faculty" action={<a href="#" style={{ fontSize: 12, color: 'var(--brand)', textDecoration: 'none', fontWeight: 600 }}>See all →</a>} />
+            <div className="list">
+              <MobileCard primary="Priya Sharma" secondary="Faculty · Pharmaceutics" badge={<Badge status="active" />} onClick={() => {}} />
+              <MobileCard primary="Anil Kumar" secondary="Morning · 12 Mar" badge={<Badge status="late" />} onClick={() => {}} />
+              <MobileCard primary="Reena Joseph" secondary="Awaiting Telegram link" badge={<Badge status="pending_telegram" />} onClick={() => {}} />
+            </div>
+          </div>
+          <div>
+            <SectionHeader title="Empty state" />
+            <div className="panel">
+              <EmptyState emoji="📅" title="No duty today" subtitle="Check your upcoming slots below" action={<Button variant="secondary" size="sm">Pick slots</Button>} />
+            </div>
+            <SectionHeader title="Brand mark" />
+            <div className="panel" style={{ padding: 18, display: 'flex', gap: 20, alignItems: 'center' }}>
+              <BrandMark size="lg" glow />
+              <BrandMark showWordmark />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

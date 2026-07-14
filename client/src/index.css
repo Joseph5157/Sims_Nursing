@@ -1,0 +1,697 @@
+/* ── Tailwind v4 ── */
+@import "tailwindcss";
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Active press feedback ── */
+[data-primary]:not(:disabled) {
+  transition: transform 0.1s ease, opacity 0.1s ease, box-shadow 0.15s ease;
+}
+[data-primary]:not(:disabled):active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+/* ── Fonts ── */
+@import "@fontsource/dm-sans/400.css";
+@import "@fontsource/dm-sans/500.css";
+@import "@fontsource/dm-sans/600.css";
+@import "@fontsource/dm-sans/700.css";
+@import "@fontsource/dm-mono/400.css";
+
+/* ── Dark mode variant ── */
+@custom-variant dark (&:is(.dark *));
+
+/* ── Design system tokens — all Tailwind utilities flow from here ── */
+@theme {
+  /* Typography families */
+  --font-sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'DM Mono', 'Courier New', ui-monospace, monospace;
+
+  /* ── Brand blue ramp ── */
+  --color-blue-50:  #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bfdbfe;
+  --color-blue-300: #93c5fd;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+  --color-blue-800: #1e40af;
+  --color-blue-900: #1e3a8a;
+  --color-indigo-50:  #e0e7ff;
+  --color-indigo-100: #e0e7ff;
+  --color-indigo-500: #6366f1;
+  --color-indigo-600: #4f46e5;
+
+  /* ── Secondary accent role (indigo — already lived in --brand-gradient; now a
+     full first-class tint family like the status colors, for M3-style continuity) ── */
+  --color-indigo-bg:     #eef2ff;
+  /* NOTE: no --color-indigo-tint. Nothing references it, so Tailwind tree-shakes
+     the light-mode @theme declaration and only the html.dark override would ship —
+     leaving a token that's empty in light and colored in dark. If indigo ever needs
+     a full tint family, add -tint here AND reference it (see specs/color-system-notes.md). */
+  --color-indigo-text:   #3730a3;
+  --color-indigo-solid:  #6366f1;
+  --color-indigo-border: #c7d2fe;
+
+  /* primary-* aliases kept for existing Tailwind classes */
+  --color-primary-50:  #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+
+  /* ── Slate neutrals ── */
+  --color-slate-50:  #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+
+  /* ── Status color families ── */
+  --color-emerald-bg:     #f0fdf4;
+  --color-emerald-tint:   #d1fae5;
+  --color-emerald-text:   #065f46;
+  --color-emerald-solid:  #10b981;
+  --color-emerald-600:    #059669;
+  --color-emerald-700:    #047857;
+  --color-emerald-border: #bbf7d0;
+
+  --color-amber-bg:     #fffbeb;
+  --color-amber-tint:   #fde68a;
+  --color-amber-text:   #92400e;
+  --color-amber-solid:  #f59e0b;
+  --color-amber-600:    #d97706;
+  --color-amber-700:    #b45309;
+  --color-amber-border: #fde68a;
+
+  --color-red-bg:     #fef2f2;
+  --color-red-tint:   #fecaca;
+  --color-red-text:   #991b1b;
+  --color-red-solid:  #ef4444;
+  --color-red-600:    #dc2626;
+  --color-red-700:    #b91c1c;
+  --color-red-border: #fecaca;
+
+  --color-cyan-bg:     #ecfeff;
+  --color-cyan-tint:   #a5f3fc;
+  --color-cyan-text:   #0e7490;
+  --color-cyan-solid:  #06b6d4;
+  --color-cyan-600:    #0891b2;
+  --color-cyan-700:    #0369a1;
+  --color-cyan-border: #a5f3fc;
+
+  --color-purple-bg:     #f5f3ff;
+  --color-purple-tint:   #ddd6fe;
+  --color-purple-text:   #5b21b6;
+  --color-purple-solid:  #8b5cf6;
+  --color-purple-border: #ddd6fe;
+
+  --color-orange-bg:     #fff7ed;
+  --color-orange-tint:   #fed7aa;
+  --color-orange-text:   #c2410c;
+  --color-orange-solid:  #f97316;
+  --color-orange-border: #fed7aa;
+
+  /* ── Semantic surface / text tokens (generate bg-surface, text-text-primary, etc.) ── */
+  --color-surface:             #f8fafc;
+  --color-card:                #ffffff;
+  /* M3 tonal elevation tiers — in @theme so bg-surface-container-* utilities exist
+     (single source of truth; dark values overridden in html.dark below). */
+  --color-surface-container-low:  #f4f7fd;
+  --color-surface-container:      #e9f0fb;
+  --color-sidebar:             #0f172a;
+  --color-sidebar-hover:       #1e293b;
+  --color-sidebar-border:      #1e293b;
+  --color-sidebar-active:      #2563eb;
+  --color-sidebar-text:        #94a3b8;
+  --color-sidebar-text-active: #ffffff;
+  --color-border:              #e2e8f0;
+  --color-border-strong:       #cbd5e1;
+  --color-divider:             #f1f5f9;
+  --color-text-primary:        #0f172a;
+  --color-text-secondary:      #475569;
+  --color-text-muted:          #64748b; /* slate-500 — AA-compliant muted text on white (~4.6:1) */
+  --color-text-on-dark:        #f1f5f9;
+
+  /* Status shorthand aliases */
+  --color-success:        #10b981;
+  --color-warning:        #f59e0b;
+  --color-danger:         #ef4444;
+  --color-info:           #3b82f6;
+  --color-success-bg:     #f0fdf4;
+  --color-success-text:   #065f46;
+  --color-success-border: #bbf7d0;
+  --color-warning-bg:     #fffbeb;
+  --color-warning-text:   #92400e;
+  --color-warning-border: #fde68a;
+  --color-danger-bg:      #fef2f2;
+  --color-danger-text:    #991b1b;
+  --color-danger-border:  #fecaca;
+
+  /* ── Radius (px — aligned to DS) ──
+     rounded-xl: 14px (cards, inputs)
+     rounded-2xl: 16px (mobile containers, hero panels) */
+  --radius-sm:    6px;
+  --radius-md:    8px;
+  --radius-lg:    12px;
+  --radius-xl:    14px;
+  --radius-2xl:   16px;
+  --radius-3xl:   20px;
+  --radius-sheet: 28px;
+  --radius-full:  9999px;
+
+  /* ── Shadows ── */
+  --shadow-card:     0 1px 3px rgb(15 23 42 / 0.07), 0 8px 18px -6px rgb(15 23 42 / 0.12);
+  --shadow-stat:     0 1px 2px rgb(15 23 42 / 0.06), 0 4px 10px -3px rgb(15 23 42 / 0.11);
+  --shadow-dropdown: 0 4px 16px -2px rgb(0 0 0 / 0.12), 0 2px 8px -2px rgb(0 0 0 / 0.08);
+  --shadow-toast:    0 4px 16px -2px rgb(0 0 0 / 0.10);
+  --shadow-modal:    0 20px 60px -12px rgb(0 0 0 / 0.25), 0 8px 24px -8px rgb(0 0 0 / 0.15);
+  --shadow-sheet:    0 -8px 40px rgba(0, 0, 0, 0.25);
+  --shadow-brand:    0 8px 32px rgba(59, 130, 246, 0.35);
+}
+
+/* ── Semantic aliases + non-Tailwind DS tokens ── */
+:root {
+  /* ── DS raw ramp aliases — match the design system token names exactly so
+     var(--blue-500), var(--slate-400), var(--emerald-bg) etc. all resolve ── */
+  --blue-50:  #eff6ff; --blue-100: #dbeafe; --blue-200: #bfdbfe;
+  --blue-300: #93c5fd; --blue-400: #60a5fa; --blue-500: #3b82f6;
+  --blue-600: #2563eb; --blue-700: #1d4ed8; --blue-800: #1e40af;
+  --indigo-500: #6366f1; --indigo-600: #4f46e5;
+
+  --slate-50: #f8fafc; --slate-100: #f1f5f9; --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1; --slate-400: #94a3b8; --slate-500: #64748b;
+  --slate-600: #475569; --slate-700: #334155; --slate-800: #1e293b;
+  --slate-900: #0f172a;
+
+  --emerald-bg: #f0fdf4; --emerald-tint: #d1fae5; --emerald-text: #065f46;
+  --emerald-solid: #10b981; --emerald-border: #bbf7d0;
+
+  --amber-bg: #fffbeb; --amber-tint: #fde68a; --amber-text: #92400e;
+  --amber-solid: #f59e0b; --amber-border: #fde68a;
+
+  --red-bg: #fef2f2; --red-tint: #fecaca; --red-text: #991b1b;
+  --red-solid: #ef4444; --red-border: #fecaca;
+
+  --cyan-bg: #ecfeff; --cyan-tint: #a5f3fc; --cyan-text: #0e7490;
+  --cyan-solid: #06b6d4; --cyan-border: #a5f3fc;
+
+  --purple-bg: #f5f3ff; --purple-tint: #ddd6fe; --purple-text: #5b21b6;
+  --purple-solid: #8b5cf6; --purple-border: #ddd6fe;
+
+  --orange-bg: #fff7ed; --orange-tint: #fed7aa; --orange-text: #c2410c;
+  --orange-solid: #f97316; --orange-border: #fed7aa;
+
+  /* Surfaces */
+  --surface-page:          #f8fafc;
+  --surface-card:          #ffffff;
+  --surface-sunken:        #f8fafc;
+  --surface-sidebar:       #0f172a;
+  --surface-sidebar-hover: #1e293b;
+
+  /* Page canvas — a subtle blue-tinted base + soft radial glow from the top, so white
+     cards separate from the background instead of blending into a near-white page.
+     Applied only to the app-shell main (not --surface-page, which stays #f8fafc for
+     within-card headers / sunken tiles that must read against white cards). */
+  --page-canvas: radial-gradient(120% 70% at 50% -10%, #cfd9ec 0%, rgba(207,217,236,0) 60%) #d8e2f0;
+
+  /* Surface elevation tiers (M3-style) now live in @theme as --color-surface-container-*
+     so they generate bg-surface-container-* utilities. See the @theme block above. */
+
+  /* Text */
+  --text-primary:   #0f172a;
+  --text-secondary: #475569;
+  --text-muted:     #64748b; /* slate-500 — AA-compliant muted text on white (~4.6:1) */
+  --text-on-dark:   #f1f5f9;
+  --text-on-brand:  #ffffff;
+
+  /* Brand */
+  --brand:               #2563eb;
+  --brand-hover:         #1d4ed8;
+  --brand-active:        #1e40af;
+  --brand-ring:          rgba(59, 130, 246, 0.30);
+  --brand-gradient:      linear-gradient(135deg, #3b82f6, #6366f1);
+  --brand-gradient-deep: linear-gradient(135deg, #2563eb, #4f46e5);
+
+  /* Borders & dividers */
+  --border:        #e2e8f0;
+  --border-strong: #cbd5e1;
+  --divider:       #f1f5f9;
+
+  /* Status */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger:  #ef4444;
+  --info:    #3b82f6;
+
+  /* ── Typography scale ── */
+  --text-stat:       40px;
+  --text-display:    28px;
+  --text-h2:         22px;
+  --text-page-title: 18px;
+  --text-card-lg:    15px;
+  --text-body:       14px;
+  --text-card:       13px;
+  --text-small:      12px;
+  --text-micro:      11px;
+  --text-nano:       9px;
+
+  /* Weights */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-extra:    800;
+
+  /* Line heights */
+  --leading-tight:  1.2;
+  --leading-snug:   1.4;
+  --leading-normal: 1.6;
+
+  /* Letter spacing */
+  --tracking-label: 0.06em;
+  --tracking-wide:  0.08em;
+  --tracking-caps:  0.15em;
+  --tracking-tight: -0.02em;
+
+  /* ── Motion ── */
+  --dur-fast:      150ms;
+  --dur-sheet:     280ms;
+  --ease-standard: ease;
+  --ease-sheet:    cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Control sizing ── */
+  --control-min: 44px;
+  --control-h:   40px;
+  --control-sm:  32px;
+  --control-xs:  28px;
+  --tabbar-h:    60px;
+  --sidebar-w:   220px;
+
+  /* ── Spacing scale (4px base) ── */
+  --space-0:   0;
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-3-5: 14px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-7:   28px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+
+  /* Selection */
+  --selection-bg:   #dbeafe;
+  --selection-text: #1e40af;
+}
+
+/* ── Dark mode overrides ── */
+html.dark {
+  /* Surfaces */
+  --surface-page:          #0f172a;
+  --surface-card:          #1e293b;
+  --surface-sunken:        #0f172a;
+  --surface-sidebar:       #0f172a;
+  --surface-sidebar-hover: #1e293b;
+
+  /* Dark mode: cards (#1e293b) already separate clearly from the page (#0f172a),
+     so the canvas stays flat — a bright glow would muddy a dark data screen. */
+  --page-canvas: #0f172a;
+
+  /* Surface elevation tiers — dark mode: progressively brighter/more saturated
+     as elevation increases, same mechanism as light mode. */
+  --color-surface-container-low:  #16213a;
+  --color-surface-container:      #1c2b4a;
+
+  /* Text */
+  --text-primary:   #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted:     #64748b;
+  --text-on-dark:   #f1f5f9;
+  --text-on-brand:  #ffffff;
+
+  /* Colors — inverted for dark mode */
+  --color-surface:             #0f172a;
+  --color-card:                #1e293b;
+  --color-sidebar:             #0f172a;
+  --color-sidebar-hover:       #1e293b;
+  --color-sidebar-border:      #334155;
+  --color-sidebar-active:      #3b82f6;
+  --color-sidebar-text:        #94a3b8;
+  --color-sidebar-text-active: #ffffff;
+  --color-border:              #334155;
+  --color-border-strong:       #475569;
+  --color-divider:             #1e293b;
+  --color-text-primary:        #f1f5f9;
+  --color-text-secondary:      #cbd5e1;
+  --color-text-muted:          #64748b;
+  --color-text-on-dark:        #f1f5f9;
+
+  /* Status colors in dark mode */
+  --color-emerald-bg:     #0d3d2a;
+  --color-emerald-tint:   #1a5f47;
+  --color-emerald-text:   #d1fae5;
+  --color-emerald-solid:  #10b981;
+  --color-emerald-600:    #059669;
+  --color-emerald-700:    #047857;
+  --color-emerald-border: #065f46;
+
+  --color-amber-bg:     #3d2f0c;
+  --color-amber-tint:   #78350f;
+  --color-amber-text:   #fbbf24;
+  --color-amber-solid:  #f59e0b;
+  --color-amber-600:    #d97706;
+  --color-amber-700:    #b45309;
+  --color-amber-border: #78350f;
+
+  --color-red-bg:     #3f0f0f;
+  --color-red-tint:   #7f1d1d;
+  --color-red-text:   #fca5a5;
+  --color-red-solid:  #ef4444;
+  --color-red-600:    #dc2626;
+  --color-red-700:    #b91c1c;
+  --color-red-border: #7f1d1d;
+
+  --color-cyan-bg:     #062e37;
+  --color-cyan-tint:   #0d5a6f;
+  --color-cyan-text:   #a5f3fc;
+  --color-cyan-solid:  #06b6d4;
+  --color-cyan-600:    #0891b2;
+  --color-cyan-700:    #0369a1;
+  --color-cyan-border: #164e63;
+
+  --color-purple-bg:     #2d1b4e;
+  --color-purple-tint:   #4c1d95;
+  --color-purple-text:   #e9d5ff;
+  --color-purple-solid:  #8b5cf6;
+  --color-purple-border: #581c87;
+
+  --color-indigo-bg:     #1e1b4b;
+  --color-indigo-text:   #c7d2fe;
+  --color-indigo-solid:  #6366f1;
+  --color-indigo-border: #4338ca;
+
+  --color-orange-bg:     #431407;
+  --color-orange-tint:   #7c2d12;
+  --color-orange-text:   #fed7aa;
+  --color-orange-solid:  #f97316;
+  --color-orange-border: #7c2d12;
+
+  /* Slate ramp — inverted for dark mode so neutral badges (inactive/cancelled/
+     not_checked_in/hidden), muted body text, and hover surfaces flip instead of
+     rendering as bright light-mode values on a dark background. Low steps (bg)
+     go dark; high steps (text) go light — same philosophy as the status ramps. */
+  --color-slate-50:  #1e293b;
+  --color-slate-100: #334155;
+  --color-slate-200: #475569;
+  --color-slate-300: #64748b;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #cbd5e1;
+  --color-slate-600: #e2e8f0;
+  --color-slate-700: #f1f5f9;
+  --color-slate-800: #f8fafc;
+  --color-slate-900: #f8fafc;
+
+  /* Blue ramp overrides for dark mode */
+  --color-blue-50:  #1e3a5f;
+  --color-blue-100: #1e3a6e;
+  --color-blue-200: #1d4a8a;
+  --color-blue-700: #93c5fd;
+  --color-blue-800: #bfdbfe;
+
+  --blue-50:  #1e3a5f;
+  --blue-100: #1e3a6e;
+  --blue-200: #1d4a8a;
+
+  /* Brands */
+  --brand:               #3b82f6;
+  --brand-hover:         #60a5fa;
+  --brand-active:        #93c5fd;
+  --brand-ring:          rgba(59, 130, 246, 0.30);
+  --brand-gradient:      linear-gradient(135deg, #1e40af, #4f46e5);
+  --brand-gradient-deep: linear-gradient(135deg, #1e3a8a, #312e81);
+
+  /* Borders & dividers */
+  --border:        #334155;
+  --border-strong: #475569;
+  --divider:       #1e293b;
+
+  /* Status in dark mode */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger:  #ef4444;
+  --info:    #3b82f6;
+
+  /* Selection in dark mode */
+  --selection-bg:   #1e40af;
+  --selection-text: #bfdbfe;
+
+  /* Scrollbar dark mode */
+}
+
+/* Dark-aware semantic tokens (not the slate ramp, which now inverts light for dark) */
+html.dark ::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ── Global reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ── Base HTML ── */
+html {
+  width: 100%;
+  height: 100%;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  width: 100%;
+  min-height: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--text-card-lg);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background-color: var(--surface-page);
+}
+
+code, .mono, pre {
+  font-family: var(--font-mono);
+}
+
+#root {
+  min-height: 100dvh;
+  width: 100%;
+}
+
+/* ── Scrollbar styling ── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ── Focus ring ── */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* ── Selection ── */
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+/* ── Transition defaults (scoped to avoid overriding Tailwind transition-* utilities) ── */
+button:not([class*="transition"]),
+a:not([class*="transition"]),
+input:not([class*="transition"]),
+select:not([class*="transition"]),
+textarea:not([class*="transition"]) {
+  transition-property: color, background-color, border-color, box-shadow, opacity;
+  transition-duration: var(--dur-fast);
+  transition-timing-function: var(--ease-standard);
+}
+
+/* ── Utility — card surface ── */
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+}
+
+.card-header {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--divider);
+  background: var(--surface-page);
+}
+
+/* ── Page layout helpers ── */
+.page-content {
+  padding-top: var(--space-3);
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+  /* safe-area-inset-bottom for iOS home indicator; was 96px for old bottom tab bar */
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--space-6));
+  min-width: 0;
+  min-height: 100%;
+}
+
+@media (min-width: 768px) {
+  .page-content {
+    /* Desktop: generous padding for comfortable reading */
+    padding-top: var(--space-6);
+    padding-left: var(--space-7);
+    padding-right: var(--space-7);
+    padding-bottom: var(--space-10);
+  }
+}
+
+/* ── Typography hierarchy (class-only to avoid overriding Tailwind utilities) ── */
+.h1 {
+  font-size: var(--text-display);    /* 28px */
+  font-weight: var(--weight-extra);  /* 800 */
+  line-height: var(--leading-tight); /* 1.2 */
+}
+
+.h2 {
+  font-size: var(--text-h2);        /* 22px */
+  font-weight: var(--weight-bold);  /* 700 */
+  line-height: var(--leading-snug); /* 1.4 */
+}
+
+.h3 {
+  font-size: var(--text-page-title); /* 18px */
+  font-weight: var(--weight-bold);   /* 700 */
+}
+
+.page-title {
+  font-size: var(--text-page-title); /* 18px */
+  font-weight: var(--weight-bold);   /* 700 */
+  color: var(--text-primary);
+}
+
+.card-title {
+  font-size: var(--text-card-lg);   /* 15px */
+  font-weight: var(--weight-bold);  /* 700 */
+}
+
+.section-title {
+  font-size: var(--text-card);      /* 13px */
+  font-weight: var(--weight-bold);  /* 700 */
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* ── Animations ── */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.animate-spin {
+  animation: spin 0.7s linear infinite;
+}
+
+/* ── Mantine dark mode overrides — sync with our design system ── */
+html.dark .mantine-Paper-root {
+  background-color: var(--surface-card);
+  border-color: var(--border);
+}
+html.dark .mantine-Modal-header {
+  background-color: var(--surface-card);
+}
+html.dark .mantine-Modal-body {
+  background-color: var(--surface-card);
+}
+html.dark .mantine-Modal-title {
+  color: var(--text-primary);
+}
+html.dark .mantine-TextInput-input,
+html.dark .mantine-NumberInput-input,
+html.dark .mantine-Select-input,
+html.dark .mantine-Checkbox-input,
+html.dark .mantine-Textarea-input {
+  background-color: var(--surface-page);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+html.dark .mantine-TextInput-label,
+html.dark .mantine-NumberInput-label,
+html.dark .mantine-Select-label,
+html.dark .mantine-Checkbox-label {
+  color: var(--text-secondary);
+}
+html.dark .mantine-Select-dropdown {
+  background-color: var(--surface-card);
+  border-color: var(--border);
+}
+html.dark .mantine-Select-option[data-combobox-option] {
+  color: var(--text-primary);
+}
+html.dark .mantine-Select-option[data-combobox-selected] {
+  background-color: var(--color-blue-900);
+}
+html.dark .mantine-Select-option:hover {
+  background-color: var(--surface-page);
+}
+html.dark .mantine-AppShell-main {
+  background-color: var(--surface-page);
+}
+html.dark .mantine-Drawer-content {
+  background-color: var(--surface-card);
+}
+html.dark .mantine-Drawer-header {
+  background-color: var(--surface-card);
+}
+html.dark .mantine-Menu-dropdown {
+  background-color: var(--surface-card);
+  border-color: var(--border);
+}
+html.dark .mantine-Menu-item {
+  color: var(--text-primary);
+}
+html.dark .mantine-Menu-item:hover {
+  background-color: var(--surface-page);
+}

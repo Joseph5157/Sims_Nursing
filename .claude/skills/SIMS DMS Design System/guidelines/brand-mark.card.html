@@ -1,0 +1,31 @@
+<!-- @dsCard group="Brand" viewport="700x200" name="App mark" subtitle="Graduation cap on a blue→indigo gradient tile" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--surface-card); padding: 26px 30px; font-family: var(--font-sans); display: flex; align-items: center; gap: 34px; }
+  .mark { width: 72px; height: 72px; border-radius: 20px; background: var(--brand-gradient); display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: var(--shadow-brand); flex-shrink: 0; }
+  .mark.sm { width: 28px; height: 28px; border-radius: 8px; font-size: 14px; box-shadow: none; }
+  .lockup { display: flex; align-items: center; gap: 10px; }
+  .wordmark { font-size: 18px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.01em; }
+  .kicker { font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 4px; }
+  .info { display: flex; flex-direction: column; gap: 12px; }
+  .sub { font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="mark">🎓</div>
+  <div class="info">
+    <div>
+      <div class="kicker">SIMS College of Pharmacy</div>
+      <div class="lockup">
+        <div class="mark sm">🎓</div>
+        <span class="wordmark">SIMS DMS</span>
+      </div>
+    </div>
+    <div class="sub">Discipline Management System · the mark pairs the cap glyph with the brand gradient. No standalone logotype file — rebuild from tokens.</div>
+  </div>
+</body>
+</html>

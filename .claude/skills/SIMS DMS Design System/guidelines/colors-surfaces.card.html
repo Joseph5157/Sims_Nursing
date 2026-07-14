@@ -1,0 +1,36 @@
+<!-- @dsCard group="Colors" viewport="700x150" name="Surfaces & text" subtitle="Page, card, sidebar surfaces and the text ramp" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--surface-card); padding: 18px 26px; font-family: var(--font-sans); display: flex; gap: 14px; }
+  .col { flex: 1; }
+  .lab { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 8px; }
+  .surfaces { display: flex; flex-direction: column; gap: 6px; }
+  .s { height: 26px; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; font-size: 11px; font-family: var(--font-mono); }
+  .txt { display: flex; flex-direction: column; gap: 6px; }
+  .t { font-size: 15px; }
+</style>
+</head>
+<body>
+  <div class="col">
+    <div class="lab">Surfaces</div>
+    <div class="surfaces">
+      <div class="s" style="background:var(--surface-page);color:var(--text-secondary)">page · #f8fafc</div>
+      <div class="s" style="background:var(--surface-card);color:var(--text-secondary)">card · #ffffff</div>
+      <div class="s" style="background:var(--surface-sidebar);color:var(--text-on-dark);border-color:var(--slate-800)">sidebar · #0f172a</div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="lab">Text ramp</div>
+    <div class="txt">
+      <span class="t" style="color:var(--text-primary);font-weight:600">Primary — slate 900</span>
+      <span class="t" style="color:var(--text-secondary)">Secondary — slate 600</span>
+      <span class="t" style="color:var(--text-muted)">Muted — slate 400</span>
+      <span class="t" style="color:var(--brand);font-weight:600">Brand link — blue 600</span>
+    </div>
+  </div>
+</body>
+</html>

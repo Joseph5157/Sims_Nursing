@@ -1,0 +1,487 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../server/node_modules/@prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  super_admin
+  admin
+  faculty
+}
+
+enum UserStatus {
+  pending_telegram
+  pending
+  active
+  inactive
+}
+
+enum SessionType {
+  morning
+  afternoon
+}
+
+enum SlotStatus {
+  scheduled
+  completed
+  absent
+}
+
+enum AttendanceInStatus {
+  normal
+  late
+  absent
+}
+
+enum AttendanceOutStatus {
+  normal
+  auto
+}
+
+enum RecordStatus {
+  active
+  hidden
+}
+
+enum ViolationChangeType {
+  created
+  edited
+  hidden
+  flagged
+  flag_resolved
+}
+
+// ─── 1. Users ─────────────────────────────────────────────────────────────────
+
+model User {
+  id                             String     @id @default(uuid())
+  name                           String     @db.VarChar(150)
+  email                          String     @unique @db.VarChar(200)
+  phone                          String?    @db.VarChar(20)
+  role                           Role
+  department                     String?    @db.VarChar(100)
+  designation                    String?    @db.VarChar(100)
+  // Salutation shown in dashboard greetings — "Dr.", "Prof.", "Mr.", etc. Distinct from
+  // designation (job title); free text so it fits any convention the college uses.
+  title                          String?    @db.VarChar(20)
+  // One of: male_professor, female_professor, admin, super_admin. Null = initials fallback.
+  avatar                         String?    @db.VarChar(30)
+  telegram_id                    String?    @unique @db.VarChar(50)
+  telegram_verified              Boolean    @default(false)
+  otp_failed_attempts            Int        @default(0) @db.SmallInt
+  password_hash                  String?    @db.VarChar(255)
+  must_change_password           Boolean    @default(true)
+  session_version                Int        @default(0)
+  status                         UserStatus @default(pending)
+  approved_at                    DateTime?
+  approved_by                    String?
+  last_password_reset_at         DateTime?
+  activation_notification_failed Boolean    @default(false)
+  deleted_at                     DateTime?
+  created_at                     DateTime   @default(now())
+  updated_at                     DateTime   @updatedAt
+
+  approver                 User?                     @relation("ApprovedBy", fields: [approved_by], references: [id])
+  approvedUsers            User[]                    @relation("ApprovedBy")
+  issuedInvites            PendingInvite[]           @relation("IssuedInvites")
+  relinkTokens             TelegramRelinkToken[]     @relation("RelinkTokens")
+  createdRelinkTokens      TelegramRelinkToken[]     @relation("CreatedRelinkTokens")
+  dutySlots                DutySlot[]                @relation("FacultyDutySlots")
+  createdDutySlots         DutySlot[]                @relation("CreatedDutySlots")
+  attendance               DutyAttendance[]          @relation("FacultyAttendance")
+  overriddenAttendance     DutyAttendance[]          @relation("OverriddenAttendance")
+  violations               Violation[]               @relation("RecordedViolations")
+  flagResolvedViolations   Violation[]               @relation("FlagResolvedViolations")
+  violationAuditLogs       ViolationAuditLog[]
+  adminAuditLogsAsActor    AdminAuditLog[]           @relation("AuditActor")
+  reassignmentsFrom        DutyReassignment[]        @relation("ReassignedFrom")
+  reassignmentsTo          DutyReassignment[]        @relation("ReassignedTo")
+  reassignmentsMade        DutyReassignment[]        @relation("ReassignedBy")
+  reassignmentRequestsFrom DutyReassignmentRequest[] @relation("RequestFrom")
+  reassignmentRequestsTo   DutyReassignmentRequest[] @relation("RequestTo")
+  reassignmentResponses    DutyReassignmentRequest[] @relation("RespondedBy")
+  calendarOpened           CalendarConfig[]
+  messagesSent             Message[]                 @relation("MessageSender")
+  messagesReceived         Message[]                 @relation("MessageReceiver")
+  photoAccessLogs          PhotoAccessLog[]
+  studentUploadLogs        StudentUploadLog[]
+  violationTypes           ViolationType[]
+  systemConfigUpdates      SystemConfig[]
+
+  @@map("users")
+}
+
+// ─── 2. Pending Invites ──────────────────────────────────────────────────
+
+model PendingInvite {
+  id                String   @id @default(uuid())
+  name              String   @db.VarChar(150)
+  email             String   @unique @db.VarChar(200)
+  phone             String?  @db.VarChar(20)
+  role              Role
+  department        String?  @db.VarChar(100)
+  designation       String?  @db.VarChar(100)
+  title             String?  @db.VarChar(20)
+  invite_token      String   @unique @db.VarChar(100)
+  invite_expires_at DateTime
+  invited_by        String
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  inviter User @relation("IssuedInvites", fields: [invited_by], references: [id])
+
+  @@map("pending_invites")
+}
+
+// ─── 2a. Telegram Relink Tokens ───────────────────────────────────────────
+
+model TelegramRelinkToken {
+  id         String    @id @default(uuid())
+  user_id    String
+  token      String    @unique @db.VarChar(100)
+  expires_at DateTime
+  used_at    DateTime?
+  created_by String
+  created_at DateTime  @default(now())
+
+  user    User @relation("RelinkTokens", fields: [user_id], references: [id])
+  creator User @relation("CreatedRelinkTokens", fields: [created_by], references: [id])
+
+  @@map("telegram_relink_tokens")
+}
+
+// ─── 3. Students ─────────────────────────────────────────────────────────────
+
+model Student {
+  id                  String    @id @default(uuid())
+  registration_number String    @unique @db.VarChar(50)
+  student_name        String    @db.VarChar(150)
+  course              String    @db.VarChar(20) // b_pharm | pharm_d | m_pharm
+  year                Int // 1–4 (b_pharm/m_pharm) | 1–6 (pharm_d)
+  semester            Int // 1–8 (b_pharm) | 1–12 (pharm_d)
+  batch_year          Int // admission year e.g. 2023
+  gender              String?   @db.VarChar(10) // male | female | other
+  phone               String?   @db.VarChar(20)
+  academic_year       String    @db.VarChar(10) // e.g. 2025-26
+  status              String    @default("active") @db.VarChar(10)
+  // Legacy fields — kept nullable for backward compat
+  semester_or_year    String?   @db.VarChar(20)
+  institution         String?   @db.VarChar(150)
+  deleted_at          DateTime?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  violations Violation[]
+
+  @@map("students")
+}
+
+// ─── 4. Student Upload Log ───────────────────────────────────────────────────
+
+model StudentUploadLog {
+  id                String   @id @default(uuid())
+  uploaded_by       String
+  filename          String   @db.VarChar(255)
+  added_count       Int      @default(0)
+  updated_count     Int      @default(0)
+  deactivated_count Int      @default(0)
+  errors            Json     @default("[]")
+  uploaded_at       DateTime @default(now())
+
+  uploader User @relation(fields: [uploaded_by], references: [id])
+
+  @@map("student_upload_log")
+}
+
+// ─── 5. Duty Slots ───────────────────────────────────────────────────────────
+
+model DutySlot {
+  id           String      @id @default(uuid())
+  faculty_id   String
+  duty_date    DateTime    @db.Date
+  session_type SessionType
+  status       SlotStatus  @default(scheduled)
+  created_by   String
+  created_at   DateTime    @default(now())
+  updated_at   DateTime    @updatedAt
+
+  faculty User @relation("FacultyDutySlots", fields: [faculty_id], references: [id])
+  creator User @relation("CreatedDutySlots", fields: [created_by], references: [id])
+
+  attendance           DutyAttendance?
+  violations           Violation[]
+  reassignments        DutyReassignment[]
+  reassignmentRequests DutyReassignmentRequest[]
+
+  @@unique([duty_date, session_type])
+  @@index([faculty_id, duty_date])
+  @@map("duty_slots")
+}
+
+// ─── 6. Duty Attendance ──────────────────────────────────────────────────────
+
+model DutyAttendance {
+  id              String              @id @default(uuid())
+  duty_slot_id    String              @unique
+  faculty_id      String
+  in_time         DateTime?
+  out_time        DateTime?
+  in_status       AttendanceInStatus  @default(absent)
+  out_status      AttendanceOutStatus @default(auto)
+  auto_out        Boolean             @default(false)
+  overridden_by   String?
+  override_reason String?             @db.Text
+  created_at      DateTime            @default(now())
+  updated_at      DateTime            @updatedAt
+
+  dutySlot     DutySlot @relation(fields: [duty_slot_id], references: [id])
+  faculty      User     @relation("FacultyAttendance", fields: [faculty_id], references: [id])
+  overriddenBy User?    @relation("OverriddenAttendance", fields: [overridden_by], references: [id])
+
+  @@index([duty_slot_id])
+  @@map("duty_attendance")
+}
+
+// ─── 7. Violation Types ──────────────────────────────────────────────────────
+
+model ViolationType {
+  id           String   @id @default(uuid())
+  name         String   @db.VarChar(150)
+  default_fine Decimal  @db.Decimal(8, 2)
+  is_active    Boolean  @default(true)
+  is_system    Boolean  @default(false)
+  created_by   String
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  creator    User        @relation(fields: [created_by], references: [id])
+  violations Violation[]
+
+  @@map("violation_types")
+}
+
+// ─── 8. Violations ───────────────────────────────────────────────────────────
+// `faculty_id` is the *recorder* — a faculty member on duty, OR an admin who
+// recorded the violation directly (admins have unrestricted recording rights).
+// `duty_slot_id` is null for admin ad-hoc records made outside any duty session;
+// for those, the effective date is `created_at` (see reports date-filter fallback).
+
+model Violation {
+  id                String       @id @default(uuid())
+  student_id        String
+  faculty_id        String
+  duty_slot_id      String?
+  violation_type_id String
+  custom_violation  String?      @db.Text
+  fine_amount       Decimal      @db.Decimal(8, 2)
+  is_warning_only   Boolean      @default(false)
+  remarks           String?      @db.Text
+  is_flagged        Boolean      @default(false)
+  flag_note         String?      @db.Text
+  flag_resolved_by  String?
+  flag_resolved_at  DateTime?
+  record_status     RecordStatus @default(active)
+  photo_path        String?      @db.VarChar(500)
+  photo_expires_at  DateTime?
+  deleted_at        DateTime?
+  created_at        DateTime     @default(now())
+  updated_at        DateTime     @updatedAt
+
+  student       Student       @relation(fields: [student_id], references: [id])
+  faculty       User          @relation("RecordedViolations", fields: [faculty_id], references: [id])
+  dutySlot      DutySlot?     @relation(fields: [duty_slot_id], references: [id])
+  violationType ViolationType @relation(fields: [violation_type_id], references: [id])
+  flagResolver  User?         @relation("FlagResolvedViolations", fields: [flag_resolved_by], references: [id])
+
+  auditLogs       ViolationAuditLog[]
+  photoAccessLogs PhotoAccessLog[]
+
+  @@index([student_id])
+  @@index([faculty_id])
+  @@index([duty_slot_id])
+  @@index([is_flagged])
+  @@index([violation_type_id])
+  @@map("violations")
+}
+
+// ─── 9. Violation Audit Log ──────────────────────────────────────────────────
+
+model ViolationAuditLog {
+  id           String              @id @default(uuid())
+  violation_id String
+  changed_by   String
+  change_type  ViolationChangeType
+  old_data     Json?
+  new_data     Json?
+  reason       String?             @db.Text
+  created_at   DateTime            @default(now())
+
+  violation Violation @relation(fields: [violation_id], references: [id])
+  changedBy User      @relation(fields: [changed_by], references: [id])
+
+  @@map("violation_audit_log")
+}
+
+// ─── 10. Admin Audit Log ─────────────────────────────────────────────────────
+
+model AdminAuditLog {
+  id          String   @id @default(uuid())
+  actor_id    String
+  action      String   @db.VarChar(50)
+  target_id   String?
+  target_type String?  @db.VarChar(50)
+  metadata    Json?
+  created_at  DateTime @default(now())
+
+  actor User @relation("AuditActor", fields: [actor_id], references: [id])
+
+  @@map("admin_audit_log")
+}
+
+// ─── 11. Duty Reassignments ──────────────────────────────────────────────────
+// Admin-controlled duty reassignment. When an admin reassigns a duty slot to a
+// different faculty member, the slot's faculty_id is updated in place and one
+// immutable history row is written here recording who it moved from/to, why, and
+// by which admin. This history drives the "Reassigned Away" / "Reassigned To"
+// views and the reassignment report. duty_date + session_type are denormalised
+// so history survives independently of the (mutated) slot.
+
+model DutyReassignment {
+  id              String      @id @default(uuid())
+  duty_slot_id    String
+  from_faculty_id String
+  to_faculty_id   String
+  duty_date       DateTime    @db.Date
+  session_type    SessionType
+  reason          String?     @db.Text
+  reassigned_by   String
+  created_at      DateTime    @default(now())
+
+  dutySlot     DutySlot @relation(fields: [duty_slot_id], references: [id])
+  fromFaculty  User     @relation("ReassignedFrom", fields: [from_faculty_id], references: [id])
+  toFaculty    User     @relation("ReassignedTo", fields: [to_faculty_id], references: [id])
+  reassignedBy User     @relation("ReassignedBy", fields: [reassigned_by], references: [id])
+
+  @@index([from_faculty_id])
+  @@index([to_faculty_id])
+  @@index([duty_slot_id])
+  @@map("duty_reassignments")
+}
+
+// ─── 11. Duty Reassignment Requests (Faculty-to-Faculty) ──────────────────────
+// Faculty A requests Faculty B to take over a duty slot. Faculty B must approve.
+
+model DutyReassignmentRequest {
+  id              String    @id @default(uuid())
+  duty_slot_id    String
+  from_faculty_id String
+  to_faculty_id   String
+  reason          String?   @db.Text
+  status          String    @default("pending") // pending | approved | declined | cancelled
+  responded_by_id String?
+  response_at     DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  dutySlot    DutySlot @relation(fields: [duty_slot_id], references: [id], onDelete: Cascade)
+  fromFaculty User     @relation("RequestFrom", fields: [from_faculty_id], references: [id])
+  toFaculty   User     @relation("RequestTo", fields: [to_faculty_id], references: [id])
+  respondedBy User?    @relation("RespondedBy", fields: [responded_by_id], references: [id])
+
+  @@index([from_faculty_id])
+  @@index([to_faculty_id])
+  @@index([status])
+  @@map("duty_reassignment_requests")
+}
+
+// ─── 12. Calendar Config ─────────────────────────────────────────────────────
+
+model CalendarConfig {
+  id                   String    @id @default(uuid())
+  config_month         Int       @db.SmallInt
+  config_year          Int       @db.SmallInt
+  blocked_dates        Json      @default("[]")
+  working_days         Json      @default("[]")
+  sessions_per_faculty Int       @default(3) @db.SmallInt
+  is_window_open       Boolean   @default(false)
+  opened_by            String?
+  opened_at            DateTime?
+  closes_at            DateTime?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+
+  openedBy User? @relation(fields: [opened_by], references: [id])
+
+  @@unique([config_month, config_year])
+  @@map("calendar_config")
+}
+
+// ─── 13. Messages ────────────────────────────────────────────────────────────
+
+model Message {
+  id                  String    @id @default(uuid())
+  from_user_id        String
+  to_user_id          String
+  subject             String    @db.VarChar(255)
+  body                String    @db.Text
+  is_read             Boolean   @default(false)
+  read_at             DateTime?
+  deleted_by_sender   Boolean   @default(false)
+  deleted_by_receiver Boolean   @default(false)
+  created_at          DateTime  @default(now())
+
+  sender   User @relation("MessageSender", fields: [from_user_id], references: [id])
+  receiver User @relation("MessageReceiver", fields: [to_user_id], references: [id])
+
+  @@index([to_user_id, created_at])
+  @@index([from_user_id, created_at])
+  @@index([from_user_id])
+  @@index([to_user_id, is_read])
+  @@map("messages")
+}
+
+// ─── 15. System Config ───────────────────────────────────────────────────────
+// Single-row table. Always access via settings.service.js — never query directly.
+
+model SystemConfig {
+  id                            String   @id @default(uuid())
+  session_start_morning_hour    Int      @default(8) @db.SmallInt
+  session_start_morning_min     Int      @default(0) @db.SmallInt
+  session_start_afternoon_hour  Int      @default(13) @db.SmallInt
+  session_start_afternoon_min   Int      @default(0) @db.SmallInt
+  late_threshold_morning_hour   Int      @default(8) @db.SmallInt
+  late_threshold_morning_min    Int      @default(15) @db.SmallInt
+  late_threshold_afternoon_hour Int      @default(13) @db.SmallInt
+  late_threshold_afternoon_min  Int      @default(15) @db.SmallInt
+  auto_checkout_morning_hour    Int      @default(16) @db.SmallInt
+  auto_checkout_morning_min     Int      @default(30) @db.SmallInt
+  auto_checkout_afternoon_hour  Int      @default(16) @db.SmallInt
+  auto_checkout_afternoon_min   Int      @default(30) @db.SmallInt
+  updated_by                    String?
+  updated_at                    DateTime @updatedAt
+
+  updatedBy User? @relation(fields: [updated_by], references: [id])
+
+  @@map("system_config")
+}
+
+// ─── 14. Photo Access Log (Foundation — Phase 2) ─────────────────────────────
+
+model PhotoAccessLog {
+  id           String   @id @default(uuid())
+  violation_id String
+  accessed_by  String
+  accessed_at  DateTime @default(now())
+
+  violation  Violation @relation(fields: [violation_id], references: [id])
+  accessedBy User      @relation(fields: [accessed_by], references: [id])
+
+  @@map("photo_access_log")
+}

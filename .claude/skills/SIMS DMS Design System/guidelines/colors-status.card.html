@@ -1,0 +1,53 @@
+<!-- @dsCard group="Colors" viewport="700x240" name="Status families" subtitle="Tinted bg + ink + solid, as used in badges & stat cards" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--surface-card); padding: 18px 26px; font-family: var(--font-sans); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .fam { border-radius: 12px; padding: 12px 14px; border: 1px solid; }
+  .top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .nm { font-size: 12px; font-weight: 700; }
+  .badge { display: inline-flex; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; letter-spacing: 0.02em; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="fam" style="background:var(--emerald-bg);border-color:var(--emerald-border)">
+      <div class="top"><span class="dot" style="background:var(--emerald-solid)"></span><span class="nm" style="color:var(--emerald-text)">Success</span></div>
+      <span class="badge" style="background:#d1fae5;color:var(--emerald-text)">Active</span>
+    </div>
+    <div class="fam" style="background:var(--amber-bg);border-color:var(--amber-border)">
+      <div class="top"><span class="dot" style="background:var(--amber-solid)"></span><span class="nm" style="color:var(--amber-text)">Warning</span></div>
+      <span class="badge" style="background:#fde68a;color:var(--amber-text)">Late</span>
+    </div>
+    <div class="fam" style="background:var(--red-bg);border-color:var(--red-border)">
+      <div class="top"><span class="dot" style="background:var(--red-solid)"></span><span class="nm" style="color:var(--red-text)">Danger</span></div>
+      <span class="badge" style="background:#fecaca;color:var(--red-text)">Absent</span>
+    </div>
+    <div class="fam" style="background:var(--cyan-bg);border-color:var(--cyan-border)">
+      <div class="top"><span class="dot" style="background:var(--cyan-solid)"></span><span class="nm" style="color:var(--cyan-text)">Telegram</span></div>
+      <span class="badge" style="background:#cffafe;color:var(--cyan-text)">Awaiting</span>
+    </div>
+    <div class="fam" style="background:var(--purple-bg);border-color:var(--purple-border)">
+      <div class="top"><span class="dot" style="background:var(--purple-solid)"></span><span class="nm" style="color:var(--purple-text)">Super Admin</span></div>
+      <span class="badge" style="background:#ede9fe;color:var(--purple-text)">Super Admin</span>
+    </div>
+    <div class="fam" style="background:var(--orange-bg);border-color:var(--orange-border)">
+      <div class="top"><span class="dot" style="background:var(--orange-solid)"></span><span class="nm" style="color:var(--orange-text)">Cover</span></div>
+      <span class="badge" style="background:#fed7aa;color:var(--orange-text)">Cover needed</span>
+    </div>
+    <div class="fam" style="background:var(--blue-50);border-color:var(--blue-200)">
+      <div class="top"><span class="dot" style="background:var(--blue-500)"></span><span class="nm" style="color:var(--blue-700)">Invite sent</span></div>
+      <span class="badge" style="background:var(--blue-50);color:var(--blue-700)">Invite sent</span>
+    </div>
+    <div class="fam" style="background:var(--red-bg);border-color:var(--red-border)">
+      <div class="top"><span class="dot" style="background:var(--red-solid)"></span><span class="nm" style="color:var(--red-text)">Link expired</span></div>
+      <span class="badge" style="background:#fecaca;color:var(--red-text)">Link expired</span>
+    </div>
+  </div>
+</body>
+</html>

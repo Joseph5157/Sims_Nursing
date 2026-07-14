@@ -1,0 +1,44 @@
+/* ──────────────────────────────────────────────────────────────
+   SIMS DMS — Typography tokens
+   DM Sans for everything; DM Mono for codes, OTP, IDs, timers.
+   The product runs a tight, mobile-first type scale (see
+   MOBILE_DESIGN_RULES.md RULE 8). Sizes are intentionally small —
+   this is a dense data app, not a marketing site.
+   ────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Families */
+  --font-sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'DM Mono', 'Courier New', ui-monospace, monospace;
+
+  /* Weights */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-extra:    800;   /* stat numbers, hero headings */
+
+  /* ── Type scale (px) — the only sizes used in product ──
+     names follow the product's role-based scale */
+  --text-stat:        40px;  /* extrabold KPI numbers */
+  --text-display:     28px;  /* login hero heading */
+  --text-h2:          22px;  /* sheet/form headings */
+  --text-page-title:  18px;  /* PageHeader */
+  --text-card-lg:     15px;  /* card primary / body default */
+  --text-body:        14px;  /* table cell, paragraph */
+  --text-card:        13px;  /* button, secondary body */
+  --text-small:       12px;  /* card secondary, captions */
+  --text-micro:       11px;  /* badges, labels, section headers */
+  --text-nano:        9px;   /* bottom-tab labels */
+
+  /* Line heights */
+  --leading-tight:   1.2;
+  --leading-snug:    1.4;
+  --leading-normal:  1.6;
+
+  /* Letter spacing */
+  --tracking-label:  0.06em;  /* uppercase section labels */
+  --tracking-wide:   0.08em;
+  --tracking-caps:   0.15em;  /* eyebrow / brand kicker */
+  --tracking-tight: -0.02em;  /* big numbers & display */
+}

@@ -1,0 +1,29 @@
+<!-- @dsCard group="Spacing" viewport="700x150" name="Spacing scale" subtitle="4px base rhythm — 16px page padding, 20px section gap" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--surface-card); padding: 22px 26px; font-family: var(--font-sans); }
+  .row { display: flex; align-items: flex-end; gap: 18px; }
+  .step { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+  .bar { background: var(--blue-200); border-radius: 3px; width: 100%; }
+  .box { display: flex; align-items: flex-end; height: 56px; }
+  .v { font-size: 11px; font-weight: 700; color: var(--text-primary); font-family: var(--font-mono); }
+  .t { font-size: 9px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="step"><div class="box"><div class="bar" style="height:4px;width:4px"></div></div><span class="v">4</span><span class="t">1</span></div>
+    <div class="step"><div class="box"><div class="bar" style="height:8px;width:8px"></div></div><span class="v">8</span><span class="t">2</span></div>
+    <div class="step"><div class="box"><div class="bar" style="height:12px;width:12px"></div></div><span class="v">12</span><span class="t">3 · gap</span></div>
+    <div class="step"><div class="box"><div class="bar" style="height:16px;width:16px"></div></div><span class="v">16</span><span class="t">4 · page</span></div>
+    <div class="step"><div class="box"><div class="bar" style="height:20px;width:20px"></div></div><span class="v">20</span><span class="t">5 · section</span></div>
+    <div class="step"><div class="box"><div class="bar" style="height:28px;width:28px"></div></div><span class="v">28</span><span class="t">7 · desktop</span></div>
+    <div class="step"><div class="box"><div class="bar" style="height:32px;width:32px"></div></div><span class="v">32</span><span class="t">8</span></div>
+    <div class="step"><div class="box"><div class="bar" style="height:48px;width:48px"></div></div><span class="v">48</span><span class="t">12</span></div>
+  </div>
+</body>
+</html>

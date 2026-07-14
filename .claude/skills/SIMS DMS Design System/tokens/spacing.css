@@ -1,0 +1,56 @@
+/* ──────────────────────────────────────────────────────────────
+   SIMS DMS — Spacing, radius, shadow & layout tokens
+   A mobile-first 4px-based rhythm. Page padding is 16px on phones,
+   28px on desktop. Touch targets never below 44px (RULE 9).
+   ────────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Spacing scale (4px base) ── */
+  --space-0:   0;
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;   /* grid gap */
+  --space-3-5: 14px;   /* card vertical padding */
+  --space-4:   16px;   /* page padding (mobile), card sides */
+  --space-5:   20px;   /* section gap */
+  --space-6:   24px;
+  --space-7:   28px;   /* page padding (desktop) */
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+
+  /* ── Radius ── */
+  --radius-sm:  6px;    /* xs buttons, dots */
+  --radius-md:  8px;    /* sm buttons, nav links, badges-square */
+  --radius-lg:  12px;   /* default buttons, alerts, quick-actions */
+  --radius-xl:  14px;   /* cards, inputs, stat cards */
+  --radius-2xl: 16px;   /* mobile card containers, hero panels */
+  --radius-3xl: 20px;   /* brand mark, drawers */
+  --radius-sheet: 28px; /* bottom-sheet top corners */
+  --radius-full: 9999px;/* pills, avatars, badges */
+
+  /* ── Touch / control sizing ── */
+  --control-min: 44px;  /* minimum tap target (mobile) */
+  --control-h:   40px;  /* default control height (desktop) */
+  --control-sm:  32px;
+  --control-xs:  28px;
+  --tabbar-h:    60px;  /* mobile bottom nav */
+  --sidebar-w:   220px; /* desktop nav rail */
+
+  /* ── Shadows ── */
+  --shadow-card:     0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --shadow-stat:     0 1px 3px 0 rgb(0 0 0 / 0.04);
+  --shadow-dropdown: 0 4px 16px -2px rgb(0 0 0 / 0.12), 0 2px 8px -2px rgb(0 0 0 / 0.08);
+  --shadow-toast:    0 4px 16px -2px rgb(0 0 0 / 0.10);
+  --shadow-modal:    0 20px 60px -12px rgb(0 0 0 / 0.25), 0 8px 24px -8px rgb(0 0 0 / 0.15);
+  --shadow-sheet:    0 -8px 40px rgba(0, 0, 0, 0.25);
+  --shadow-brand:    0 8px 32px rgba(59, 130, 246, 0.35);
+
+  /* ── Motion ──
+     The product uses short, ease transitions (150ms) for state, and a
+     cubic-bezier slide for drawers/sheets. No bounce, no decorative loops. */
+  --ease-standard: ease; /* @kind other */
+  --ease-sheet:    cubic-bezier(0.4, 0, 0.2, 1); /* @kind other */
+  --dur-fast:      150ms; /* @kind other */
+  --dur-sheet:     280ms; /* @kind other */
+}

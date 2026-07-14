@@ -1,0 +1,38 @@
+schema_version: "1.0"
+
+extension:
+  id: handoff
+  name: "Handoff Reports"
+  version: "1.0.0"
+  description: "Generates/updates a structured handoff.md report for the active feature after implementation work, before changes are committed"
+  author: sims-dms
+  repository: null
+  license: MIT
+
+requires:
+  speckit_version: ">=0.2.0"
+
+provides:
+  commands:
+    - name: speckit.handoff.update
+      file: commands/speckit.handoff.update.md
+      description: "Generate or update specs/<feature-folder>/handoff.md from specs/_templates/handoff.md"
+
+hooks:
+  after_specify:
+    command: speckit.handoff.update
+    optional: false
+    description: "Generate/update handoff.md for the active feature before specification changes are committed"
+  after_clarify:
+    command: speckit.handoff.update
+    optional: false
+    description: "Generate/update handoff.md for the active feature before clarification changes are committed"
+  after_implement:
+    command: speckit.handoff.update
+    optional: false
+    description: "Generate/update handoff.md for the active feature before implementation changes are committed"
+
+tags:
+  - "handoff"
+  - "reporting"
+  - "workflow"

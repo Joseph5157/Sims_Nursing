@@ -1,0 +1,8 @@
+/* ──────────────────────────────────────────────────────────────
+   SIMS DMS — Webfonts
+   The product self-hosts DM Sans (400/500/600/700) and DM Mono (400)
+   via @fontsource. Here we load the same families from the Google
+   Fonts CDN so consumers get pixel-identical type with zero setup.
+   ────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap');

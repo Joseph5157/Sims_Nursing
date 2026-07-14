@@ -1,0 +1,60 @@
+<!-- @template name="Faculty PWA app" description="Mobile faculty app shell — Telegram OTP login, dashboard, attendance, violations, slots, messages" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIMS DMS — Faculty app</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<!-- Synchronous bundle load guarantees the namespace is ready before the Babel
+     screen scripts evaluate. ds-base.js (below) wires CSS + is the loader a
+     consuming project keeps; it skips the bundle when this tag is present. -->
+<script src="../../_ds_bundle.js" data-ds-bundle></script>
+<script src="./ds-base.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: radial-gradient(circle at 50% 0%, #1e293b, #0b1120 70%);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 30px;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="shell.jsx"></script>
+<script type="text/babel" src="screens.jsx"></script>
+<script type="text/babel" data-presets="react">
+  window.addEventListener('load', () => {
+    const { useState } = React;
+    function App() {
+      const [authed, setAuthed] = useState(false);
+      const [tab, setTab] = useState('dashboard');
+      if (!authed) {
+        return (
+          <PhoneFrame statusDark>
+            <LoginScreen onAuth={() => setAuthed(true)} />
+          </PhoneFrame>
+        );
+      }
+      const screen =
+        tab === 'dashboard'   ? <DashboardScreen go={setTab} /> :
+        tab === 'slots'       ? <SlotsScreen /> :
+        tab === 'attendance'  ? <AttendanceScreen /> :
+        tab === 'violations'  ? <ViolationsScreen /> :
+                                <MessagesScreen />;
+      return (
+        <PhoneFrame>
+          {screen}
+          <BottomTabBar active={tab} onChange={setTab} />
+        </PhoneFrame>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "name": "sims-dms",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
+    "build": "npm run build --workspace=client",
+    "start": "npm run start --workspace=server",
+    "migrate": "node node_modules/prisma/build/index.js migrate dev --schema prisma/schema.prisma",
+    "migrate:deploy": "node node_modules/prisma/build/index.js migrate deploy --schema prisma/schema.prisma",
+    "generate": "node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma",
+    "seed": "node prisma/seed.js",
+    "seed:department": "node db/seed-department.mjs",
+    "studio": "node node_modules/prisma/build/index.js studio --schema prisma/schema.prisma"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prisma": "^5.22.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  }
+}

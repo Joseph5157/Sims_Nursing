@@ -1,0 +1,83 @@
+/* ──────────────────────────────────────────────────────────────
+   SIMS DMS — Color tokens
+   Slate-neutral UI with a blue (#2563eb) brand spine. Status colors
+   map to the badge/stat-card system used throughout the product.
+   Sourced from client/src/index.css (@theme) + utils/constants.js.
+   ────────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Brand blue ── */
+  --blue-50:  #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-200: #bfdbfe;
+  --blue-300: #93c5fd;
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;   /* primary action */
+  --blue-700: #1d4ed8;
+  --blue-800: #1e40af;
+  --indigo-500: #6366f1; /* gradient partner for brand mark */
+  --indigo-600: #4f46e5;
+
+  /* ── Slate neutrals (the backbone) ── */
+  --slate-50:  #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+
+  /* ── Status / semantic families ──
+     each has bg (tint) + text (ink) + border, matching StatCard + Badge */
+  --emerald-bg:  #f0fdf4;  --emerald-tint: #d1fae5;  --emerald-text: #065f46;  --emerald-solid: #10b981;  --emerald-border: #bbf7d0;
+  --amber-bg:    #fffbeb;  --amber-tint:   #fde68a;  --amber-text:   #92400e;  --amber-solid:   #f59e0b;  --amber-border:   #fde68a;
+  --red-bg:      #fef2f2;  --red-tint:     #fecaca;  --red-text:     #991b1b;  --red-solid:     #ef4444;  --red-border:     #fecaca;
+  --cyan-bg:     #ecfeff;  --cyan-tint:    #a5f3fc;  --cyan-text:    #0e7490;  --cyan-solid:    #06b6d4;  --cyan-border:    #a5f3fc;
+  --purple-bg:   #f5f3ff;  --purple-tint:  #ddd6fe;  --purple-text:  #5b21b6;  --purple-solid:  #8b5cf6;  --purple-border:  #ddd6fe;
+  --orange-bg:   #fff7ed;  --orange-tint:  #fed7aa;  --orange-text:  #c2410c;  --orange-solid:  #f97316;  --orange-border:  #fed7aa;
+
+  /* ──────────────────────────────────────────────
+     SEMANTIC ALIASES — reach for these in product code
+     ────────────────────────────────────────────── */
+
+  /* Surfaces */
+  --surface-page:    var(--slate-50);    /* app background */
+  --surface-card:    #ffffff;            /* cards, inputs, sheets */
+  --surface-sunken:  var(--slate-50);    /* inset wells, disabled inputs */
+  --surface-sidebar: var(--slate-900);   /* dark nav rail */
+  --surface-sidebar-hover: var(--slate-800);
+
+  /* Text */
+  --text-primary:    var(--slate-900);
+  --text-secondary:  var(--slate-600);
+  --text-muted:      var(--slate-400);
+  --text-on-dark:    #f1f5f9;
+  --text-on-brand:   #ffffff;
+
+  /* Brand */
+  --brand:           var(--blue-600);
+  --brand-hover:     var(--blue-700);
+  --brand-active:    var(--blue-800);
+  --brand-ring:      rgba(59, 130, 246, 0.30);
+  --brand-gradient:  linear-gradient(135deg, #3b82f6, #6366f1); /* @kind color */
+  --brand-gradient-deep: linear-gradient(135deg, #2563eb, #4f46e5); /* @kind color */
+
+  /* Borders & dividers */
+  --border:          var(--slate-200);
+  --border-strong:   var(--slate-300);
+  --divider:         var(--slate-100);
+
+  /* Status semantic */
+  --success: var(--emerald-solid);
+  --warning: var(--amber-solid);
+  --danger:  var(--red-solid);
+  --info:    var(--blue-500);
+
+  /* Selection */
+  --selection-bg:   var(--blue-100);
+  --selection-text: var(--blue-800);
+}

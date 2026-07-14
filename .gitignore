@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Build output
+dist/
+build/
+
+# Prisma generated (migrations MUST be committed to git)
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Screenshots
+*.png
+*.jpg
+*.jpeg
+# ...but source assets are deployable
+!client/public/icons/
+!client/public/icons/*.png
+!client/src/assets/*.png
+
+# IDE
+.vscode/
+.idea/
+
+# Code Graph index
+.code-graph/

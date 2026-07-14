@@ -1,0 +1,9 @@
+[phases.build]
+cmds = [
+  "npm install --omit=dev",
+  "npm run generate",
+  "npm run build"
+]
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "openssl"]

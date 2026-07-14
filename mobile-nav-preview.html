@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SIMS DMS — Mobile Nav Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue-400: #60a5fa; --blue-500: #3b82f6; --blue-600: #2563eb; --blue-700: #1d4ed8;
+    --indigo-500: #6366f1; --indigo-600: #4f46e5;
+    --slate-50: #f8fafc; --slate-100: #f1f5f9; --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1; --slate-400: #94a3b8; --slate-500: #64748b;
+    --slate-600: #475569; --slate-700: #334155; --slate-800: #1e293b; --slate-900: #0f172a;
+    --emerald-bg: #f0fdf4; --emerald-text: #065f46; --emerald-border: #bbf7d0;
+    --surface-page: #f8fafc; --surface-card: #ffffff; --surface-sidebar: #0f172a;
+    --border: #e2e8f0; --divider: #f1f5f9;
+    --brand-gradient: linear-gradient(135deg, #3b82f6, #6366f1);
+    --font-sans: 'DM Sans', sans-serif;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: #f1f5f9;
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+  }
+
+  h1.page-title {
+    text-align: center;
+    font-size: 22px; font-weight: 800; color: var(--slate-900);
+    margin-bottom: 6px; letter-spacing: -0.02em;
+  }
+  p.page-sub {
+    text-align: center; font-size: 13px; color: var(--slate-500);
+    margin-bottom: 48px;
+  }
+
+  /* ── Layout ── */
+  .row { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; margin-bottom: 56px; }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .col-label {
+    font-size: 11px; font-weight: 700; color: var(--slate-400);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  /* ── Phone frame ── */
+  .phone {
+    width: 320px; height: 660px;
+    background: #fff; border-radius: 38px;
+    border: 9px solid #0b1120;
+    box-shadow: 0 24px 64px -16px rgba(15,23,42,0.45), 0 4px 16px rgba(15,23,42,0.12);
+    overflow: hidden; position: relative;
+    display: flex; flex-direction: column;
+  }
+
+  /* iOS status bar */
+  .status-bar {
+    height: 38px; display: flex; align-items: center;
+    justify-content: space-between; padding: 0 18px 0 22px;
+    flex-shrink: 0; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.02em; color: #f8fafc;
+    background: var(--surface-sidebar);
+  }
+  .status-bar.light { background: var(--surface-page); color: var(--slate-900); }
+  .status-icons { display: flex; align-items: center; gap: 5px; font-size: 11px; }
+
+  /* ── Page content area ── */
+  .page-body {
+    flex: 1; min-height: 0; overflow: hidden;
+    background: var(--surface-page);
+    display: flex; flex-direction: column;
+  }
+  .page-header-bar {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-card);
+    flex-shrink: 0;
+  }
+  .page-header-bar h1 {
+    font-size: 17px; font-weight: 700; color: var(--slate-900); line-height: 1.2;
+  }
+  .page-header-bar p {
+    font-size: 11px; color: var(--slate-400); margin-top: 2px;
+  }
+  .page-scroll { flex: 1; padding: 16px; overflow: hidden; }
+
+  /* ── Greeting card ── */
+  .greeting-card {
+    background: var(--surface-card);
+    border-radius: 14px; border: 1px solid var(--border);
+    padding: 14px; margin-bottom: 10px;
+  }
+  .greeting-name { font-size: 15px; font-weight: 700; color: var(--slate-900); }
+  .greeting-sub { font-size: 11px; color: var(--slate-400); margin-top: 1px; }
+  .duty-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--emerald-bg); border: 1px solid var(--emerald-border);
+    border-radius: 8px; padding: 4px 8px; margin-top: 8px;
+    font-size: 11px; font-weight: 600; color: var(--emerald-text);
+  }
+
+  .stat-row { display: flex; gap: 8px; }
+  .stat-mini {
+    flex: 1; background: var(--surface-card); border-radius: 12px;
+    border: 1px solid var(--border); padding: 10px 10px 8px;
+    border-left: 3px solid;
+  }
+  .stat-mini .num { font-size: 22px; font-weight: 800; color: var(--slate-900); line-height: 1; }
+  .stat-mini .lbl { font-size: 9px; font-weight: 700; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
+
+  /* ── Bottom tab bar ── */
+  .bottom-bar {
+    display: flex; height: 60px;
+    background: var(--surface-sidebar);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+  .tab-btn {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 3px; border: none; background: none; cursor: pointer;
+    color: rgba(255,255,255,0.4);
+    font-family: var(--font-sans); font-size: 9px; font-weight: 500;
+    letter-spacing: 0.01em; transition: color 0.15s;
+    border-top: 2px solid transparent;
+    padding: 0;
+  }
+  .tab-btn.active {
+    color: var(--blue-400);
+    border-top-color: var(--blue-400);
+  }
+  .tab-icon { font-size: 19px; line-height: 1; }
+
+  /* ── Drawer overlay ── */
+  .drawer-overlay {
+    position: absolute; inset: 0; z-index: 10;
+    background: rgba(0,0,0,0.52);
+    backdrop-filter: blur(2px);
+    display: flex;
+  }
+  .drawer-panel {
+    width: 240px; height: 100%;
+    background: var(--surface-sidebar);
+    display: flex; flex-direction: column;
+    box-shadow: 4px 0 32px rgba(0,0,0,0.4);
+  }
+
+  /* Brand block */
+  .drawer-brand {
+    padding: 14px 12px 12px;
+    display: flex; flex-direction: column; gap: 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .brand-row { display: flex; align-items: center; gap: 8px; }
+  .brand-mark {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: var(--brand-gradient);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .brand-name { font-size: 13px; font-weight: 700; color: #f1f5f9; letter-spacing: -0.01em; }
+  .brand-role { font-size: 10px; color: var(--slate-500); padding-left: 34px; }
+
+  /* Nav links in drawer */
+  .drawer-nav { flex: 1; overflow-y: auto; padding: 8px; }
+  .nav-section-label {
+    font-size: 9px; font-weight: 700; color: var(--slate-600);
+    text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 10px 10px 4px;
+  }
+  .nav-link {
+    display: flex; align-items: center; gap: 9px;
+    padding: 7px 10px; border-radius: 7px;
+    font-size: 12px; font-weight: 500; color: var(--slate-400);
+    cursor: pointer; transition: background 0.15s, color 0.15s;
+  }
+  .nav-link:hover { background: var(--slate-800); color: #f1f5f9; }
+  .nav-link.active { background: var(--blue-600); color: #fff; }
+  .nav-icon { font-size: 14px; flex-shrink: 0; }
+
+  /* User + logout block */
+  .drawer-user {
+    padding: 10px; border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .user-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px; margin-bottom: 6px;
+  }
+  .avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--blue-600); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .user-name { font-size: 11px; font-weight: 600; color: var(--slate-300); }
+  .logout-btn {
+    display: flex; align-items: center; gap: 6px;
+    width: 100%; padding: 7px 10px; border-radius: 7px;
+    font-size: 11px; font-weight: 500; color: #fecaca;
+    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25);
+    cursor: pointer;
+  }
+
+  /* Drawer close dim area */
+  .drawer-dim {
+    flex: 1;
+    background: transparent;
+  }
+
+  /* ── Section labels ── */
+  .section {
+    margin-bottom: 24px;
+  }
+  .section-title {
+    font-size: 13px; font-weight: 700; color: var(--slate-900);
+    margin-bottom: 12px; margin-top: 32px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--slate-200);
+  }
+
+  /* ── Callout annotation ── */
+  .annotation {
+    background: var(--slate-900); color: #fff;
+    border-radius: 10px; padding: 12px 16px;
+    font-size: 12px; line-height: 1.6; max-width: 320px;
+    text-align: center;
+  }
+  .annotation strong { color: var(--blue-400); }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">SIMS DMS — Mobile Navigation</h1>
+<p class="page-sub">390px mobile view · Bottom bar (left) and Menu drawer open (right) for each role</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  FACULTY                                    -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-title">🎓 Faculty</div>
+
+<div class="row">
+
+  <!-- Faculty: Bottom bar (normal state) -->
+  <div class="col">
+    <div class="col-label">Bottom bar — normal</div>
+    <div class="phone">
+      <div class="status-bar light">
+        <span>9:41</span>
+        <div class="status-icons"><span>●●●</span><span>📶</span><span>🔋</span></div>
+      </div>
+      <div class="page-body">
+        <div class="page-header-bar">
+          <h1>Good morning, Priya 👋</h1>
+          <p>Thursday, 13 June 2026</p>
+        </div>
+        <div class="page-scroll">
+          <div class="greeting-card">
+            <div class="greeting-name">Today's duty</div>
+            <div class="greeting-sub">Morning session · Main Gate</div>
+            <div class="duty-pill">✅ Scheduled</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-mini" style="border-left-color:#3b82f6">
+              <div class="num">3</div><div class="lbl">My slots</div>
+            </div>
+            <div class="stat-mini" style="border-left-color:#f59e0b">
+              <div class="num">1</div><div class="lbl">Violations</div>
+            </div>
+            <div class="stat-mini" style="border-left-color:#10b981">
+              <div class="num">2</div><div class="lbl">Messages</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="bottom-bar">
+        <button class="tab-btn active"><span class="tab-icon">📊</span><span>Home</span></button>
+        <button class="tab-btn"><span class="tab-icon">📆</span><span>Slots</span></button>
+        <button class="tab-btn"><span class="tab-icon">✅</span><span>Attend</span></button>
+        <button class="tab-btn"><span class="tab-icon">⚠️</span><span>Violat.</span></button>
+        <button class="tab-btn"><span class="tab-icon">☰</span><span>Menu</span></button>
+      </nav>
+    </div>
+    <div class="annotation">
+      <strong>4 pinned routes</strong> + Menu button.<br>
+      Active tab highlighted in blue.
+    </div>
+  </div>
+
+  <!-- Faculty: Menu drawer open -->
+  <div class="col">
+    <div class="col-label">Menu drawer — open</div>
+    <div class="phone">
+      <div class="status-bar light">
+        <span>9:41</span>
+        <div class="status-icons"><span>●●●</span><span>📶</span><span>🔋</span></div>
+      </div>
+      <div class="page-body" style="position:relative; flex:1;">
+        <!-- Blurred page behind -->
+        <div style="padding:16px; opacity:0.3;">
+          <div class="greeting-card"><div class="greeting-name">Dashboard</div></div>
+        </div>
+        <!-- Drawer overlay -->
+        <div class="drawer-overlay">
+          <div class="drawer-panel">
+            <div class="drawer-brand">
+              <div class="brand-row">
+                <div class="brand-mark">🎓</div>
+                <span class="brand-name">SIMS DMS</span>
+              </div>
+              <span class="brand-role">Faculty Portal</span>
+            </div>
+            <div class="drawer-nav">
+              <div class="nav-link active"><span class="nav-icon">📊</span> Dashboard</div>
+              <div class="nav-link"><span class="nav-icon">📆</span> My Slots</div>
+              <div class="nav-link"><span class="nav-icon">✅</span> Attendance</div>
+              <div class="nav-link"><span class="nav-icon">⚠️</span> Violations</div>
+              <div class="nav-link"><span class="nav-icon">🔄</span> Cover Requests</div>
+              <div class="nav-link"><span class="nav-icon">✉️</span> Messages</div>
+            </div>
+            <div class="drawer-user">
+              <div class="user-row">
+                <div class="avatar">PS</div>
+                <span class="user-name">Priya Sharma</span>
+              </div>
+              <div class="logout-btn">⬅ Log out</div>
+            </div>
+          </div>
+          <div class="drawer-dim"></div>
+        </div>
+      </div>
+      <nav class="bottom-bar">
+        <button class="tab-btn active"><span class="tab-icon">📊</span><span>Home</span></button>
+        <button class="tab-btn"><span class="tab-icon">📆</span><span>Slots</span></button>
+        <button class="tab-btn"><span class="tab-icon">✅</span><span>Attend</span></button>
+        <button class="tab-btn"><span class="tab-icon">⚠️</span><span>Violat.</span></button>
+        <button class="tab-btn active" style="border-top-color:rgba(255,255,255,0.3); color:rgba(255,255,255,0.7)"><span class="tab-icon">☰</span><span>Menu</span></button>
+      </nav>
+    </div>
+    <div class="annotation">
+      Tapping <strong>Menu</strong> slides in the full nav drawer.<br>
+      All 6 routes + logout accessible.
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  ADMIN                                      -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-title">🛡️ Admin</div>
+
+<div class="row">
+
+  <!-- Admin: Bottom bar -->
+  <div class="col">
+    <div class="col-label">Bottom bar — normal</div>
+    <div class="phone">
+      <div class="status-bar light">
+        <span>9:41</span>
+        <div class="status-icons"><span>●●●</span><span>📶</span><span>🔋</span></div>
+      </div>
+      <div class="page-body">
+        <div class="page-header-bar">
+          <h1>Admin Dashboard</h1>
+          <p>Thursday, 13 June 2026</p>
+        </div>
+        <div class="page-scroll">
+          <div class="stat-row" style="margin-bottom:8px">
+            <div class="stat-mini" style="border-left-color:#3b82f6">
+              <div class="num">42</div><div class="lbl">Students</div>
+            </div>
+            <div class="stat-mini" style="border-left-color:#ef4444">
+              <div class="num">7</div><div class="lbl">Violations</div>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-mini" style="border-left-color:#10b981">
+              <div class="num">12</div><div class="lbl">Checked in</div>
+            </div>
+            <div class="stat-mini" style="border-left-color:#f59e0b">
+              <div class="num">3</div><div class="lbl">Pending</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="bottom-bar">
+        <button class="tab-btn active"><span class="tab-icon">📊</span><span>Home</span></button>
+        <button class="tab-btn"><span class="tab-icon">🎓</span><span>Students</span></button>
+        <button class="tab-btn"><span class="tab-icon">⚠️</span><span>Violations</span></button>
+        <button class="tab-btn"><span class="tab-icon">✅</span><span>Live</span></button>
+        <button class="tab-btn"><span class="tab-icon">☰</span><span>Menu</span></button>
+      </nav>
+    </div>
+    <div class="annotation">
+      <strong>4 pinned routes</strong> + Menu.<br>
+      Dashboard · Students · Violations · Live attendance.
+    </div>
+  </div>
+
+  <!-- Admin: Drawer open -->
+  <div class="col">
+    <div class="col-label">Menu drawer — open</div>
+    <div class="phone">
+      <div class="status-bar light">
+        <span>9:41</span>
+        <div class="status-icons"><span>●●●</span><span>📶</span><span>🔋</span></div>
+      </div>
+      <div class="page-body" style="position:relative; flex:1;">
+        <div style="padding:16px; opacity:0.3;">
+          <div class="greeting-card"><div class="greeting-name">Admin Dashboard</div></div>
+        </div>
+        <div class="drawer-overlay">
+          <div class="drawer-panel">
+            <div class="drawer-brand">
+              <div class="brand-row">
+                <div class="brand-mark">🎓</div>
+                <span class="brand-name">SIMS DMS</span>
+              </div>
+              <span class="brand-role">Admin Panel</span>
+            </div>
+            <div class="drawer-nav">
+              <div class="nav-link active"><span class="nav-icon">📊</span> Dashboard</div>
+              <div class="nav-link"><span class="nav-icon">👥</span> Users</div>
+              <div class="nav-link"><span class="nav-icon">🎓</span> Students</div>
+              <div class="nav-link"><span class="nav-icon">📅</span> Calendar</div>
+              <div class="nav-link"><span class="nav-icon">📆</span> Duty Slots</div>
+              <div class="nav-link"><span class="nav-icon">✅</span> Attendance</div>
+              <div class="nav-link"><span class="nav-icon">⚠️</span> Violations</div>
+              <div class="nav-link"><span class="nav-icon">🏷️</span> Viol. Types</div>
+              <div class="nav-link"><span class="nav-icon">🔄</span> Cover Requests</div>
+              <div class="nav-link"><span class="nav-icon">✉️</span> Messages</div>
+              <div class="nav-link"><span class="nav-icon">📈</span> Reports</div>
+            </div>
+            <div class="drawer-user">
+              <div class="user-row">
+                <div class="avatar">JB</div>
+                <span class="user-name">Joseph Brones</span>
+              </div>
+              <div class="logout-btn">⬅ Log out</div>
+            </div>
+          </div>
+          <div class="drawer-dim"></div>
+        </div>
+      </div>
+      <nav class="bottom-bar">
+        <button class="tab-btn active"><span class="tab-icon">📊</span><span>Home</span></button>
+        <button class="tab-btn"><span class="tab-icon">🎓</span><span>Students</span></button>
+        <button class="tab-btn"><span class="tab-icon">⚠️</span><span>Violations</span></button>
+        <button class="tab-btn"><span class="tab-icon">✅</span><span>Live</span></button>
+        <button class="tab-btn" style="color:rgba(255,255,255,0.7)"><span class="tab-icon">☰</span><span>Menu</span></button>
+      </nav>
+    </div>
+    <div class="annotation">
+      All <strong>11 admin routes</strong> accessible from the drawer.<br>
+      Scrollable if list is long.
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  SUPER ADMIN                                -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-title">⚡ Super Admin</div>
+
+<div class="row">
+
+  <!-- Super Admin: Bottom bar -->
+  <div class="col">
+    <div class="col-label">Bottom bar — normal</div>
+    <div class="phone">
+      <div class="status-bar light">
+        <span>9:41</span>
+        <div class="status-icons"><span>●●●</span><span>📶</span><span>🔋</span></div>
+      </div>
+      <div class="page-body">
+        <div class="page-header-bar">
+          <h1>Admin Dashboard</h1>
+          <p>Super Admin · Thursday, 13 June 2026</p>
+        </div>
+        <div class="page-scroll">
+          <div class="stat-row" style="margin-bottom:8px">
+            <div class="stat-mini" style="border-left-color:#8b5cf6">
+              <div class="num">8</div><div class="lbl">Users</div>
+            </div>
+            <div class="stat-mini" style="border-left-color:#ef4444">
+              <div class="num">7</div><div class="lbl">Violations</div>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-mini" style="border-left-color:#3b82f6">
+              <div class="num">3</div><div class="lbl">Invites</div>
+            </div>
+            <div class="stat-mini" style="border-left-color:#f59e0b">
+              <div class="num">142</div><div class="lbl">Audit logs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="bottom-bar">
+        <button class="tab-btn active"><span class="tab-icon">📊</span><span>Home</span></button>
+        <button class="tab-btn"><span class="tab-icon">🎓</span><span>Students</span></button>
+        <button class="tab-btn"><span class="tab-icon">⚠️</span><span>Violations</span></button>
+        <button class="tab-btn"><span class="tab-icon">✅</span><span>Live</span></button>
+        <button class="tab-btn"><span class="tab-icon">☰</span><span>Menu</span></button>
+      </nav>
+    </div>
+    <div class="annotation">
+      Same 4 pinned tabs as Admin.<br>
+      Super Admin tools in the drawer.
+    </div>
+  </div>
+
+  <!-- Super Admin: Drawer open -->
+  <div class="col">
+    <div class="col-label">Menu drawer — open</div>
+    <div class="phone">
+      <div class="status-bar light">
+        <span>9:41</span>
+        <div class="status-icons"><span>●●●</span><span>📶</span><span>🔋</span></div>
+      </div>
+      <div class="page-body" style="position:relative; flex:1;">
+        <div style="padding:16px; opacity:0.3;">
+          <div class="greeting-card"><div class="greeting-name">Admin Dashboard</div></div>
+        </div>
+        <div class="drawer-overlay">
+          <div class="drawer-panel">
+            <div class="drawer-brand">
+              <div class="brand-row">
+                <div class="brand-mark">🎓</div>
+                <span class="brand-name">SIMS DMS</span>
+              </div>
+              <span class="brand-role">Super Admin</span>
+            </div>
+            <div class="drawer-nav">
+              <div class="nav-section-label">Admin</div>
+              <div class="nav-link active"><span class="nav-icon">📊</span> Dashboard</div>
+              <div class="nav-link"><span class="nav-icon">👥</span> Users</div>
+              <div class="nav-link"><span class="nav-icon">🎓</span> Students</div>
+              <div class="nav-link"><span class="nav-icon">📅</span> Calendar</div>
+              <div class="nav-link"><span class="nav-icon">📆</span> Duty Slots</div>
+              <div class="nav-link"><span class="nav-icon">✅</span> Attendance</div>
+              <div class="nav-link"><span class="nav-icon">⚠️</span> Violations</div>
+              <div class="nav-link"><span class="nav-icon">🏷️</span> Viol. Types</div>
+              <div class="nav-link"><span class="nav-icon">🔄</span> Cover Requests</div>
+              <div class="nav-link"><span class="nav-icon">✉️</span> Messages</div>
+              <div class="nav-link"><span class="nav-icon">📈</span> Reports</div>
+              <div class="nav-section-label" style="margin-top:4px">Super Admin</div>
+              <div class="nav-link" style="color:#c4b5fd"><span class="nav-icon">⚡</span> SA Dashboard</div>
+              <div class="nav-link" style="color:#c4b5fd"><span class="nav-icon">🔑</span> Sessions</div>
+              <div class="nav-link" style="color:#c4b5fd"><span class="nav-icon">📋</span> Audit Logs</div>
+            </div>
+            <div class="drawer-user">
+              <div class="user-row">
+                <div class="avatar" style="background:#7c3aed;">JB</div>
+                <span class="user-name">Joseph Brones</span>
+              </div>
+              <div class="logout-btn">⬅ Log out</div>
+            </div>
+          </div>
+          <div class="drawer-dim"></div>
+        </div>
+      </div>
+      <nav class="bottom-bar">
+        <button class="tab-btn active"><span class="tab-icon">📊</span><span>Home</span></button>
+        <button class="tab-btn"><span class="tab-icon">🎓</span><span>Students</span></button>
+        <button class="tab-btn"><span class="tab-icon">⚠️</span><span>Violations</span></button>
+        <button class="tab-btn"><span class="tab-icon">✅</span><span>Live</span></button>
+        <button class="tab-btn" style="color:rgba(255,255,255,0.7)"><span class="tab-icon">☰</span><span>Menu</span></button>
+      </nav>
+    </div>
+    <div class="annotation">
+      All <strong>11 admin + 3 super admin routes</strong>.<br>
+      Super Admin links in purple.
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
