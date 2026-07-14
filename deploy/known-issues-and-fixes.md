@@ -196,3 +196,46 @@ it), but it's confusing clutter and worth a 10-second cleanup.
 against this repo's structure, not something specific to the Nursing clone. Expect it every time a
 new department connects this repo to a fresh Railway project, and check for it right after step 3
 of `clone-checklist.md`.
+
+---
+
+## 7. Verifying a fresh deploy in the browser can show you the *old* build (PWA cache)
+
+**Symptom**: After deploying new frontend code (e.g. a new button/feature on the login page) and
+confirming the server-side deploy succeeded (health check green, correct migration applied), the
+browser still shows the old page — no new element, no error either. It looks like the deploy
+didn't actually include the change.
+
+**Root cause**: This app is a PWA using Workbox for offline/service-worker caching (Constitution
+§2 Frontend). A browser tab that already visited the site before the deploy has a service worker
+and cache actively intercepting requests and serving the previously-cached bundle, independent of
+what the server now returns. A normal reload (even `Ctrl+Shift+R` in some cases) can still hit the
+service worker's cache rather than the network.
+
+**How to tell the difference from a real deploy failure**: fetch the built JS asset directly and
+grep it for the new feature's distinctive string —
+
+```bash
+curl -s https://<your-app>/ | grep -oE 'src="[^"]*\.js"'          # find the current bundle filename
+curl -s https://<your-app>/assets/<bundle>.js | grep -c "some distinctive string from the new code"
+```
+
+If that string **is** present in the fetched bundle, the deploy is correct and it's purely a
+client-side caching issue — don't waste time re-checking the server/build.
+
+**Fix**: Unregister the service worker and clear caches for that origin, then reload:
+
+```js
+// Run in the browser console (or via any JS-execution tool) on the affected page
+const regs = await navigator.serviceWorker.getRegistrations();
+for (const r of regs) await r.unregister();
+const keys = await caches.keys();
+for (const k of keys) await caches.delete(k);
+```
+
+The app also has its own in-app update prompt (`PWAUpdatePrompt.jsx`) for real end users — this
+manual unregister is specifically for verifying a deploy yourself right after shipping it, not
+something to tell real users to do.
+
+**Applies to other department clones?** Yes — every clone is the same PWA setup. Expect this any
+time you verify a frontend change in a browser tab that had the site open before the new deploy.
