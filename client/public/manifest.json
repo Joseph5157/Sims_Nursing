@@ -1,7 +1,7 @@
 {
-  "name": "SIMS Discipline Management System",
-  "short_name": "SIMS DMS",
-  "description": "SIMS College of Pharmacy Discipline Management System",
+  "name": "SIMS Nursing Discipline Management System",
+  "short_name": "SIMS Nursing DMS",
+  "description": "SIMS College of Nursing Discipline Management System",
   "id": "/",
   "start_url": "/",
   "display": "standalone",

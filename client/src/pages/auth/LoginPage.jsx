@@ -1,18 +1,36 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLogin } from '../../hooks/useAuth';
 import { ROLES } from '../../utils/constants';
 import simsLogo from '../../assets/sims-logo.png';
 import { INSTITUTION_NAME } from '../../utils/branding';
 
+// Plain-language messages for a failed Telegram magic-link login
+// (022-telegram-magic-link-login) — see
+// specs/022-telegram-magic-link-login/contracts/telegram-login-endpoint.md
+const TELEGRAM_ERROR_MESSAGES = {
+  expired: 'That Telegram login link has expired. Message the bot /login for a new one.',
+  used: 'That Telegram login link has already been used. Message the bot /login for a new one.',
+  inactive_account: 'That account is no longer active. Contact your admin.',
+  not_found: 'That Telegram login link is invalid. Message the bot /login for a new one.',
+};
+
+const TELEGRAM_BOT_USERNAME = import.meta.env.VITE_TELEGRAM_BOT_USERNAME;
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const login = useLogin();
+  const [searchParams] = useSearchParams();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+
+  const telegramErrorCode = searchParams.get('telegram_error');
+  const telegramError = telegramErrorCode
+    ? TELEGRAM_ERROR_MESSAGES[telegramErrorCode] || TELEGRAM_ERROR_MESSAGES.not_found
+    : null;
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -128,6 +146,20 @@ export default function LoginPage() {
               </p>
             </div>
 
+            {/* Telegram magic-link error banner (redirected back from a failed /auth/telegram/:token) */}
+            {telegramError && (
+              <div
+                className="rounded-[var(--radius-lg)] px-3.5 py-3 sm:py-2 text-[length:var(--text-card)] sm:text-[12px] text-[var(--color-red-text)]"
+                style={{
+                  backgroundColor: 'var(--color-red-bg)',
+                  border: '1px solid var(--color-red-border)',
+                  borderLeft: '3px solid var(--color-red-solid)',
+                }}
+              >
+                {telegramError}
+              </div>
+            )}
+
             {/* Email field */}
             <div className="flex flex-col gap-2 sm:gap-1">
               <label
@@ -231,6 +263,20 @@ export default function LoginPage() {
             >
               {login.isPending ? 'Signing in...' : 'Sign in'}
             </button>
+
+            {/* Telegram magic-link login entry point (022-telegram-magic-link-login) —
+                only shown if a bot username is configured; opens Telegram directly to
+                the bot with the login request pre-filled, no server call needed here. */}
+            {TELEGRAM_BOT_USERNAME && (
+              <a
+                href={`https://t.me/${TELEGRAM_BOT_USERNAME}?start=login`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full h-12 sm:h-10 rounded-[var(--radius-xl)] flex items-center justify-center gap-2 text-[length:var(--text-card)] font-[var(--weight-bold)] text-[var(--text-secondary)] border-2 border-[var(--border)] hover:border-[var(--border-strong)] transition-colors"
+              >
+                Log in via Telegram
+              </a>
+            )}
           </form>
         </div>
       </div>

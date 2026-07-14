@@ -10,4 +10,10 @@ const changePasswordSchema = z.object({
   new_password: z.string().min(8, 'New password must be at least 8 characters.'),
 });
 
-module.exports = { loginSchema, changePasswordSchema };
+// Telegram magic-link login token — a 32-byte crypto.randomBytes hex string is 64 hex chars,
+// but bound generously to stay compatible if the generation scheme changes.
+const telegramLoginTokenParamSchema = z.object({
+  token: z.string().min(16).max(100).regex(/^[a-f0-9]+$/i, 'Invalid token format.'),
+});
+
+module.exports = { loginSchema, changePasswordSchema, telegramLoginTokenParamSchema };

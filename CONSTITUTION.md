@@ -10,8 +10,8 @@
 
 | Field | Value |
 |---|---|
-| Project Name | SIMS Discipline Management System (SIMS DMS) |
-| Institution | SIMS College of Pharmacy |
+| Project Name | SIMS Discipline Management System (SIMS Nursing DMS) |
+| Institution | SIMS College of Nursing |
 | Purpose | Replace the manual paper-based discipline process with a digital system for managing faculty duties, student violations, and reporting |
 | Scale | Single college, ~20–30 faculty members |
 | Status | All three build phases functionally complete (see §8) — now in QA/UAT before production launch |
@@ -52,7 +52,7 @@ These decisions are locked. Do not suggest alternatives or use different tools.
 |---|---|
 | Database | PostgreSQL — hosted on Railway |
 | Hosting | Railway — both staging and production |
-| Auth | Email + password → JWT stored in httpOnly cookie + CSRF token. Telegram is used for notifications only, never for login |
+| Auth | Email + password → JWT stored in httpOnly cookie + CSRF token. **Additionally**, a linked/verified user may log in via a Telegram magic link (single-use, 10-minute token; issues the identical cookie session) — see §4 Authentication. Telegram remains the sole notification channel otherwise |
 | Real-time | 30-second polling — no WebSockets, no SSE |
 | API style | REST — no GraphQL |
 | App structure | Monolithic — single repo, single deploy |
@@ -109,7 +109,24 @@ There are exactly 3 roles. Do not add, merge, or rename roles.
 These are non-negotiable rules encoded in the planning document. Every feature must respect them.
 
 ### Authentication
-- Login is via registered email + password. No Telegram OTP, no SMS, no email OTP.
+- Login is via registered email + password, **or** via a Telegram magic link for users with a
+  linked, verified Telegram account (022-telegram-magic-link-login) — both methods remain fully
+  available side by side; neither replaces the other. No Telegram OTP (the code-entry kind), no
+  SMS, no email OTP — the magic link is a single-use URL, not a one-time code the user types in.
+- **Telegram magic-link login**: a linked user sends `/login` to the bot (or taps "Log in via
+  Telegram" on the login page, which deep-links to `t.me/<bot>?start=login` — no server call
+  needed to trigger this). The bot issues a random, single-use `telegram_login_tokens` row
+  (10-minute expiry) and sends back a link (`{APP_URL}/auth/telegram/:token`). Requesting a new
+  link invalidates any previous still-unused one; requests are throttled to 1 per 30 seconds per
+  user (independent of the `/resetpassword` 1-per-hour limit below). Opening a valid link
+  atomically claims the token (a single conditional `updateMany` — no raw SQL, no explicit row
+  lock; Postgres's own atomicity on the `used_at IS NULL` predicate prevents any token from ever
+  granting two sessions, including near-simultaneous clicks) and, only if the token is unexpired,
+  unused, and the linked account is still active and not deleted, issues the exact same
+  httpOnly-cookie JWT + CSRF session `POST /auth/login` issues, including `session_version`. Users
+  without linked Telegram are unaffected and cannot obtain a link. Logged in `admin_audit_log` as
+  `TELEGRAM_LOGIN`, distinct from `PASSWORD_LOGIN`. See
+  `specs/022-telegram-magic-link-login/` for the full spec/plan/contracts.
 - Passwords are hashed with bcrypt (cost factor 12) — plaintext is never stored or logged.
 - JWT stored in httpOnly cookie — never in localStorage. A CSRF token (`sims_csrf` cookie +
   `X-CSRF-Token` header) is required on every mutating *authenticated* request. **Exception:**
@@ -306,6 +323,7 @@ All migrations must match this schema exactly. Full column definitions in `SIMS_
 | `student_upload_log` | History of Excel uploads including error rows |
 | `pending_invites` | Temporary invite tokens for new account activation via Telegram |
 | `telegram_relink_tokens` | Temporary tokens for relinking an existing user to a new Telegram account |
+| `telegram_login_tokens` | Single-use, 10-minute magic-link login tokens (022-telegram-magic-link-login). No `deleted_at` — mirrors `telegram_relink_tokens`'s lifecycle (rows persist, `used_at` is the only mutation, no purge job) |
 
 > **Removed**: `correction_requests` (replaced by `violations.is_flagged`), `reschedule_requests` then `cover_requests` (the Need Cover / Volunteer workflow was built and then removed in favor of Admin Duty Reassignment — `duty_reassignments`, see §4), `otp_sessions` (Telegram OTP login was built and then abandoned in favor of email/password — see §4 Authentication)
 
@@ -325,13 +343,13 @@ All migrations must match this schema exactly. Full column definitions in `SIMS_
 
 ---
 
-## 6. API — 114 Endpoints Across 14 Modules
+## 6. API — 115 Endpoints Across 14 Modules
 
 Counts verified directly against `server/routes/*.routes.js`. The Need Cover module (9 endpoints under `/cover-requests`) was removed; Duty Slots grew from 6 to 8 with the admin reassignment endpoints (`POST /duty-slots/:id/reassign`, `GET /duty-slots/reassigned-away/:year/:month`), then dropped to 7 when `DELETE /duty-slots/:id/unpick` was removed (P26 — faculty can no longer unpick a picked slot; Admin Duty Reassignment or Faculty-Requested Reassignment are now the only ways to change a picked slot's owner). Two modules were added since: Analytics (P24 Student Discipline Analytics Dashboard) and Duty Reassignment Requests (P27 Faculty-Requested Reassignment, §4 Method 2). Violations dropped from 10 to 9 endpoints (2026-07): `PATCH /:id/hide` and `GET /:id/audit-log` were removed (Hide and the per-violation Log view no longer exist anywhere in the app) and `DELETE /:id` was added (soft-delete, §4 Violations).
 
 | Module | Count | Base Path |
 |---|---|---|
-| Authentication | 3 | `/auth` |
+| Authentication | 4 | `/auth` |
 | Users & Accounts | 13 | `/users`, `/admin` |
 | Students | 10 | `/students` |
 | Duty Calendar | 8 | `/calendar` |
@@ -355,6 +373,9 @@ Analytics (10): `GET /summary`, `/trend`, `/violation-types`, `/repeat-violators
 Duty Reassignment Requests (6): `POST /`, `GET /`, `GET /sent`, `GET /eligible-faculty/:dutySlotId`, `PATCH /:id`, `PATCH /:id/cancel` — faculty only. Implements Method 2 of §4 Duty Reassignment. `PATCH /:id/cancel` lets the requester withdraw their own still-pending request (distinct from `PATCH /:id`, which is the target faculty approving/declining).
 
 Not counted above: `POST /bot/webhook/:secret` (`server/routes/bot.routes.js`) — a Telegram-facing webhook receiver, not part of the client-facing API surface this table describes.
+
+**Authentication** grew 3→4: `GET /auth/telegram/:token` (022-telegram-magic-link-login) added
+alongside the existing `POST /auth/login`, `/change-password`, `/logout`.
 
 Full endpoint definitions in `SIMS_API_Endpoints_v2.0.md` (v2.2) — **this file is now stale against the counts above and should be regenerated/updated to match.**
 
@@ -460,6 +481,19 @@ PORT=3000
 
 ---
 
+*Constitution version: 3.17 — Updated: July 2026 (Telegram magic-link login —
+022-telegram-magic-link-login. §2 Infrastructure, §4 Authentication: a linked/verified user may
+now log in via a single-use, 10-minute Telegram link, issuing the identical httpOnly-cookie
+JWT+CSRF session as password login, side by side with it — password login is unchanged and not
+replaced. New table `telegram_login_tokens` (§5) mirrors `telegram_relink_tokens`'s lifecycle, no
+`deleted_at`. New endpoint `GET /auth/telegram/:token` (§6, Authentication module 3→4, total
+114→115). This deliberately reopens a decision an earlier version of this constitution recorded
+as settled — the project previously built and abandoned a Telegram-OTP login table
+(`otp_sessions`) in favor of password-only auth. That earlier decision was about a code-entry OTP
+mechanism and a full replacement of password login; this feature is a single-use link, additive
+only, and was explicitly requested and approved by the project owner before any spec work began —
+not a silent reversal. See `specs/022-telegram-magic-link-login/` for the full spec, plan,
+research, and contracts.)*
 *Constitution version: 3.16 — Updated: July 2026 (login-flakiness fix + duplicate-feature
 cleanup, no schema/endpoint changes. §4 Authentication: `POST /auth/login` is now CSRF-exempt
 (a stale `sims_token` cookie could previously 403-block every login attempt); `authenticate`

@@ -85,6 +85,79 @@ async function login(req, res) {
   }
 }
 
+// ─── GET /auth/telegram/:token ─────────────────────────────────────────────────
+// Telegram magic-link login (022-telegram-magic-link-login). Reached only via a
+// real browser navigation (a tapped Telegram link), never a fetch/XHR — so the
+// response is always a redirect, never JSON. See
+// specs/022-telegram-magic-link-login/contracts/telegram-login-endpoint.md.
+
+async function telegramLogin(req, res) {
+  const { token } = req.params;
+
+  try {
+    // Atomic claim first — this is the sole authorization decision (research.md
+    // §1). The diagnostic lookup below only ever runs *after* a failed claim, so
+    // it reflects post-claim-attempt state (e.g. a token another concurrent
+    // request just won) rather than a stale pre-claim snapshot.
+    const claim = await prisma.telegramLoginToken.updateMany({
+      where: {
+        token,
+        used_at: null,
+        expires_at: { gt: new Date() },
+        user: { status: 'active', deleted_at: null },
+      },
+      data: { used_at: new Date() },
+    });
+
+    if (claim.count !== 1) {
+      const existing = await prisma.telegramLoginToken.findUnique({
+        where: { token },
+        select: { expires_at: true, used_at: true, user: { select: { status: true, deleted_at: true } } },
+      });
+
+      let code = 'not_found';
+      if (existing) {
+        if (existing.used_at) code = 'used';
+        else if (new Date(existing.expires_at) <= new Date()) code = 'expired';
+        else if (!existing.user || existing.user.status !== 'active' || existing.user.deleted_at) code = 'inactive_account';
+      }
+      return res.redirect(`/login?telegram_error=${code}`);
+    }
+
+    const claimed = await prisma.telegramLoginToken.findUnique({ where: { token }, include: { user: true } });
+    const user = claimed.user;
+
+    const jwtToken = jwt.sign(
+      { sub: user.id, role: user.role, session_version: user.session_version },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' },
+    );
+    const csrfToken = crypto.randomBytes(32).toString('hex');
+
+    res.cookie('sims_token', jwtToken, authCookieOptions());
+    res.cookie('sims_csrf', csrfToken, csrfCookieOptions());
+
+    const { logAction } = require('../services/audit.service');
+    try {
+      await logAction({
+        actorId: user.id,
+        action: 'TELEGRAM_LOGIN',
+        targetId: user.id,
+        targetType: 'user',
+      });
+    } catch (auditErr) {
+      logger.warn(`[AUTH] telegram-login audit log failed (login still succeeded): ${auditErr.message}`);
+    }
+
+    logger.info(`[AUTH] Telegram-link login successful: user=${user.id}, role=${user.role}`);
+
+    return res.redirect('/');
+  } catch (err) {
+    logger.error(`telegramLogin error: ${err.message}`);
+    return res.redirect('/login?telegram_error=not_found');
+  }
+}
+
 // ─── POST /auth/change-password ────────────────────────────────────────────────
 
 async function changePassword(req, res) {
@@ -166,4 +239,4 @@ async function logout(req, res) {
   res.json({ message: 'Logged out successfully.' });
 }
 
-module.exports = { login, changePassword, logout };
+module.exports = { login, changePassword, logout, telegramLogin };

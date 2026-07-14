@@ -93,6 +93,7 @@ model User {
   issuedInvites            PendingInvite[]           @relation("IssuedInvites")
   relinkTokens             TelegramRelinkToken[]     @relation("RelinkTokens")
   createdRelinkTokens      TelegramRelinkToken[]     @relation("CreatedRelinkTokens")
+  loginTokens              TelegramLoginToken[]      @relation("LoginTokens")
   dutySlots                DutySlot[]                @relation("FacultyDutySlots")
   createdDutySlots         DutySlot[]                @relation("CreatedDutySlots")
   attendance               DutyAttendance[]          @relation("FacultyAttendance")
@@ -155,6 +156,27 @@ model TelegramRelinkToken {
   creator User @relation("CreatedRelinkTokens", fields: [created_by], references: [id])
 
   @@map("telegram_relink_tokens")
+}
+
+// ─── 2b. Telegram Login Tokens ────────────────────────────────────────────
+// Single-use, short-lived magic-link tokens for passwordless Telegram login
+// (022-telegram-magic-link-login). Self-issued by the user via the bot — no
+// created_by, unlike telegram_relink_tokens which an admin creates on a
+// user's behalf. No deleted_at: mirrors telegram_relink_tokens's lifecycle
+// (used_at is the only mutation; rows persist, no purge job).
+
+model TelegramLoginToken {
+  id         String    @id @default(uuid())
+  user_id    String
+  token      String    @unique @db.VarChar(100)
+  expires_at DateTime
+  used_at    DateTime?
+  created_at DateTime  @default(now())
+
+  user User @relation("LoginTokens", fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@map("telegram_login_tokens")
 }
 
 // ─── 3. Students ─────────────────────────────────────────────────────────────
