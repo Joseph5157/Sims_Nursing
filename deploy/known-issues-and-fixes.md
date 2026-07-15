@@ -309,3 +309,36 @@ from local source when auto-deploy has skipped or misbehaved.
 **Applies to other department clones?** Only if Watch Paths gets configured the same narrow way
 on that clone's Railway project — check `railway status --json` if a clone's frontend changes
 mysteriously never seem to deploy.
+
+---
+
+## 10. Invite deep link silently ignored — new user taps "Start" and gets the generic welcome message instead of auto-activating
+
+**Symptom**: Admin invites a user via WhatsApp/the copyable link. The invitee opens it in
+Telegram, sees a "START" button, taps it — and instead of their account activating, they just get
+the bot's generic "Welcome... if you have an activation link, send `/start invite_xxxxx`" message.
+Manually typing/pasting the full `/start invite_<token>` command afterward works fine.
+
+**Root cause**: Telegram's Bot API caps the deep-link `start` parameter (the part after
+`?start=` in `t.me/<bot>?start=<payload>`) at **64 characters**. The invite token was
+`invite_` (7 chars) + a 32-byte hex token (64 chars) = **71 characters** — over the limit.
+Telegram doesn't error or truncate in this case; it silently drops the entire parameter, so the
+bot receives a bare `/start` with no payload at all, indistinguishable from a user who never had
+an invite link. This affected every invite ever sent, for every new user's first tap — the
+manual-paste workaround happened to work because typing the command directly bypasses the
+Telegram client's deep-link URL parsing entirely.
+
+**Fix** (`server/controllers/invites.controller.js`, both `createInvite` and
+`regenerateInvite`): shortened the token from `crypto.randomBytes(32)` to
+`crypto.randomBytes(24)` — 48 hex chars instead of 64, keeping the full `invite_<token>` payload
+at 55 characters, safely under the limit. Still 192 bits of entropy for a single-use, 7-day
+token — no meaningful security tradeoff.
+
+**Only fixes new invites** — any invite link already sent before this fix still has the oversized
+token and needs either the manual-paste workaround or a "Regenerate" to get a working short link.
+
+**Applies to other department clones?** Yes — any bot deep link (invite, relink, or otherwise)
+built as `` `t.me/<bot>?start=<prefix>_<token>` `` needs to keep the combined
+`<prefix>_<token>` under 64 characters. Worth checking `telegram_relink_tokens` token generation
+too if/when that flow gets a token-creation code path (not found in the codebase as of
+2026-07-15 — only consumed in `bot.js`, never generated, so not yet exposed to this bug).
