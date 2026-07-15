@@ -236,6 +236,234 @@ async function changePassword(req, res) {
   }
 }
 
+// ─── POST /auth/otp/request ───────────────────────────────────────────────────
+// Request a new 6-digit OTP code for Telegram delivery (024-telegram-otp-login).
+// Always returns generic 200 — never reveals whether account exists or is deliverable.
+// If any condition fails (user missing, inactive, no Telegram, throttled, locked),
+// the bcrypt overhead is still incurred so timing is uniform across branches.
+// See specs/024-telegram-otp-login/research.md §4 (timing-safe non-enumeration).
+
+async function requestOtp(req, res) {
+  const { sims_id } = req.body;
+  const { OTP_TTL_MS, OTP_REQUEST_THROTTLE_MS, generateOtpCode } = require('../lib/otp');
+  const { sendMessage } = require('../lib/telegram');
+
+  try {
+    // Always run bcrypt regardless of outcome so timing is uniform across success/failure
+    const { generateOtpCode: genCode } = require('../lib/otp');
+    const plainCode = genCode();
+    const bcryptStart = Date.now();
+    const codeHash = await bcrypt.hash(plainCode, 12);
+    logger.debug(`[OTP] bcrypt hash took ${Date.now() - bcryptStart}ms`);
+
+    // Look up user by SIMS ID
+    const user = await prisma.user.findUnique({
+      where: { sims_id: parseInt(sims_id, 10) },
+      select: {
+        id: true,
+        sims_id: true,
+        telegram_id: true,
+        telegram_verified: true,
+        status: true,
+        deleted_at: true,
+        otp_locked_until: true,
+        otp_login_codes: {
+          where: { used_at: null },
+          orderBy: { created_at: 'desc' },
+          take: 1,
+          select: { created_at: true },
+        },
+      },
+    });
+
+    // Determine if request should be fulfilled (generic logic, same timing cost applies)
+    let shouldIssueCode = false;
+    if (user &&
+        !user.deleted_at &&
+        user.status === 'active' &&
+        user.telegram_id &&
+        user.telegram_verified &&
+        (!user.otp_locked_until || user.otp_locked_until <= new Date())) {
+      // Check per-account throttle: 60s between requests
+      const lastCodeTime = user.otp_login_codes?.[0]?.created_at;
+      const timeSinceLastCode = lastCodeTime ? Date.now() - new Date(lastCodeTime).getTime() : Infinity;
+      if (timeSinceLastCode >= OTP_REQUEST_THROTTLE_MS) {
+        shouldIssueCode = true;
+      }
+    }
+
+    // Issue code (or suppress during cool-off per research.md §6)
+    if (shouldIssueCode) {
+      // Atomic: delete unused codes for this user, then create new one
+      await prisma.otpLoginCode.deleteMany({
+        where: {
+          user_id: user.id,
+          used_at: null,
+        },
+      });
+
+      await prisma.otpLoginCode.create({
+        data: {
+          user_id: user.id,
+          code_hash: codeHash,
+          expires_at: new Date(Date.now() + OTP_TTL_MS),
+        },
+      });
+
+      // Send code to Telegram — fire without awaiting (research.md §4)
+      // Never await delivery; log errors but don't fail the request
+      sendMessage(user.telegram_id, `Your SIMS login code is: ${plainCode}\n\nValid for 5 minutes.`).catch((err) => {
+        logger.error(`[OTP] Failed to send code to user ${user.id}: ${err.message}`);
+      });
+    }
+
+    // Always return generic 200 (never reveals whether user exists, is active, etc.)
+    res.json({ message: 'If an account with that SIMS ID exists, a code has been sent.' });
+  } catch (err) {
+    logger.error(`requestOtp error: ${err.message}`);
+    res.status(503).json({ error: true, code: 'SERVICE_UNAVAILABLE', message: 'Service temporarily unavailable. Please try again.' });
+  }
+}
+
+// ─── POST /auth/otp/verify ────────────────────────────────────────────────────
+// Verify a 6-digit OTP code and issue a session (024-telegram-otp-login).
+// Atomically claims the code (single-use enforcement), issues JWT + CSRF on success.
+// Happy-path implementation; lockout logic is added in Phase 5 (US3).
+
+async function verifyOtp(req, res) {
+  const { sims_id, code } = req.body;
+
+  try {
+    // Look up user by SIMS ID
+    const user = await prisma.user.findUnique({
+      where: { sims_id: parseInt(sims_id, 10) },
+      select: {
+        id: true,
+        sims_id: true,
+        role: true,
+        status: true,
+        deleted_at: true,
+        must_change_password: true,
+        session_version: true,
+      },
+    });
+
+    if (!user || user.deleted_at || user.status !== 'active') {
+      // Generic rejection — never reveal account state
+      return res.status(401).json({
+        error: true,
+        code: 'INVALID_OTP',
+        message: 'Invalid code or SIMS ID.',
+      });
+    }
+
+    // Find live code for this user
+    const codeRow = await prisma.otpLoginCode.findFirst({
+      where: {
+        user_id: user.id,
+        used_at: null,
+        expires_at: { gt: new Date() },
+      },
+      select: { id: true, code_hash: true },
+    });
+
+    if (!codeRow) {
+      return res.status(401).json({
+        error: true,
+        code: 'INVALID_OTP',
+        message: 'Invalid code or SIMS ID.',
+      });
+    }
+
+    // Verify code against bcrypt hash
+    const isCodeValid = await bcrypt.compare(code, codeRow.code_hash);
+    if (!isCodeValid) {
+      return res.status(401).json({
+        error: true,
+        code: 'INVALID_OTP',
+        message: 'Invalid code or SIMS ID.',
+      });
+    }
+
+    // Atomic claim: mark code as used (single-update, single-winner guarantee)
+    const claim = await prisma.otpLoginCode.updateMany({
+      where: {
+        id: codeRow.id,
+        used_at: null, // Recheck at commit time — prevents TOCTOU
+      },
+      data: {
+        used_at: new Date(),
+      },
+    });
+
+    if (claim.count !== 1) {
+      // Someone else claimed it (concurrent request) or it was invalidated between our checks
+      return res.status(401).json({
+        error: true,
+        code: 'INVALID_OTP',
+        message: 'Invalid code or SIMS ID.',
+      });
+    }
+
+    // Re-check user is still active (state can change between issue and redemption)
+    const userRecheck = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: {
+        id: true,
+        deleted_at: true,
+        status: true,
+        must_change_password: true,
+        role: true,
+        session_version: true,
+      },
+    });
+
+    if (!userRecheck || userRecheck.deleted_at || userRecheck.status !== 'active') {
+      return res.status(401).json({
+        error: true,
+        code: 'ACCOUNT_INACTIVE',
+        message: 'Account is no longer active.',
+      });
+    }
+
+    // Issue JWT and CSRF tokens
+    const token = jwt.sign(
+      { sub: userRecheck.id, role: userRecheck.role, session_version: userRecheck.session_version },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' },
+    );
+    const csrfToken = crypto.randomBytes(32).toString('hex');
+
+    res.cookie('sims_token', token, authCookieOptions());
+    res.cookie('sims_csrf', csrfToken, csrfCookieOptions());
+
+    // Audit log — non-fatal (cookies already set)
+    const { logAction } = require('../services/audit.service');
+    try {
+      await logAction({
+        actorId: userRecheck.id,
+        action: 'OTP_LOGIN',
+        targetId: userRecheck.id,
+        targetType: 'user',
+      });
+    } catch (auditErr) {
+      logger.warn(`[AUTH] otp-verify audit log failed (login still succeeded): ${auditErr.message}`);
+    }
+
+    logger.info(`[AUTH] OTP login successful: user=${userRecheck.id}, sims_id=${sims_id}, role=${userRecheck.role}`);
+
+    // Fetch full safeUser for response
+    const fullUser = await prisma.user.findUnique({ where: { id: userRecheck.id } });
+    res.json({
+      ...safeUser(fullUser),
+      must_change_password: userRecheck.must_change_password,
+    });
+  } catch (err) {
+    logger.error(`verifyOtp error: ${err.message}`);
+    res.status(503).json({ error: true, code: 'SERVICE_UNAVAILABLE', message: 'Service temporarily unavailable. Please try again.' });
+  }
+}
+
 // ─── POST /auth/logout ────────────────────────────────────────────────────────
 
 async function logout(req, res) {
@@ -245,4 +473,4 @@ async function logout(req, res) {
   res.json({ message: 'Logged out successfully.' });
 }
 
-module.exports = { login, changePassword, logout, telegramLogin };
+module.exports = { login, changePassword, logout, telegramLogin, requestOtp, verifyOtp };
