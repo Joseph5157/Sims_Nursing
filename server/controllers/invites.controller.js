@@ -61,7 +61,12 @@ async function createInvite(req, res) {
     }
   }
 
-  const token = crypto.randomBytes(32).toString('hex');
+  // Telegram's bot deep-link `start` parameter caps out at 64 characters
+  // total. "invite_" (7 chars) + a 32-byte hex token (64 chars) = 71 chars,
+  // over the limit — Telegram silently drops the whole parameter and the
+  // bot just receives a bare /start, no payload. 24 bytes (48 hex chars)
+  // keeps "invite_<token>" at 55 chars, safely under the limit.
+  const token = crypto.randomBytes(24).toString('hex');
   const botUsername = process.env.TELEGRAM_BOT_USERNAME;
   if (!botUsername) {
     return res.status(500).json({
@@ -171,8 +176,10 @@ async function regenerateInvite(req, res) {
     });
   }
 
-  // Generate new token
-  const newToken = crypto.randomBytes(32).toString('hex');
+  // Generate new token — 24 bytes (48 hex chars), see createInvite for why
+  // not 32: "invite_" + 64 hex chars exceeds Telegram's 64-char start-param
+  // limit and gets silently dropped, arriving as a bare /start.
+  const newToken = crypto.randomBytes(24).toString('hex');
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
   const botUsername = process.env.TELEGRAM_BOT_USERNAME;
