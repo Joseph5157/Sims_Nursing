@@ -110,16 +110,16 @@ ALTER TABLE "pending_invites" ADD CONSTRAINT "pending_invites_sims_id_range_chec
 CREATE TABLE "sims_id_counters" (
   "series" VARCHAR(20) NOT NULL,
   "last_value" INTEGER NOT NULL,
-  "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" TIMESTAMP(3) NOT NULL,
   CONSTRAINT "sims_id_counters_pkey" PRIMARY KEY ("series")
 );
 
-INSERT INTO "sims_id_counters" ("series", "last_value") VALUES
+INSERT INTO "sims_id_counters" ("series", "last_value", "updated_at") VALUES
   ('admin', GREATEST(
     COALESCE((SELECT MAX(sims_id) FROM "users" WHERE role IN ('admin', 'super_admin')), 999),
     COALESCE((SELECT MAX(sims_id) FROM "pending_invites" WHERE role = 'admin'), 999)
-  )),
+  ), CURRENT_TIMESTAMP),
   ('faculty', GREATEST(
     COALESCE((SELECT MAX(sims_id) FROM "users" WHERE role = 'faculty'), 1099),
     COALESCE((SELECT MAX(sims_id) FROM "pending_invites" WHERE role = 'faculty'), 1099)
-  ));
+  ), CURRENT_TIMESTAMP);
