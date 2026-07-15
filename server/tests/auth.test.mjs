@@ -26,6 +26,7 @@ function makeRes() {
 describe('login', () => {
   const userWithPassword = {
     id: 'user-1',
+    sims_id: 1100,
     email: 'faculty@sims.edu',
     password_hash: '$2b$12$somehash',
     status: 'active',
@@ -62,6 +63,18 @@ describe('login', () => {
     expect(res._body.id).toBe(userWithPassword.id);
     expect(res._body.email).toBe(userWithPassword.email);
     expect(res._body.must_change_password).toBe(false);
+  });
+
+  it('accepts a four-digit SIMS ID as the login identifier', async () => {
+    prisma.user.findUnique.mockResolvedValue(userWithPassword);
+    bcrypt.compare.mockResolvedValue(true);
+    const res = makeRes();
+    await login(makeReq({ identifier: '1100', password: 'password123' }), res);
+    expect(res._status).toBe(200);
+    expect(prisma.user.findUnique).toHaveBeenCalledWith({ where: { sims_id: 1100 } });
+    expect(audit.logAction).toHaveBeenCalledWith(expect.objectContaining({
+      metadata: { identifier_type: 'sims_id' },
+    }));
   });
 
   it('returns 401 INVALID_CREDENTIALS on incorrect password', async () => {
@@ -116,7 +129,7 @@ describe('login', () => {
         action: 'PASSWORD_LOGIN',
         targetId: userWithPassword.id,
         targetType: 'user',
-        metadata: expect.objectContaining({ email: userWithPassword.email }),
+        metadata: expect.objectContaining({ identifier_type: 'email' }),
       }),
     );
   });

@@ -174,6 +174,12 @@ export default function ProfileDrawer({ open, onClose, user }) {
         </div>
 
         <div>
+          <FieldLabel label="SIMS ID" icon={IdCard} htmlFor="profile-sims-id" />
+          <input id="profile-sims-id" value={user?.sims_id ?? ''} disabled className={`${inputClassName} opacity-60 cursor-not-allowed font-mono font-bold`} style={inputInline} />
+          <p className="text-[length:var(--text-micro)] text-[color:var(--text-muted)] mt-1">Your permanent institutional login ID.</p>
+        </div>
+
+        <div>
           <FieldLabel label="Email" icon={Mail} htmlFor="profile-email" />
           <input id="profile-email" value={user?.email ?? ''} disabled className={`${inputClassName} opacity-60 cursor-not-allowed`} style={inputInline} />
           <p className="text-[length:var(--text-micro)] text-[color:var(--text-muted)] mt-1">Managed by administrators.</p>

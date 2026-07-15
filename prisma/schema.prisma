@@ -63,7 +63,8 @@ enum ViolationChangeType {
 model User {
   id                             String     @id @default(uuid())
   name                           String     @db.VarChar(150)
-  email                          String     @unique @db.VarChar(200)
+  sims_id                        Int        @unique
+  email                          String?    @unique @db.VarChar(200)
   phone                          String?    @db.VarChar(20)
   role                           Role
   department                     String?    @db.VarChar(100)
@@ -124,7 +125,8 @@ model User {
 model PendingInvite {
   id                String   @id @default(uuid())
   name              String   @db.VarChar(150)
-  email             String   @unique @db.VarChar(200)
+  sims_id           Int      @unique
+  email             String?  @unique @db.VarChar(200)
   phone             String?  @db.VarChar(20)
   role              Role
   department        String?  @db.VarChar(100)
@@ -177,6 +179,19 @@ model TelegramLoginToken {
 
   @@index([user_id])
   @@map("telegram_login_tokens")
+}
+
+
+// ─── 2c. SIMS ID Counters ───────────────────────────────────────────────────
+// Atomic counters keep short numeric identifiers unique under concurrent
+// invites. Admin/super-admin IDs use 1000–1099; faculty IDs start at 1100.
+
+model SimsIdCounter {
+  series     String   @id @db.VarChar(20)
+  last_value Int
+  updated_at DateTime @updatedAt
+
+  @@map("sims_id_counters")
 }
 
 // ─── 3. Students ─────────────────────────────────────────────────────────────

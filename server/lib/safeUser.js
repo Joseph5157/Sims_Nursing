@@ -5,6 +5,7 @@
 const safeUser = (u) => ({
   id: u.id,
   name: u.name,
+  sims_id: u.sims_id,
   email: u.email,
   phone: u.phone,
   role: u.role,

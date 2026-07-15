@@ -52,7 +52,7 @@ These decisions are locked. Do not suggest alternatives or use different tools.
 |---|---|
 | Database | PostgreSQL — hosted on Railway |
 | Hosting | Railway — both staging and production |
-| Auth | Email + password → JWT stored in httpOnly cookie + CSRF token. **Additionally**, a linked/verified user may log in via a Telegram magic link (single-use, 10-minute token; issues the identical cookie session) — see §4 Authentication. Telegram remains the sole notification channel otherwise |
+| Auth | Email + password → JWT stored in httpOnly cookie + CSRF token. Every user also has a permanent 4-digit SIMS ID (`1000`–`1099` admin/super_admin, `1100`–`9999` faculty, allocated by an atomic DB counter) usable as an alternative login identifier in place of email — email is now optional, kept for contact and legacy login (see §4 Authentication). **Additionally**, a linked/verified user may log in via a Telegram magic link (single-use, 10-minute token; issues the identical cookie session) — see §4 Authentication. Telegram remains the sole notification channel otherwise |
 | Real-time | 30-second polling — no WebSockets, no SSE |
 | API style | REST — no GraphQL |
 | App structure | Monolithic — single repo, single deploy |
@@ -113,6 +113,16 @@ These are non-negotiable rules encoded in the planning document. Every feature m
   linked, verified Telegram account (022-telegram-magic-link-login) — both methods remain fully
   available side by side; neither replaces the other. No Telegram OTP (the code-entry kind), no
   SMS, no email OTP — the magic link is a single-use URL, not a one-time code the user types in.
+- **SIMS ID login**: every user (and pending invite) also has a permanent 4-digit SIMS ID —
+  `1000`–`1099` for admin/super_admin, `1100`–`9999` for faculty — allocated sequentially by an
+  atomic `sims_id_counters` row per role series (`server/lib/simsId.js`), assigned at invite
+  creation and never reused. `POST /auth/login` accepts either the SIMS ID or the email address
+  as the identifier (a bare 4-digit string is treated as a SIMS ID, anything else as email); the
+  password check and all other login behavior is unchanged. This makes email optional —
+  Telegram-first users (invited without an email address) can still log in and be identified
+  purely by SIMS ID. Linked users can recover their SIMS ID any time via `/myid` on the Telegram
+  bot. This is additive to, not a replacement for, the Telegram magic-link login above — both
+  remain available side by side.
 - **Telegram magic-link login**: a linked user sends `/login` to the bot (or taps "Log in via
   Telegram" on the login page, which deep-links to `t.me/<bot>?start=login` — no server call
   needed to trigger this). The bot issues a random, single-use `telegram_login_tokens` row
@@ -300,7 +310,7 @@ whose date has not passed and that has no recorded attendance can be reassigned.
 
 ---
 
-## 5. Database — 17 Tables
+## 5. Database — 18 Tables
 
 All migrations must match this schema exactly. Full column definitions in `SIMS_Database_Schema_v2.1.md`.
 
@@ -324,6 +334,7 @@ All migrations must match this schema exactly. Full column definitions in `SIMS_
 | `pending_invites` | Temporary invite tokens for new account activation via Telegram |
 | `telegram_relink_tokens` | Temporary tokens for relinking an existing user to a new Telegram account |
 | `telegram_login_tokens` | Single-use, 10-minute magic-link login tokens (022-telegram-magic-link-login). No `deleted_at` — mirrors `telegram_relink_tokens`'s lifecycle (rows persist, `used_at` is the only mutation, no purge job) |
+| `sims_id_counters` | Two rows (`admin`, `faculty`) — atomic `last_value` counters backing SIMS ID allocation on `users.sims_id` / `pending_invites.sims_id`. No FK to either table; purely a sequence generator |
 
 > **Removed**: `correction_requests` (replaced by `violations.is_flagged`), `reschedule_requests` then `cover_requests` (the Need Cover / Volunteer workflow was built and then removed in favor of Admin Duty Reassignment — `duty_reassignments`, see §4), `otp_sessions` (Telegram OTP login was built and then abandoned in favor of email/password — see §4 Authentication)
 
@@ -339,6 +350,7 @@ All migrations must match this schema exactly. Full column definitions in `SIMS_
 - `violation_types.is_system` — prevents deletion of built-in types
 - `student_upload_log.errors` — JSONB array of failed rows with reason
 - `calendar_config.working_days` — JSONB array of working days set by Admin before opening window
+- `users.email` / `pending_invites.email` are now nullable (previously `NOT NULL @unique`) — `users.sims_id` / `pending_invites.sims_id` (`Int @unique`, range-checked by role via a DB `CHECK` constraint) are the new mandatory identifier. Migration `20260715103000_add_sims_id_series` backfilled existing rows in creation order and stops with an error rather than silently overflowing if a role's 100/8900-slot range is already exhausted
 - `system_config` timing fields are session-scoped by naming convention (`{concept}_{morning,afternoon}_{hour,min}`) — there is no shared/default fallback field for any timing concept. Ordering (`session_start < late_threshold ≤ auto_checkout`, per session) is enforced at the application layer via `settingsService.findOrderingViolation`, not as a DB constraint — shared by every write path onto these fields (`PATCH /duty-timing-settings` and `PATCH /admin/settings`) so neither can write out-of-order values; any new code path that writes to `system_config` timing fields directly (bypassing this check) would skip it
 
 ---
@@ -481,6 +493,18 @@ PORT=3000
 
 ---
 
+*Constitution version: 3.18 — Updated: July 2026 (SIMS Short ID series — §2 Infrastructure, §4
+Authentication: every user/pending-invite gains a permanent 4-digit SIMS ID (`1000`–`1099`
+admin/super_admin, `1100`–`9999` faculty), allocated by an atomic per-role counter
+(`server/lib/simsId.js`, new `sims_id_counters` table). `POST /auth/login` now accepts a bare
+4-digit SIMS ID or an email as the login identifier; `users.email`/`pending_invites.email` become
+nullable so Telegram-first users can be invited and onboarded without an email address at all.
+Existing email+password login is unchanged and still fully supported — this is additive, not a
+replacement. Telegram activation/password-reset messages now show the SIMS ID, and linked users
+can recover it via `/myid`. Does not touch the Telegram magic-link login (022) — both remain
+available side by side. §5: new `sims_id_counters` table, total 17→18. No new endpoints (§6
+Authentication stays at 4). See `SIMS_ID_IMPLEMENTATION.md` for the full number-range/deployment
+notes.)*
 *Constitution version: 3.17 — Updated: July 2026 (Telegram magic-link login —
 022-telegram-magic-link-login. §2 Infrastructure, §4 Authentication: a linked/verified user may
 now log in via a single-use, 10-minute Telegram link, issuing the identical httpOnly-cookie

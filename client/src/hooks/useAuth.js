@@ -29,7 +29,7 @@ export function useCurrentUser() {
 export function useLogin() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ email, password }) => api.post('/auth/login', { email, password }),
+    mutationFn: ({ identifier, password }) => api.post('/auth/login', { identifier, password }),
     onSuccess: (res) => {
       saveUserToStorage(res.data);
       qc.setQueryData(['currentUser'], res.data);

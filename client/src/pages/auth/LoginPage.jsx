@@ -22,7 +22,7 @@ export default function LoginPage() {
   const login = useLogin();
   const [searchParams] = useSearchParams();
 
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -36,14 +36,14 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
 
-    if (!email.trim() || !password.trim()) {
-      setError('Please enter both email and password.');
+    if (!identifier.trim() || !password.trim()) {
+      setError('Please enter your SIMS ID and password.');
       return;
     }
 
     try {
       const res = await login.mutateAsync({
-        email: email.trim(),
+        identifier: identifier.trim(),
         password,
       });
 
@@ -66,7 +66,7 @@ export default function LoginPage() {
       if (!err.response) {
         setError("Can't reach the server. Check your connection and try again.");
       } else if (err.response.status === 401) {
-        setError('Invalid email or password. Please try again.');
+        setError('Invalid SIMS ID/email or password. Please try again.');
       } else if (err.response.status === 429) {
         setError('Too many login attempts. Please wait and try again.');
       } else {
@@ -77,7 +77,7 @@ export default function LoginPage() {
     }
   };
 
-  const isDisabled = login.isPending || !email.trim() || !password.trim();
+  const isDisabled = login.isPending || !identifier.trim() || !password.trim();
 
   const inputClasses = [
     'border-2 border-[var(--border)] rounded-[var(--radius-xl)] px-5 sm:px-4 h-14 sm:h-11',
@@ -142,7 +142,7 @@ export default function LoginPage() {
                 Sign in
               </h2>
               <p className="text-[length:var(--text-body)] sm:text-[12px] text-[var(--text-secondary)]">
-                Enter your credentials to continue
+                Enter your four-digit SIMS ID to continue
               </p>
             </div>
 
@@ -160,21 +160,22 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Email field */}
+            {/* SIMS ID / legacy email field */}
             <div className="flex flex-col gap-2 sm:gap-1">
               <label
-                htmlFor="login-email"
+                htmlFor="login-identifier"
                 className="text-[length:var(--text-small)] font-[var(--weight-bold)] text-[var(--text-secondary)] uppercase tracking-[var(--tracking-label)] pl-5"
               >
-                Email Address
+                SIMS ID
               </label>
               <input
-                id="login-email"
-                type="email"
-                autoComplete="email"
-                placeholder="your.email@college.edu"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="login-identifier"
+                type="text"
+                inputMode="numeric"
+                autoComplete="username"
+                placeholder="e.g. 1100"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value.replace(/\D/g, '').slice(0, 4))}
                 required
                 autoFocus
                 disabled={login.isPending}

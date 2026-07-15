@@ -1,8 +1,13 @@
 const { z } = require('zod');
 
 const loginSchema = z.object({
-  email: z.string().email('A valid email address is required.'),
+  identifier: z.string().trim().min(1).max(200).optional(),
+  // Kept for backward compatibility with older clients during rollout.
+  email: z.string().trim().email('A valid email address is required.').max(200).optional(),
   password: z.string().min(8, 'Password must be at least 8 characters.'),
+}).refine((value) => Boolean(value.identifier || value.email), {
+  message: 'SIMS ID or email is required.',
+  path: ['identifier'],
 });
 
 const changePasswordSchema = z.object({

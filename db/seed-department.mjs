@@ -32,6 +32,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const pkg = require('../server/node_modules/@prisma/client/index.js');
 const { PrismaClient } = pkg;
+const { allocateSimsId } = require('../server/lib/simsId');
 
 const prisma = new PrismaClient();
 
@@ -108,25 +109,29 @@ async function seedSuperAdmin(args) {
   const generatedPassword = args['admin-password'] || process.env.BOOTSTRAP_SUPER_ADMIN_PASSWORD || generatePassword();
   const passwordHash = await bcrypt.hash(generatedPassword, 12);
 
-  const superAdmin = await prisma.user.create({
-    data: {
-      name,
-      email,
-      phone,
-      role: 'super_admin',
-      department,
-      designation,
-      status: 'active',
-      telegram_id: telegramId,
-      telegram_verified: Boolean(telegramId),
-      password_hash: passwordHash,
-      must_change_password: true,
-      session_version: 1,
-      approved_at: new Date(),
-    },
+  const superAdmin = await prisma.$transaction(async (tx) => {
+    const simsId = await allocateSimsId(tx, 'super_admin');
+    return tx.user.create({
+      data: {
+        name,
+        sims_id: simsId,
+        email,
+        phone,
+        role: 'super_admin',
+        department,
+        designation,
+        status: 'active',
+        telegram_id: telegramId,
+        telegram_verified: Boolean(telegramId),
+        password_hash: passwordHash,
+        must_change_password: true,
+        session_version: 1,
+        approved_at: new Date(),
+      },
+    });
   });
 
-  console.log(`[super-admin] CREATE — ${superAdmin.email}`);
+  console.log(`[super-admin] CREATE — SIMS ID ${superAdmin.sims_id} (${superAdmin.email})`);
   if (!args['admin-password'] && !process.env.BOOTSTRAP_SUPER_ADMIN_PASSWORD) {
     console.log('');
     console.log('================================================================');
@@ -138,7 +143,7 @@ async function seedSuperAdmin(args) {
     console.log('');
   }
   if (!telegramId) {
-    console.log('[super-admin] No Telegram ID given — account works via email+password.');
+    console.log('[super-admin] No Telegram ID given — account works via SIMS ID + password.');
     console.log('               Link Telegram later from Profile to enable notifications.');
   }
 

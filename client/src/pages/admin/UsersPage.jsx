@@ -182,7 +182,7 @@ export default function UsersPage({ user }) {
         <input
           className="border border-[var(--border)] rounded-lg px-3 py-2 flex-1 min-w-[200px] outline-none focus:border-[var(--brand)] focus:ring-[3px] focus:ring-[var(--brand)]/15 placeholder:text-[var(--text-muted)] bg-[var(--surface-card)] text-[var(--text-primary)]"
           style={{ fontSize: 16 }}
-          placeholder="Search by name or Telegram ID…"
+          placeholder="Search by name or SIMS ID…"
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
         />
@@ -218,7 +218,7 @@ export default function UsersPage({ user }) {
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {u.name}
               </p>
-              <p style={{ fontSize: 'var(--text-small)', color: 'var(--text-muted)' }}>{u.email}</p>
+              <p style={{ fontSize: 'var(--text-small)', color: 'var(--text-muted)' }}>SIMS ID {u.sims_id}{u.email ? ` · ${u.email}` : ''}</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
               <Badge status={u.role} label={u.role.replace(/_/g, ' ')} />
@@ -244,6 +244,7 @@ export default function UsersPage({ user }) {
         <Table>
           <thead>
             <tr>
+              <Th>SIMS ID</Th>
               <Th>Name</Th>
               <Th>Role</Th>
               <Th className="hidden sm:table-cell">Department</Th>
@@ -253,14 +254,15 @@ export default function UsersPage({ user }) {
             </tr>
           </thead>
           <tbody>
-            {isLoading && <EmptyRow cols={6} message="Loading…" />}
-            {isError && <ErrorRow cols={6} onRetry={refetch} />}
-            {!isLoading && !isError && !data?.data?.length && <EmptyRow cols={6} />}
+            {isLoading && <EmptyRow cols={7} message="Loading…" />}
+            {isError && <ErrorRow cols={7} onRetry={refetch} />}
+            {!isLoading && !isError && !data?.data?.length && <EmptyRow cols={7} />}
             {data?.data?.map((u) => (
               <tr key={u.id}>
+                <Td><span className="font-mono font-bold text-[var(--brand)]">{u.sims_id}</span></Td>
                 <Td>
                   <p className="font-medium text-[var(--text-primary)]">{u.name}</p>
-                  <p className="text-[length:11px] text-[var(--text-muted)]">{u.email}</p>
+                  <p className="text-[length:11px] text-[var(--text-muted)]">{u.email || 'No email added'}</p>
                 </Td>
                 <Td><Badge status={u.role} label={u.role.replace(/_/g, ' ')} /></Td>
                 <Td className="hidden sm:table-cell">{u.department ?? '—'}</Td>
@@ -317,6 +319,7 @@ export default function UsersPage({ user }) {
         <Table>
           <thead>
             <tr>
+              <Th>SIMS ID</Th>
               <Th>Name</Th>
               <Th>Email</Th>
               <Th>Role</Th>
@@ -325,13 +328,14 @@ export default function UsersPage({ user }) {
             </tr>
           </thead>
           <tbody>
-            {invitesLoading && <EmptyRow cols={5} message="Loading…" />}
-            {invitesError && <ErrorRow cols={5} onRetry={refetchInvites} />}
-            {!invitesLoading && !invitesError && !invitesData?.data?.length && <EmptyRow cols={5} message="No pending invites." />}
+            {invitesLoading && <EmptyRow cols={6} message="Loading…" />}
+            {invitesError && <ErrorRow cols={6} onRetry={refetchInvites} />}
+            {!invitesLoading && !invitesError && !invitesData?.data?.length && <EmptyRow cols={6} message="No pending invites." />}
             {invitesData?.data?.map((inv) => (
               <tr key={inv.id}>
+                <Td><span className="font-mono font-bold text-[var(--brand)]">{inv.sims_id}</span></Td>
                 <Td><p className="font-medium text-[var(--text-primary)]">{inv.name}</p></Td>
-                <Td>{inv.email}</Td>
+                <Td>{inv.email || '—'}</Td>
                 <Td><Badge status={inv.role} label={inv.role.replace(/_/g, ' ')} /></Td>
                 <Td className="hidden sm:table-cell text-[length:12px] text-[var(--text-secondary)]">
                   {new Date(inv.invite_expires_at).toLocaleDateString()}

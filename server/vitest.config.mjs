@@ -10,6 +10,7 @@ export default defineConfig({
       NODE_ENV: 'test',
       JWT_SECRET: 'test-secret',
       JWT_EXPIRES_IN: '7d',
+      TELEGRAM_BOT_USERNAME: 'test_sims_bot',
     },
   },
 });

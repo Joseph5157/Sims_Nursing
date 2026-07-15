@@ -33,9 +33,11 @@ async function listUsers(req, res) {
     where.status = status;
   }
   if (search) {
+    const simsId = /^\d{4}$/.test(search.trim()) ? Number(search.trim()) : null;
     where.OR = [
       { name: { contains: search, mode: 'insensitive' } },
       { email: { contains: search, mode: 'insensitive' } },
+      ...(simsId ? [{ sims_id: simsId }] : []),
     ];
   }
 
@@ -76,7 +78,7 @@ async function listDirectory(req, res) {
 
   const users = await prisma.user.findMany({
     where,
-    select: { id: true, name: true, role: true, department: true, designation: true },
+    select: { id: true, sims_id: true, name: true, role: true, department: true, designation: true },
     orderBy: { name: 'asc' },
   });
 
@@ -121,7 +123,7 @@ async function updateProfile(req, res) {
   }
 
   // Reject attempts to modify security-sensitive fields
-  const sensitiveFields = ['role', 'status', 'telegram_id', 'telegram_verified', 'approved_at', 'deleted_at', 'email'];
+  const sensitiveFields = ['sims_id', 'role', 'status', 'telegram_id', 'telegram_verified', 'approved_at', 'deleted_at', 'email'];
   const attemptedSensitiveChanges = sensitiveFields.filter(f => f in req.body);
   if (attemptedSensitiveChanges.length > 0) {
     logger.warn(`[UPDATE_PROFILE] Attempted unauthorized change of fields: ${attemptedSensitiveChanges.join(', ')} for user ${targetId}`);
@@ -308,7 +310,7 @@ async function resetUserLogin(req, res) {
   if (user.telegram_id) {
     try {
       const appUrl = process.env.APP_URL || 'https://sims-dms.railway.app';
-      const text = `🔑 Your ${APP_SHORT_NAME} password has been reset by an Admin.\n\nLogin at: ${appUrl}/login\nEmail: ${user.email}\nTemporary password: <code>${tempPassword}</code>\n\nYou'll be asked to set a new password on first login.`;
+      const text = `🔑 Your ${APP_SHORT_NAME} password has been reset by an Admin.\n\nLogin at: ${appUrl}/login\nSIMS ID: <code>${user.sims_id}</code>\nTemporary password: <code>${tempPassword}</code>\n\nYou'll be asked to set a new password on first login.`;
       await telegram.sendMessage(user.telegram_id, text);
       telegramDelivered = true;
     } catch (err) {

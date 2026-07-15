@@ -25,6 +25,7 @@ function makeRes() {
 
 const validBody = {
   name: 'Dr. Test',
+  sims_id: 1100,
   email: 'test@sims.edu',
   role: 'faculty',
   phone: null,
@@ -49,6 +50,11 @@ describe('createInvite', () => {
     vi.spyOn(prisma.user, 'findFirst').mockResolvedValue(null);
     vi.spyOn(prisma.pendingInvite, 'findUnique').mockResolvedValue(null);
     vi.spyOn(prisma.pendingInvite, 'create').mockResolvedValue(existingInvite);
+    vi.spyOn(prisma.simsIdCounter, 'upsert').mockImplementation(async ({ where }) => ({
+      series: where.series,
+      last_value: where.series === 'admin' ? 1000 : 1100,
+    }));
+    vi.spyOn(prisma, '$transaction').mockImplementation(async (callback) => callback(prisma));
     vi.spyOn(prisma.adminAuditLog, 'create').mockResolvedValue({});
   });
   afterEach(() => vi.restoreAllMocks());
@@ -82,6 +88,7 @@ describe('createInvite', () => {
     expect(res._status).toBe(201);
     expect(res._body.invite_link).toMatch(/\?start=invite_/);
     expect(res._body.invite).not.toHaveProperty('invite_token');
+    expect(res._body.invite.sims_id).toBe(1100);
   });
 
   it('super_admin can invite admin role', async () => {

@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const prisma = require('../lib/prisma');
 const { logAction } = require('../services/audit.service');
+const { allocateSimsId } = require('../lib/simsId');
 
 /**
  * Helper: Return safe invite object without sensitive fields
@@ -8,6 +9,7 @@ const { logAction } = require('../services/audit.service');
 const safeInvite = (invite) => ({
   id: invite.id,
   name: invite.name,
+  sims_id: invite.sims_id,
   email: invite.email,
   phone: invite.phone,
   role: invite.role,
@@ -25,6 +27,7 @@ const safeInvite = (invite) => ({
  */
 async function createInvite(req, res) {
   const { name, email, phone, role, department, designation, title } = req.body;
+  const normalizedEmail = email?.trim().toLowerCase() || null;
 
   // Role-scope guard: admin can only invite faculty
   if (req.user.role === 'admin' && role !== 'faculty') {
@@ -35,27 +38,29 @@ async function createInvite(req, res) {
     });
   }
 
-  // Check for duplicate: either active user or pending invite with this email
-  const [existingUser, existingInvite] = await Promise.all([
-    prisma.user.findFirst({
-      where: { email, deleted_at: null },
-      select: { id: true },
-    }),
-    prisma.pendingInvite.findUnique({
-      where: { email },
-      select: { id: true },
-    }),
-  ]);
+  // Email is optional for Telegram-first accounts. When supplied, keep the
+  // existing uniqueness guarantee across active users and pending invites.
+  if (normalizedEmail) {
+    const [existingUser, existingInvite] = await Promise.all([
+      prisma.user.findFirst({
+        where: { email: normalizedEmail, deleted_at: null },
+        select: { id: true },
+      }),
+      prisma.pendingInvite.findUnique({
+        where: { email: normalizedEmail },
+        select: { id: true },
+      }),
+    ]);
 
-  if (existingUser || existingInvite) {
-    return res.status(409).json({
-      error: true,
-      code: 'EMAIL_TAKEN',
-      message: 'An account or pending invite already exists for this email.',
-    });
+    if (existingUser || existingInvite) {
+      return res.status(409).json({
+        error: true,
+        code: 'EMAIL_TAKEN',
+        message: 'An account or pending invite already exists for this email.',
+      });
+    }
   }
 
-  // Generate token
   const token = crypto.randomBytes(32).toString('hex');
   const botUsername = process.env.TELEGRAM_BOT_USERNAME;
   if (!botUsername) {
@@ -65,34 +70,50 @@ async function createInvite(req, res) {
       message: 'Telegram bot not configured.',
     });
   }
+
   const invite_link = `https://t.me/${botUsername}?start=invite_${token}`;
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-  // Create pending invite
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-  const invite = await prisma.pendingInvite.create({
-    data: {
-      name,
-      email,
-      phone: phone || null,
-      role,
-      department: department || null,
-      designation: designation || null,
-      title: title || null,
-      invite_token: token,
-      invite_expires_at: expiresAt,
-      invited_by: req.user.id,
-    },
-  });
+  let invite;
+  try {
+    invite = await prisma.$transaction(async (tx) => {
+      const simsId = await allocateSimsId(tx, role);
+      return tx.pendingInvite.create({
+        data: {
+          name,
+          sims_id: simsId,
+          email: normalizedEmail,
+          phone: phone || null,
+          role,
+          department: department || null,
+          designation: designation || null,
+          title: title || null,
+          invite_token: token,
+          invite_expires_at: expiresAt,
+          invited_by: req.user.id,
+        },
+      });
+    });
+  } catch (err) {
+    if (err.code === 'SIMS_ID_RANGE_EXHAUSTED') {
+      return res.status(409).json({
+        error: true,
+        code: err.code,
+        message: role === 'faculty'
+          ? 'The four-digit faculty SIMS ID range is full.'
+          : 'The 1000-series admin SIMS ID range is full.',
+      });
+    }
+    throw err;
+  }
 
-  // Fire-and-forget audit log
   logAction({
     actorId: req.user.id,
     action: 'CREATE_INVITE',
     targetId: invite.id,
     targetType: 'pending_invite',
-    metadata: { email, role },
+    metadata: { email: normalizedEmail, role, sims_id: invite.sims_id },
   }).catch((err) => {
-    // Log error but don't fail the request
     console.error('Audit log error in createInvite:', err);
   });
 

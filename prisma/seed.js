@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('../server/node_modules/@prisma/client');
 
 const prisma = new PrismaClient();
+const { allocateSimsId } = require('../server/lib/simsId');
 
 function generatePassword() {
   return crypto.randomBytes(12).toString('base64url');
@@ -56,25 +57,29 @@ async function main() {
   const generatedPassword = process.env.BOOTSTRAP_SUPER_ADMIN_PASSWORD || generatePassword();
   const passwordHash = await bcrypt.hash(generatedPassword, 12);
 
-  const superAdmin = await prisma.user.create({
-    data: {
-      name,
-      email,
-      phone,
-      role: 'super_admin',
-      department,
-      designation,
-      status: 'active',
-      telegram_id: telegramId,
-      telegram_verified: true,
-      password_hash: passwordHash,
-      must_change_password: true,
-      session_version: 1,
-      approved_at: new Date(),
-    },
+  const superAdmin = await prisma.$transaction(async (tx) => {
+    const simsId = await allocateSimsId(tx, 'super_admin');
+    return tx.user.create({
+      data: {
+        name,
+        sims_id: simsId,
+        email,
+        phone,
+        role: 'super_admin',
+        department,
+        designation,
+        status: 'active',
+        telegram_id: telegramId,
+        telegram_verified: true,
+        password_hash: passwordHash,
+        must_change_password: true,
+        session_version: 1,
+        approved_at: new Date(),
+      },
+    });
   });
 
-  console.log(`Bootstrap super_admin created: ${superAdmin.email}`);
+  console.log(`Bootstrap super_admin created: SIMS ID ${superAdmin.sims_id} (${superAdmin.email})`);
 
   if (!process.env.BOOTSTRAP_SUPER_ADMIN_PASSWORD) {
     console.log('');

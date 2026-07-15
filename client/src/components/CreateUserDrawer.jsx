@@ -28,6 +28,7 @@ export default function CreateUserDrawer({ open, onClose, onSubmit, loading, act
   });
   const [inviteLink, setInviteLink] = useState(null);
   const [invitedName, setInvitedName] = useState('');
+  const [assignedSimsId, setAssignedSimsId] = useState(null);
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
   const setRole = (r) => setForm(f => ({ ...f, role: r }));
@@ -38,6 +39,7 @@ export default function CreateUserDrawer({ open, onClose, onSubmit, loading, act
       if (response.invite_link) {
         setInviteLink(response.invite_link);
         setInvitedName(response.invite?.name || form.name);
+        setAssignedSimsId(response.invite?.sims_id ?? null);
       } else {
         resetAndClose();
       }
@@ -48,11 +50,12 @@ export default function CreateUserDrawer({ open, onClose, onSubmit, loading, act
     setForm({ name: '', email: '', role: 'faculty', department: '', designation: '', title: '', phone: '' });
     setInviteLink(null);
     setInvitedName('');
+    setAssignedSimsId(null);
     onClose();
   }
 
   function shareOnWhatsApp() {
-    const message = `Hi ${invitedName}, tap this link to activate your SIMS account: ${inviteLink}`;
+    const message = `Hi ${invitedName}, your SIMS ID is ${assignedSimsId}. Tap this link to activate your SIMS account: ${inviteLink}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
   }
 
@@ -85,10 +88,10 @@ export default function CreateUserDrawer({ open, onClose, onSubmit, loading, act
             <button type="button" onClick={onClose} style={cancelBtnStyle}>Cancel</button>
             <button
               type="submit"
-              disabled={loading || !form.name.trim() || !form.email.trim()}
+              disabled={loading || !form.name.trim()}
               onClick={handleSubmit}
               data-primary=""
-              style={primaryBtnStyle(loading || !form.name.trim() || !form.email.trim())}
+              style={primaryBtnStyle(loading || !form.name.trim())}
             >
               {loading ? '🔄 Sending...' : 'Send Invite'}
             </button>
@@ -99,6 +102,14 @@ export default function CreateUserDrawer({ open, onClose, onSubmit, loading, act
       {inviteLink ? (
         // ── INVITE LINK PANEL ──
         <div className="p-5 flex flex-col gap-3.5">
+          {assignedSimsId && (
+            <div className="bg-[var(--surface-page)] rounded-xl p-4 text-center border-[1.5px] border-[var(--brand)]">
+              <p className="text-[length:var(--text-micro)] text-[color:var(--text-muted)] mb-1 uppercase tracking-[0.12em] font-bold">Assigned SIMS ID</p>
+              <p className="text-3xl font-extrabold text-[var(--brand)] font-mono tracking-[0.18em]">{assignedSimsId}</p>
+              <p className="text-[length:var(--text-micro)] text-[color:var(--text-muted)] mt-1">Permanent ID — it will not be reused.</p>
+            </div>
+          )}
+
           <div className="bg-[var(--color-blue-50)] border-[1.5px] border-[var(--color-blue-200)] rounded-xl p-3 text-xs text-[var(--color-blue-800)] leading-relaxed">
             <p className="font-bold mb-2">📋 Instructions:</p>
             <ol className="m-0 pl-[18px]">
@@ -155,7 +166,7 @@ export default function CreateUserDrawer({ open, onClose, onSubmit, loading, act
             Identity
           </p>
           <TextInput label="Full name" placeholder="Priya Sharma" value={form.name} onChange={set('name')} required autoComplete="name" />
-          <TextInput label="Email" type="email" placeholder="priya@sims.edu.in" value={form.email} onChange={set('email')} required autoComplete="email" />
+          <TextInput label="Email (optional)" type="email" placeholder="priya@sims.edu.in" value={form.email} onChange={set('email')} autoComplete="email" />
 
           <p className={sectionTitle}>
             Role

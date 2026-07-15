@@ -10,16 +10,22 @@ const { safeUser } = require('../lib/safeUser');
 
 async function login(req, res) {
   try {
-    const { email, password } = req.body;
+    const { password } = req.body;
+    const identifier = String(req.body.identifier || req.body.email || '').trim();
+    const isSimsId = /^\d{4}$/.test(identifier);
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: isSimsId
+        ? { sims_id: Number(identifier) }
+        : { email: identifier.toLowerCase() },
+    });
 
     // Generic response — never reveal whether user exists or has no password
     if (!user || user.deleted_at || user.status !== 'active' || !user.password_hash) {
       return res.status(401).json({
         error: true,
         code: 'INVALID_CREDENTIALS',
-        message: 'Invalid email or password.',
+        message: 'Invalid SIMS ID/email or password.',
       });
     }
 
@@ -39,7 +45,7 @@ async function login(req, res) {
       return res.status(401).json({
         error: true,
         code: 'INVALID_CREDENTIALS',
-        message: 'Invalid email or password.',
+        message: 'Invalid SIMS ID/email or password.',
       });
     }
 
@@ -65,7 +71,7 @@ async function login(req, res) {
         action: 'PASSWORD_LOGIN',
         targetId: user.id,
         targetType: 'user',
-        metadata: { email },
+        metadata: { identifier_type: isSimsId ? 'sims_id' : 'email' },
       });
     } catch (auditErr) {
       logger.warn(`[AUTH] login audit log failed (login still succeeded): ${auditErr.message}`);
@@ -76,7 +82,7 @@ async function login(req, res) {
       must_change_password: user.must_change_password,
     };
 
-    logger.info(`[AUTH] Login successful: user=${user.id}, email=${email}, role=${user.role}`);
+    logger.info(`[AUTH] Login successful: user=${user.id}, sims_id=${user.sims_id}, role=${user.role}`);
 
     res.json(response);
   } catch (err) {

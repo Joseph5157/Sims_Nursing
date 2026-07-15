@@ -50,8 +50,8 @@ async function handleWebhook(req, res) {
 
       if (result.success) {
         const appUrl = process.env.APP_URL || 'https://sims-dms.railway.app';
-        replyText = `✅ Your ${APP_SHORT_NAME} account is active!\n\nLogin at: ${appUrl}/login\nEmail: ${result.user.email}\nTemporary password: <code>${result.tempPassword}</code>\n\nYou'll be asked to set a new password on first login.`;
-        logger.info(`[TELEGRAM] Account activated: ${result.user.id} (${result.user.email})`);
+        replyText = `✅ Your ${APP_SHORT_NAME} account is active!\n\nYour SIMS ID: <code>${result.user.sims_id}</code>\nLogin at: ${appUrl}/login\nTemporary password: <code>${result.tempPassword}</code>\n\nUse your SIMS ID and this temporary password. You'll be asked to set a new password on first login.`;
+        logger.info(`[TELEGRAM] Account activated: ${result.user.id} (SIMS ID ${result.user.sims_id})`);
 
         // The invite token is already consumed at this point (PendingInvite deleted,
         // User row created) — if this notification never reaches the user, they have
@@ -66,7 +66,7 @@ async function handleWebhook(req, res) {
         replyText = 'This Telegram account is already linked to a SIMS account. Contact your admin.';
         logger.warn(`[TELEGRAM] Duplicate Telegram ID attempted: ${chatId}`);
       } else if (result.error === 'EMAIL_CONFLICT') {
-        replyText = 'An account with this email already exists. Contact your admin.';
+        replyText = 'An account with these details already exists. Contact your admin.';
         logger.warn(`[TELEGRAM] Email conflict for invite: ${result.invite?.email}`);
       } else {
         replyText = 'This invite link is invalid or has expired. Ask your admin to send a new one.';
@@ -124,8 +124,15 @@ async function handleWebhook(req, res) {
       });
       return res.status(200).json({ ok: true });
     } else if (text === '/myid') {
-      // Handle /myid command — reply with the user's Telegram chat ID
-      const replyText = `Your Telegram ID is: ${chatId}`;
+      // Give users a self-service way to recover the short ID without asking
+      // an administrator or remembering an email address.
+      const linkedUser = await prisma.user.findUnique({
+        where: { telegram_id: chatId },
+        select: { sims_id: true, status: true, deleted_at: true },
+      });
+      const replyText = linkedUser && !linkedUser.deleted_at && linkedUser.status === 'active'
+        ? `Your ${APP_SHORT_NAME} SIMS ID is: <code>${linkedUser.sims_id}</code>`
+        : `No active ${APP_SHORT_NAME} account is linked to this Telegram. Contact your admin.`;
       sendTelegramMessage(chatId, replyText).catch((err) => {
         logger.error(`[TELEGRAM] Failed to send /myid response to ${chatId}:`, err);
       });
@@ -140,7 +147,7 @@ async function handleWebhook(req, res) {
       if (result.success) {
         return res.status(200).json({ ok: true }); // message already sent inside handleLoginRequest
       } else if (result.error === 'NOT_LINKED') {
-        replyText = `No active ${APP_SHORT_NAME} account is linked to this Telegram. Log in with your email and password, then link Telegram from your Profile page first.`;
+        replyText = `No active ${APP_SHORT_NAME} account is linked to this Telegram. Use your SIMS ID and password, or contact your admin to link Telegram first.`;
       } else if (result.error === 'RATE_LIMITED') {
         replyText = `You already have a login link — check the message above. Try again in ${result.secondsWait}s if you need a new one.`;
       } else {
@@ -157,7 +164,7 @@ async function handleWebhook(req, res) {
       const result = await handlePasswordReset(chatId);
 
       if (result.success) {
-        const replyText = `✅ Your password has been reset!\n\nLogin at: ${process.env.APP_URL || 'https://sims-dms.railway.app'}/login\nEmail: ${result.email}\nTemporary password: <code>${result.tempPassword}</code>\n\nYou'll be asked to set a new password on first login.`;
+        const replyText = `✅ Your password has been reset!\n\nLogin at: ${process.env.APP_URL || 'https://sims-dms.railway.app'}/login\nSIMS ID: <code>${result.simsId}</code>\nTemporary password: <code>${result.tempPassword}</code>\n\nYou'll be asked to set a new password on first login.`;
         logger.info(`[TELEGRAM] Password reset: ${result.userId}`);
 
         // The password is already changed at this point — if this notification
@@ -434,7 +441,7 @@ async function handleInviteActivation(chatId, token) {
       // Raw SQL used here because Prisma does not support FOR UPDATE natively — this is
       // the sole constitution exception for non-report raw SQL in this file.
       const invites = await tx.$queryRaw`
-        SELECT id, name, email, phone, role, department, designation, title, invited_by
+        SELECT id, name, sims_id, email, phone, role, department, designation, title, invited_by
         FROM pending_invites
         WHERE invite_token = ${token}
         AND invite_expires_at > NOW()
@@ -458,13 +465,15 @@ async function handleInviteActivation(chatId, token) {
       }
 
       // Step 3: Check if an active user with this email already exists (edge case)
-      const emailConflict = await tx.user.findFirst({
-        where: { email: invite.email, deleted_at: null },
-        select: { id: true },
-      });
+      if (invite.email) {
+        const emailConflict = await tx.user.findFirst({
+          where: { email: invite.email, deleted_at: null },
+          select: { id: true },
+        });
 
-      if (emailConflict) {
-        return { success: false, error: 'EMAIL_CONFLICT', invite };
+        if (emailConflict) {
+          return { success: false, error: 'EMAIL_CONFLICT', invite };
+        }
       }
 
       // Step 4: Generate temporary password for the new user
@@ -475,7 +484,8 @@ async function handleInviteActivation(chatId, token) {
       const newUser = await tx.user.create({
         data: {
           name: invite.name,
-          email: invite.email,
+          sims_id: Number(invite.sims_id),
+          email: invite.email || null,
           phone: invite.phone || null,
           role: invite.role,
           department: invite.department || null,
@@ -496,7 +506,7 @@ async function handleInviteActivation(chatId, token) {
 
       return {
         success: true,
-        user: { id: newUser.id, name: newUser.name, email: newUser.email },
+        user: { id: newUser.id, name: newUser.name, sims_id: newUser.sims_id, email: newUser.email },
         tempPassword,
       };
     });
@@ -555,7 +565,7 @@ async function handleRelinkActivation(chatId, token) {
           telegram_verified: true,
           status: 'active',
         },
-        select: { id: true, name: true, email: true },
+        select: { id: true, name: true, sims_id: true, email: true },
       });
 
       return { success: true, user: updated };
@@ -579,7 +589,7 @@ async function handlePasswordReset(chatId) {
     // Step 1: Find user by telegram_id
     const user = await prisma.user.findUnique({
       where: { telegram_id: telegramId },
-      select: { id: true, email: true, status: true, deleted_at: true, last_password_reset_at: true },
+      select: { id: true, sims_id: true, email: true, status: true, deleted_at: true, last_password_reset_at: true },
     });
 
     if (!user || user.deleted_at || user.status !== 'active') {
@@ -621,7 +631,7 @@ async function handlePasswordReset(chatId) {
       metadata: { reset_method: 'telegram_bot' },
     });
 
-    return { success: true, userId: user.id, email: user.email, tempPassword };
+    return { success: true, userId: user.id, simsId: user.sims_id, email: user.email, tempPassword };
   } catch (error) {
     logger.error('[TELEGRAM] Error in handlePasswordReset:', error);
     return { success: false, error: 'SYSTEM_ERROR' };
