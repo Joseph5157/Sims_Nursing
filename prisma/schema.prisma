@@ -77,6 +77,10 @@ model User {
   telegram_id                    String?    @unique @db.VarChar(50)
   telegram_verified              Boolean    @default(false)
   otp_failed_attempts            Int        @default(0) @db.SmallInt
+  // Set when otp_failed_attempts reaches the lockout threshold; null/past = unlocked.
+  // Cool-off is the *only* unlock path (024-telegram-otp-login) — no admin unlock,
+  // no password-login shortcut. See specs/024-telegram-otp-login/research.md §3.
+  otp_locked_until               DateTime?
   password_hash                  String?    @db.VarChar(255)
   must_change_password           Boolean    @default(true)
   session_version                Int        @default(0)
@@ -95,6 +99,7 @@ model User {
   relinkTokens             TelegramRelinkToken[]     @relation("RelinkTokens")
   createdRelinkTokens      TelegramRelinkToken[]     @relation("CreatedRelinkTokens")
   loginTokens              TelegramLoginToken[]      @relation("LoginTokens")
+  otpLoginCodes            OtpLoginCode[]            @relation("OtpLoginCodes")
   dutySlots                DutySlot[]                @relation("FacultyDutySlots")
   createdDutySlots         DutySlot[]                @relation("CreatedDutySlots")
   attendance               DutyAttendance[]          @relation("FacultyAttendance")
@@ -179,6 +184,33 @@ model TelegramLoginToken {
 
   @@index([user_id])
   @@map("telegram_login_tokens")
+}
+
+// ─── 2b-i. Telegram OTP Login Codes ──────────────────────────────────────
+// Short-lived, single-use 6-digit codes delivered over Telegram
+// (024-telegram-otp-login). Mirrors TelegramLoginToken's lifecycle
+// (used_at is the only mutation, no deleted_at, no purge job).
+//
+// code_hash is bcrypt, NOT a fast hash: a 6-digit code has only 1,000,000
+// possible values, so SHA-256 of it is recoverable instantly from a DB
+// dump. Only a slow KDF makes a keyspace this small survivable at rest.
+// Do not "optimise" this to a fast hash. No unique index on code_hash —
+// bcrypt salts, so identical codes hash differently, and nothing is ever
+// looked up by this value (the atomic claim keys on id; see
+// specs/024-telegram-otp-login/research.md §1–§2).
+
+model OtpLoginCode {
+  id         String    @id @default(uuid())
+  user_id    String
+  code_hash  String    @db.VarChar(255)
+  expires_at DateTime
+  used_at    DateTime?
+  created_at DateTime  @default(now())
+
+  user User @relation("OtpLoginCodes", fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@map("otp_login_codes")
 }
 
 
