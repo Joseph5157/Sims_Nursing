@@ -23,6 +23,15 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // The default SPA navigation fallback intercepts every full-page
+        // navigation and serves the cached app shell — including
+        // /auth/telegram/:token, a real server route that must redirect and
+        // set cookies. Without this denylist, the Telegram magic-link login
+        // silently fails for any user with an already-active service worker
+        // (i.e. anyone who has used the app before): the browser never
+        // reaches the server, and the SPA router just falls back to /login
+        // with no error.
+        navigateFallbackDenylist: [/^\/auth\//],
         runtimeCaching: [
           // API routes — network-first so data stays fresh; fall back to cache on failure.
           // /auth/* and /users/me are deliberately excluded: serving a cached
