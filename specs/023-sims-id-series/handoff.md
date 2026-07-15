@@ -47,6 +47,26 @@ complete
   (`27 migrations found`, `All migrations have been successfully applied`) and a healthy
   `/health` check. See `failed_or_blocked` below for the real trouble this took — it was not a
   clean first push.
+- **Full end-to-end test of the feature's actual point** (2026-07-15, after deploy): created a
+  real invite with **no email** via the admin UI (assigned SIMS ID `1100`), activated it
+  (simulated the Telegram side via `handleInviteActivation` with a synthetic chat ID, since the
+  only real Telegram account available was already linked as super_admin), logged in on the live
+  `/login` page using **only the SIMS ID + temp password**, completed the forced
+  `must_change_password` flow, reached the faculty dashboard, then cleaned up (soft-deleted the
+  test user, confirmed its session was correctly revoked, confirmed the admin Users page shows
+  zero pending invites and only the original super_admin).
+- **Bug found and fixed during that test**: production's `TELEGRAM_BOT_USERNAME` (server-side env
+  var, used only by `invites.controller.js` for the invite deep link) pointed to
+  `@SimsPharmacybot` — stale from before the Nursing rebrand — while the *client-side*
+  `VITE_TELEGRAM_BOT_USERNAME` (used by the login page) correctly pointed to
+  `@SIMS_Nursing_DMS_Bot`. Real invites were telling new faculty to message the wrong bot
+  entirely. Fixed via `railway variable set TELEGRAM_BOT_USERNAME=SIMS_Nursing_DMS_Bot
+  --skip-deploys` + `railway restart`.
+- **Separate, more significant bug found during that same test**: the PWA service worker was
+  silently swallowing the *existing* Telegram magic-link login (022) for any returning user.
+  Root-caused, fixed, and deployed in this same session — see
+  `[[telegram-magic-link-popup-bug]]` memory and commit `88f8546`. Not part of this feature's
+  scope, but directly found while testing this feature's login flow, so documented here too.
 
 ## failed_or_blocked
 - Nothing left blocked, but getting the local dev Postgres container reachable took real effort

@@ -239,3 +239,73 @@ something to tell real users to do.
 
 **Applies to other department clones?** Yes — every clone is the same PWA setup. Expect this any
 time you verify a frontend change in a browser tab that had the site open before the new deploy.
+
+---
+
+## 8. Service worker silently swallowing `/auth/telegram/:token` (Telegram magic-link login "just goes to /login")
+
+**Symptom**: A user taps "Log in" from the Telegram bot's message, confirms Telegram Web's "Open
+Link" dialog, and lands on a plain `/login` page — no error, no `?telegram_error=` query param.
+Direct `curl`/`fetch` against the exact same token succeeds fine.
+
+**Root cause**: Workbox's default SPA navigation fallback intercepts every full-page navigation
+on the origin and serves the cached app shell, unless explicitly told not to. Without a
+`navigateFallbackDenylist`, this includes `GET /auth/telegram/:token` — a real server route that
+must hit the network and set cookies, not be served `index.html`. Any user with an
+already-active service worker (i.e. anyone who has used the app before) never actually reaches
+the server; the browser just renders the cached shell, which client-side-routes to `/login` since
+`/auth/telegram/:token` isn't a recognized SPA route.
+
+**Fix** (already applied, `client/vite.config.js`):
+```js
+workbox: {
+  navigateFallbackDenylist: [/^\/auth\//],
+  // ...
+}
+```
+
+**How to verify this is really the cause vs. something else**: from a page already on the
+origin, compare `fetch('/auth/telegram/<token>', {redirect:'follow', credentials:'include'})`
+(bypasses navigateFallback, only intercepted by `runtimeCaching` rules, which already correctly
+exclude `/auth`) against an actual full navigation to the same URL. If fetch succeeds and
+navigation doesn't, it's this bug.
+
+**Testing gotcha**: `registerType: 'prompt'` means a newly deployed fix's service worker sits in
+"waiting" state in any tab that already had an older worker — that tab won't actually run the fix
+until you force-activate it (`registration.waiting.postMessage({type: 'SKIP_WAITING'})`) or fully
+unregister + reload. Don't conclude a fix isn't live without doing this first.
+
+**Applies to other department clones?** Yes — same PWA setup everywhere. Any future full-page
+server route reached via an external link (not just Telegram) needs the same denylist treatment.
+
+---
+
+## 9. Railway "Watch Paths" can silently skip a deploy that looks like it should have shipped
+
+**Symptom**: `git push` succeeds, but `railway deployment list` shows the new commit as `SKIPPED`
+instead of `BUILDING`. Running `railway up` manually doesn't help either — it prints `"no changes
+detected in watch paths, build will skip"` and exits without building anything.
+
+**Root cause**: this service's Watch Paths (a Railway dashboard setting, not in `railway.toml`)
+are scoped to `/server/**` only — confirmed via `railway status --json` →
+`serviceManifest.build.watchPatterns`. Any commit that only touches `client/` (or root-level
+files, or docs) never triggers a build, silently, regardless of whether the change actually
+matters to the deployed app (e.g. a `vite.config.js` change absolutely affects the built client
+bundle, but doesn't match the watch pattern).
+
+**Workaround used**: bump the `// reloaded: <date><letter>` marker comment on line 1 of
+`server/index.js` in the same commit — a file under `/server/**`, so the watch pattern matches
+and the build actually runs. (This marker convention already existed in the codebase before this
+was diagnosed — `20260607b` predates this entry — suggesting this has bitten the project before.)
+
+**Real fix, not yet done**: widen Watch Paths in the Railway dashboard (this service → Settings →
+Build → Watch Paths) to include `/client/**`, or clear the field entirely to watch everything.
+
+**Also note**: `railway redeploy` reuses the *last successfully built Docker image* — it does
+**not** rebuild from source. If the last build was broken, `redeploy` just replays the same broken
+image and fails identically. `railway up -c` is the reliable way to force an actual fresh build
+from local source when auto-deploy has skipped or misbehaved.
+
+**Applies to other department clones?** Only if Watch Paths gets configured the same narrow way
+on that clone's Railway project — check `railway status --json` if a clone's frontend changes
+mysteriously never seem to deploy.
