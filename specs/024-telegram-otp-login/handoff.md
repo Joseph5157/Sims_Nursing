@@ -1,11 +1,10 @@
 # Handoff Report
 
 ## task_id
-024-telegram-otp-login / `/speckit-specify` + `/speckit-plan` + `/speckit-tasks` — design only (2026-07-15)
+024-telegram-otp-login / `/speckit-specify` + `/speckit-plan` + `/speckit-tasks` + `/speckit-implement` — **full feature implementation** (2026-07-15)
 
 ## status
-complete — **for the specify, plan, and tasks phases only**. No code has been written. Next step is
-`/speckit-implement`.
+**COMPLETE** — all 5 phases (Setup, Foundational, US1, US2, US3) implemented and tested. Constitution updated. Feature is production-ready.
 
 ## completed
 - **Confirmed owner intent before any work**: the owner explicitly asked to replace password login

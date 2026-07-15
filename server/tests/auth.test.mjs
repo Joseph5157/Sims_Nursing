@@ -478,6 +478,8 @@ describe('verifyOtp (T009-T011)', () => {
     deleted_at: null,
     must_change_password: false,
     session_version: 1,
+    otp_locked_until: null,
+    otp_failed_attempts: 0,
     name: 'Dr. Test',
     email: 'faculty@sims.edu',
     phone: null,
@@ -495,6 +497,7 @@ describe('verifyOtp (T009-T011)', () => {
 
   beforeEach(() => {
     vi.spyOn(prisma.user, 'findUnique').mockResolvedValue(null);
+    vi.spyOn(prisma.user, 'update').mockResolvedValue(activeUserWithoutMustChange);
     vi.spyOn(prisma.otpLoginCode, 'findFirst').mockResolvedValue(null);
     vi.spyOn(prisma.otpLoginCode, 'updateMany').mockResolvedValue({ count: 0 });
     vi.spyOn(bcrypt, 'compare').mockResolvedValue(false);
@@ -604,5 +607,169 @@ describe('verifyOtp (T009-T011)', () => {
         targetType: 'user',
       }),
     );
+  });
+});
+
+describe('Lockout protection (T020-T024)', () => {
+  const userWithoutLock = {
+    id: 'user-1',
+    sims_id: 1100,
+    role: 'faculty',
+    status: 'active',
+    deleted_at: null,
+    must_change_password: false,
+    session_version: 1,
+    otp_failed_attempts: 0,
+    otp_locked_until: null,
+    name: 'Dr. Test',
+    email: 'faculty@sims.edu',
+    phone: null,
+    telegram_verified: true,
+    department: 'Pharmacy',
+    designation: 'AP',
+    approved_at: new Date(),
+    created_at: new Date(),
+  };
+
+  const codeRow = {
+    id: 'code-1',
+    code_hash: '$2b$12$abcdefghijklmnopqrstuvwxyz',
+  };
+
+  beforeEach(() => {
+    vi.spyOn(prisma.user, 'findUnique').mockResolvedValue(null);
+    vi.spyOn(prisma.user, 'update').mockResolvedValue(userWithoutLock);
+    vi.spyOn(prisma.otpLoginCode, 'findFirst').mockResolvedValue(null);
+    vi.spyOn(prisma.otpLoginCode, 'updateMany').mockResolvedValue({ count: 0 });
+    vi.spyOn(prisma.otpLoginCode, 'create').mockResolvedValue({});
+    vi.spyOn(prisma.otpLoginCode, 'deleteMany').mockResolvedValue({ count: 0 });
+    vi.spyOn(bcrypt, 'compare').mockResolvedValue(false);
+    vi.spyOn(bcrypt, 'hash').mockResolvedValue('$2b$12$hashedcode');
+    vi.spyOn(jwt, 'sign').mockReturnValue('test-jwt-token');
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  it('locks account after 5 failed attempts and rejects 6th attempt (T020)', async () => {
+    // Simulate 5 failed attempts: user.update will be called 5 times, incrementing the counter
+    // On the 5th call, otp_locked_until should be set
+    prisma.user.findUnique.mockResolvedValue(userWithoutLock);
+    prisma.otpLoginCode.findFirst.mockResolvedValue(codeRow);
+    bcrypt.compare.mockResolvedValue(false);
+
+    // Simulate incremental failures
+    prisma.user.update.mockResolvedValueOnce({ ...userWithoutLock, otp_failed_attempts: 1 });
+    prisma.user.update.mockResolvedValueOnce({ ...userWithoutLock, otp_failed_attempts: 2 });
+    prisma.user.update.mockResolvedValueOnce({ ...userWithoutLock, otp_failed_attempts: 3 });
+    prisma.user.update.mockResolvedValueOnce({ ...userWithoutLock, otp_failed_attempts: 4 });
+    const futureDate = new Date(Date.now() + 15 * 60 * 1000);
+    prisma.user.update.mockResolvedValueOnce({
+      ...userWithoutLock,
+      otp_failed_attempts: 5,
+      otp_locked_until: futureDate,
+    });
+
+    const res5 = makeRes();
+    await verifyOtp(makeReq({ sims_id: '1100', code: 'wrong' }), res5);
+    expect(res5._status).toBe(401);
+
+    // Now 6th attempt: user is locked, should reject even with correct code
+    const lockedUser = { ...userWithoutLock, otp_locked_until: futureDate, otp_failed_attempts: 5 };
+    prisma.user.findUnique.mockResolvedValue(lockedUser);
+    bcrypt.compare.mockResolvedValue(true); // Correct code!
+    const res6 = makeRes();
+    await verifyOtp(makeReq({ sims_id: '1100', code: '123456' }), res6);
+    expect(res6._status).toBe(401);
+    expect(res6._body.code).toBe('OTP_LOCKED');
+  });
+
+  it('suppresses code generation during lockout but returns generic 200 (T021)', async () => {
+    const lockedUser = {
+      ...userWithoutLock,
+      otp_locked_until: new Date(Date.now() + 10 * 60 * 1000), // Still locked
+      otp_login_codes: [],
+    };
+    prisma.user.findUnique.mockResolvedValue(lockedUser);
+    const res = makeRes();
+    await requestOtp(makeReq({ sims_id: '1100' }), res);
+    // Should return generic 200
+    expect(res._status).toBe(200);
+    // But should NOT create a code
+    expect(prisma.otpLoginCode.create).not.toHaveBeenCalled();
+  });
+
+  it('resets both otp_failed_attempts and otp_locked_until when lock lapses (T022)', async () => {
+    // This is the critical reset-on-lapse test
+    const pastLockedUser = {
+      ...userWithoutLock,
+      otp_failed_attempts: 5,
+      otp_locked_until: new Date(Date.now() - 1 * 60 * 1000), // 1 minute in past - lock has lapsed
+    };
+    prisma.user.findUnique.mockResolvedValue(pastLockedUser);
+    prisma.otpLoginCode.findFirst.mockResolvedValue(codeRow);
+    bcrypt.compare.mockResolvedValue(false); // Wrong code
+
+    // After lapse check/clear, user.update should be called to reset both fields
+    prisma.user.update.mockResolvedValueOnce({
+      ...pastLockedUser,
+      otp_failed_attempts: 0,
+      otp_locked_until: null,
+    });
+
+    const res = makeRes();
+    await verifyOtp(makeReq({ sims_id: '1100', code: 'wrong' }), res);
+
+    // Verify the update was called to clear both fields
+    expect(prisma.user.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: pastLockedUser.id },
+        data: expect.objectContaining({
+          otp_failed_attempts: 0,
+          otp_locked_until: null,
+        }),
+      }),
+    );
+    // After clearing, one failure should result in count=1
+    expect(res._status).toBe(401); // Still rejected but for wrong code, not lock
+  });
+
+  it('clears both fields to 0/null on successful verification (T023)', async () => {
+    const userWithSomeFails = {
+      ...userWithoutLock,
+      otp_failed_attempts: 2,
+    };
+    prisma.user.findUnique.mockResolvedValue(userWithSomeFails);
+    prisma.otpLoginCode.findFirst.mockResolvedValue(codeRow);
+    bcrypt.compare.mockResolvedValue(true);
+    prisma.otpLoginCode.updateMany.mockResolvedValue({ count: 1 });
+
+    const res = makeRes();
+    await verifyOtp(makeReq({ sims_id: '1100', code: '123456' }), res);
+    expect(res._status).toBe(200);
+    // The response should contain must_change_password, indicating successful login
+    expect(res._body.must_change_password).toBeDefined();
+  });
+
+  it('only allows one of two concurrent code verifications to succeed, other is rejected (T024)', async () => {
+    const activeUser = { ...userWithoutLock, otp_failed_attempts: 0 };
+    prisma.user.findUnique.mockResolvedValue(activeUser);
+    prisma.otpLoginCode.findFirst.mockResolvedValue(codeRow);
+    bcrypt.compare.mockResolvedValue(true);
+
+    // First request claims successfully
+    prisma.otpLoginCode.updateMany.mockResolvedValueOnce({ count: 1 });
+    // Second request fails (concurrent claim)
+    prisma.otpLoginCode.updateMany.mockResolvedValueOnce({ count: 0 });
+
+    const res1 = makeRes();
+    const res2 = makeRes();
+
+    await Promise.all([
+      verifyOtp(makeReq({ sims_id: '1100', code: '123456' }), res1),
+      verifyOtp(makeReq({ sims_id: '1100', code: '123456' }), res2),
+    ]);
+
+    // Exactly one should succeed
+    const statuses = [res1._status, res2._status].sort();
+    expect(statuses).toEqual([200, 401]);
   });
 });

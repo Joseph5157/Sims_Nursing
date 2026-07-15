@@ -277,13 +277,15 @@ async function requestOtp(req, res) {
     });
 
     // Determine if request should be fulfilled (generic logic, same timing cost applies)
+    // ─── T028: Suppress during cool-off (don't generate or send code if locked) ───
+    const now = new Date();
     let shouldIssueCode = false;
     if (user &&
         !user.deleted_at &&
         user.status === 'active' &&
         user.telegram_id &&
         user.telegram_verified &&
-        (!user.otp_locked_until || user.otp_locked_until <= new Date())) {
+        (!user.otp_locked_until || user.otp_locked_until <= now)) { // Not locked (or lock lapsed)
       // Check per-account throttle: 60s between requests
       const lastCodeTime = user.otp_login_codes?.[0]?.created_at;
       const timeSinceLastCode = lastCodeTime ? Date.now() - new Date(lastCodeTime).getTime() : Infinity;
@@ -327,11 +329,12 @@ async function requestOtp(req, res) {
 
 // ─── POST /auth/otp/verify ────────────────────────────────────────────────────
 // Verify a 6-digit OTP code and issue a session (024-telegram-otp-login).
-// Atomically claims the code (single-use enforcement), issues JWT + CSRF on success.
-// Happy-path implementation; lockout logic is added in Phase 5 (US3).
+// Enforces lockout after 5 failed attempts with 15-minute cool-off (US3).
+// Ordering: lock-check → lapse-clear → code-verify → attempt-count (024 data-model.md).
 
 async function verifyOtp(req, res) {
   const { sims_id, code } = req.body;
+  const { OTP_LOCKOUT_THRESHOLD, OTP_COOLOFF_MS } = require('../lib/otp');
 
   try {
     // Look up user by SIMS ID
@@ -345,6 +348,8 @@ async function verifyOtp(req, res) {
         deleted_at: true,
         must_change_password: true,
         session_version: true,
+        otp_locked_until: true,
+        otp_failed_attempts: true,
       },
     });
 
@@ -357,12 +362,41 @@ async function verifyOtp(req, res) {
       });
     }
 
+    // ─── T025: Lock check (FIRST, before code lookup) ───
+    // If account is currently locked, reject immediately without attempting code verification.
+    // Do NOT increment counter; doing so would let continued guessing hold the lock open indefinitely.
+    const now = new Date();
+    if (user.otp_locked_until && user.otp_locked_until > now) {
+      return res.status(401).json({
+        error: true,
+        code: 'OTP_LOCKED',
+        message: 'Account locked due to too many failed attempts. Try again later.',
+      });
+    }
+
+    // ─── T026: Lapse check (SECOND, after lock check) ───
+    // If lock exists but has passed, clear BOTH otp_locked_until AND otp_failed_attempts
+    // before proceeding. Clearing only the timestamp would leave the counter at 5, causing
+    // the next single failure to re-lock (reset-on-lapse trap, data-model.md).
+    if (user.otp_locked_until && user.otp_locked_until <= now) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          otp_locked_until: null,
+          otp_failed_attempts: 0,
+        },
+      });
+      // Reload user state after clear
+      user.otp_locked_until = null;
+      user.otp_failed_attempts = 0;
+    }
+
     // Find live code for this user
     const codeRow = await prisma.otpLoginCode.findFirst({
       where: {
         user_id: user.id,
         used_at: null,
-        expires_at: { gt: new Date() },
+        expires_at: { gt: now },
       },
       select: { id: true, code_hash: true },
     });
@@ -378,6 +412,18 @@ async function verifyOtp(req, res) {
     // Verify code against bcrypt hash
     const isCodeValid = await bcrypt.compare(code, codeRow.code_hash);
     if (!isCodeValid) {
+      // ─── T027: Failure counting and lockout trigger ───
+      const newFailureCount = user.otp_failed_attempts + 1;
+      const shouldLock = newFailureCount >= OTP_LOCKOUT_THRESHOLD;
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          otp_failed_attempts: newFailureCount,
+          ...(shouldLock && { otp_locked_until: new Date(Date.now() + OTP_COOLOFF_MS) }),
+        },
+      });
+
       return res.status(401).json({
         error: true,
         code: 'INVALID_OTP',
@@ -425,6 +471,15 @@ async function verifyOtp(req, res) {
         message: 'Account is no longer active.',
       });
     }
+
+    // Successful code verification: clear both lockout fields
+    await prisma.user.update({
+      where: { id: userRecheck.id },
+      data: {
+        otp_failed_attempts: 0,
+        otp_locked_until: null,
+      },
+    });
 
     // Issue JWT and CSRF tokens
     const token = jwt.sign(

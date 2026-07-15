@@ -110,9 +110,20 @@ These are non-negotiable rules encoded in the planning document. Every feature m
 
 ### Authentication
 - Login is via registered email + password, **or** via a Telegram magic link for users with a
-  linked, verified Telegram account (022-telegram-magic-link-login) — both methods remain fully
-  available side by side; neither replaces the other. No Telegram OTP (the code-entry kind), no
-  SMS, no email OTP — the magic link is a single-use URL, not a one-time code the user types in.
+  linked, verified Telegram account (022-telegram-magic-link-login), **or** via a typed 6-digit
+  Telegram OTP code (024-telegram-otp-login) — all three methods remain fully available side by
+  side; none replaces the others. The OTP code method (user-typed credential, not a magic link)
+  enables cross-device login: a code delivered to Telegram on one device can be entered on any
+  other device (the gap the magic link cannot fill, since it logs in only the device that tapped
+  it). See §5 and §6 below for OTP tables and endpoints. This deliberately reverses an earlier
+  version of this constitution's §4 sentence "No Telegram OTP (the code-entry kind), no SMS, no
+  email OTP" — the project previously built and abandoned a Telegram-OTP table (`otp_sessions`)
+  in 2026-05, then decided to reopen and build the feature again in 2026-07, following an
+  explicit owner request before spec work began. Both the magic-link login (additive to
+  password-only) and the OTP login (additive to both prior methods) were deliberately designed
+  as additions, not replacements, so password login remains the unbreakable fallback for when
+  Telegram is unavailable. See `specs/022-telegram-magic-link-login/` and
+  `specs/024-telegram-otp-login/` for the full specs/plans/research/contracts.
 - **SIMS ID login**: every user (and pending invite) also has a permanent 4-digit SIMS ID —
   `1000`–`1099` for admin/super_admin, `1100`–`9999` for faculty — allocated sequentially by an
   atomic `sims_id_counters` row per role series (`server/lib/simsId.js`), assigned at invite
@@ -310,13 +321,13 @@ whose date has not passed and that has no recorded attendance can be reassigned.
 
 ---
 
-## 5. Database — 18 Tables
+## 5. Database — 19 Tables
 
 All migrations must match this schema exactly. Full column definitions in `SIMS_Database_Schema_v2.1.md`.
 
 | Table | Purpose |
 |---|---|
-| `users` | All system users — 3 roles: Faculty, Admin, Super Admin |
+| `users` | All system users — 3 roles: Faculty, Admin, Super Admin. Columns `otp_failed_attempts` (dormant until 024) and `otp_locked_until` (new in 024) support per-account OTP brute-force lockout |
 | `students` | Student master data uploaded via Excel |
 | `duty_slots` | Monthly duty assignments per faculty |
 | `duty_attendance` | Faculty IN/OUT timestamps and status per duty slot |
@@ -334,9 +345,10 @@ All migrations must match this schema exactly. Full column definitions in `SIMS_
 | `pending_invites` | Temporary invite tokens for new account activation via Telegram |
 | `telegram_relink_tokens` | Temporary tokens for relinking an existing user to a new Telegram account |
 | `telegram_login_tokens` | Single-use, 10-minute magic-link login tokens (022-telegram-magic-link-login). No `deleted_at` — mirrors `telegram_relink_tokens`'s lifecycle (rows persist, `used_at` is the only mutation, no purge job) |
+| `otp_login_codes` | Single-use, 5-minute code-entry OTP login tokens (024-telegram-otp-login). No `deleted_at` — mirrors `telegram_login_tokens`'s lifecycle (rows persist, `used_at` is the only mutation, no purge job). Code is bcrypt-hashed, not fast-hash (1M keyspace does not survive SHA-256) |
 | `sims_id_counters` | Two rows (`admin`, `faculty`) — atomic `last_value` counters backing SIMS ID allocation on `users.sims_id` / `pending_invites.sims_id`. No FK to either table; purely a sequence generator |
 
-> **Removed**: `correction_requests` (replaced by `violations.is_flagged`), `reschedule_requests` then `cover_requests` (the Need Cover / Volunteer workflow was built and then removed in favor of Admin Duty Reassignment — `duty_reassignments`, see §4), `otp_sessions` (Telegram OTP login was built and then abandoned in favor of email/password — see §4 Authentication)
+> **Removed**: `correction_requests` (replaced by `violations.is_flagged`), `reschedule_requests` then `cover_requests` (the Need Cover / Volunteer workflow was built and then removed in favor of Admin Duty Reassignment — `duty_reassignments`, see §4), `otp_sessions` (Telegram OTP login was built and then abandoned in 2026-05, then rebuilt in 2026-07 as `otp_login_codes` with bcrypt hashing — see §4 Authentication and §3.19 version history)
 
 ### Key Schema Rules
 - `admin_audit_log` — system-level actions only (password resets, account changes, hard deletes). Never mix with `violation_audit_log`
@@ -355,13 +367,13 @@ All migrations must match this schema exactly. Full column definitions in `SIMS_
 
 ---
 
-## 6. API — 115 Endpoints Across 14 Modules
+## 6. API — 117 Endpoints Across 14 Modules
 
-Counts verified directly against `server/routes/*.routes.js`. The Need Cover module (9 endpoints under `/cover-requests`) was removed; Duty Slots grew from 6 to 8 with the admin reassignment endpoints (`POST /duty-slots/:id/reassign`, `GET /duty-slots/reassigned-away/:year/:month`), then dropped to 7 when `DELETE /duty-slots/:id/unpick` was removed (P26 — faculty can no longer unpick a picked slot; Admin Duty Reassignment or Faculty-Requested Reassignment are now the only ways to change a picked slot's owner). Two modules were added since: Analytics (P24 Student Discipline Analytics Dashboard) and Duty Reassignment Requests (P27 Faculty-Requested Reassignment, §4 Method 2). Violations dropped from 10 to 9 endpoints (2026-07): `PATCH /:id/hide` and `GET /:id/audit-log` were removed (Hide and the per-violation Log view no longer exist anywhere in the app) and `DELETE /:id` was added (soft-delete, §4 Violations).
+Counts verified directly against `server/routes/*.routes.js`. The Need Cover module (9 endpoints under `/cover-requests`) was removed; Duty Slots grew from 6 to 8 with the admin reassignment endpoints (`POST /duty-slots/:id/reassign`, `GET /duty-slots/reassigned-away/:year/:month`), then dropped to 7 when `DELETE /duty-slots/:id/unpick` was removed (P26 — faculty can no longer unpick a picked slot; Admin Duty Reassignment or Faculty-Requested Reassignment are now the only ways to change a picked slot's owner). Two modules were added since: Analytics (P24 Student Discipline Analytics Dashboard) and Duty Reassignment Requests (P27 Faculty-Requested Reassignment, §4 Method 2). Violations dropped from 10 to 9 endpoints (2026-07): `PATCH /:id/hide` and `GET /:id/audit-log` were removed (Hide and the per-violation Log view no longer exist anywhere in the app) and `DELETE /:id` was added (soft-delete, §4 Violations). Authentication grew 4→6 with OTP code-entry login endpoints (024-telegram-otp-login).
 
 | Module | Count | Base Path |
 |---|---|---|
-| Authentication | 4 | `/auth` |
+| Authentication | 6 | `/auth` |
 | Users & Accounts | 13 | `/users`, `/admin` |
 | Students | 10 | `/students` |
 | Duty Calendar | 8 | `/calendar` |
@@ -386,8 +398,9 @@ Duty Reassignment Requests (6): `POST /`, `GET /`, `GET /sent`, `GET /eligible-f
 
 Not counted above: `POST /bot/webhook/:secret` (`server/routes/bot.routes.js`) — a Telegram-facing webhook receiver, not part of the client-facing API surface this table describes.
 
-**Authentication** grew 3→4: `GET /auth/telegram/:token` (022-telegram-magic-link-login) added
-alongside the existing `POST /auth/login`, `/change-password`, `/logout`.
+**Authentication** grew 3→4→6: `GET /auth/telegram/:token` (022-telegram-magic-link-login),
+`POST /auth/otp/request`, and `POST /auth/otp/verify` (024-telegram-otp-login) added alongside
+the existing `POST /auth/login`, `/change-password`, `/logout`.
 
 Full endpoint definitions in `SIMS_API_Endpoints_v2.0.md` (v2.2) — **this file is now stale against the counts above and should be regenerated/updated to match.**
 
@@ -493,6 +506,22 @@ PORT=3000
 
 ---
 
+*Constitution version: 3.19 — Updated: July 2026 (Telegram OTP code-entry login —
+024-telegram-otp-login. §2 Infrastructure, §4 Authentication: a linked/verified user may now
+log in via a typed 6-digit OTP code delivered to Telegram, enabling cross-device login (code
+sent to phone can be entered on desktop), additive alongside password and magic-link logins —
+neither is replaced. New table `otp_login_codes` (§5) mirrors `telegram_login_tokens`'s
+single-use lifecycle, no `deleted_at`, with bcrypt-hashed code (not fast-hash — 1M possible
+values in keyspace). New column `users.otp_locked_until` enforces per-account brute-force
+protection: 5 failed code attempts lock the account for 15 minutes, self-healing cool-off, no
+manual unlock. Two new endpoints `POST /auth/otp/request` and `POST /auth/otp/verify` (§6,
+Authentication module 6→8, total 117→119). This reverses an earlier §4 sentence "No Telegram
+OTP (the code-entry kind)" — the project previously abandoned an OTP table (`otp_sessions`) in
+2026-05, then owner-requested a rebuild of the feature in 2026-07 for the cross-device gap the
+magic link cannot fill. Both password and magic-link logins remain fully intact — this is
+additive, not a replacement, preserving the unbreakable fallback when Telegram is unavailable.
+See `specs/024-telegram-otp-login/` for the full spec, plan, research, data-model, and
+contracts.)*
 *Constitution version: 3.18 — Updated: July 2026 (SIMS Short ID series — §2 Infrastructure, §4
 Authentication: every user/pending-invite gains a permanent 4-digit SIMS ID (`1000`–`1099`
 admin/super_admin, `1100`–`9999` faculty), allocated by an atomic per-role counter
