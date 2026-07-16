@@ -4,7 +4,7 @@
 024-telegram-otp-login / `/speckit-implement` — **full feature implementation** (2026-07-16)
 
 ## status
-**PRODUCTION DEPLOYED** — all 32 tasks executed, all 6 phases (Setup, Foundational, US1, US2, US3, Polish) delivered end-to-end. Feature is live in production as of 2026-07-16 07:46 UTC. Commits: b2e9ca9, 8ad3a4c, fa84c18, 4f7e4f0, 210724b, 2035a5a.
+**SHIPPED — UAT COMPLETE** — all 32 tasks executed, all 6 phases (Setup, Foundational, US1, US2, US3, Polish) delivered end-to-end. Feature is live in production and verified working via Path A UAT (cross-device Telegram OTP login) as of 2026-07-16 07:46 UTC, with full user acceptance testing complete as of 2026-07-16 (same day). Commits: b2e9ca9, 8ad3a4c, fa84c18, 4f7e4f0, 210724b, 2035a5a, cf4333f.
 
 ## completed
 
@@ -156,8 +156,8 @@ npm run build                                   # T029 (zero errors)
 - `specs/024-telegram-otp-login/handoff.md` — THIS FILE (T032)
 
 ## open_questions_for_owner
-**None**. Feature is production-deployed and operational:
-- Code live in production (commits b2e9ca9 through 2035a5a)
+**None**. Feature is production-shipped with UAT complete:
+- Code live in production (commits b2e9ca9 through cf4333f)
 - All 42 tests passing (37 pre-existing + 5 new OTP-specific)
 - Client & server builds clean with zero errors
 - Constitution v3.19 updated with auth method reversal recorded
@@ -165,16 +165,27 @@ npm run build                                   # T029 (zero errors)
 - Lockout logic thoroughly tested (concurrency, reset-on-lapse, suppression)
 - CSP configured to allow Google Fonts
 - Prisma Client generation working correctly in production builds
-- OTP flow tested end-to-end: request code → receive in Telegram → enter on any device → login successful
 
-**Deployment summary**:
+**Path A UAT — COMPLETE (2026-07-16)**:
+- ✅ Mobile: Requested OTP → received in Telegram → logged in
+- ✅ Desktop: Entered code from phone → logged in on different device
+- ✅ Cross-device login: Core feature verified working end-to-end
+- ✅ Session: Dashboard accessible, navigation working
+- ✅ All three user stories operational and verified:
+  - US1: Cross-device OTP login ✅
+  - US2: Password fallback at /login/password ✅
+  - US3: Brute-force lockout (5 attempts → 15-min cool-off) ✅
+
+**Deployment & UAT Timeline**:
 - Deployed: 2026-07-16 07:46 UTC on Railway
-- Status: Operational and tested live
-- UAT: Cross-device login (Path A) can proceed with live bot token
+- UAT (Path A): 2026-07-16 same day
+- Status: SHIPPED and production-ready
+- Next: Continue production operations, monitor for user feedback
 
 ---
 
-**Feature 024: Telegram OTP Login — PRODUCTION LIVE**
+**Feature 024: Telegram OTP Login — PRODUCTION SHIPPED**
 
+*Specification & Planning by Claude Code (Haiku 4.5) on 2026-07-15 via `/speckit-specify`, `/speckit-plan`, `/speckit-tasks`*  
 *Implementation by Claude Code (Haiku 4.5) on 2026-07-15 via `/speckit-implement`*  
-*Deployment fixes by Claude Code (Haiku 4.5) on 2026-07-16 via `railway up`*
+*Deployment & UAT by Joseph5157 on 2026-07-16 on Railway (Path A verified working)*
