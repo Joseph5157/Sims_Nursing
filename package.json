@@ -13,6 +13,7 @@
     "migrate": "node node_modules/prisma/build/index.js migrate dev --schema prisma/schema.prisma",
     "migrate:deploy": "node node_modules/prisma/build/index.js migrate deploy --schema prisma/schema.prisma",
     "generate": "node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma",
+    "postinstall": "npm run generate",
     "seed": "node prisma/seed.js",
     "seed:department": "node db/seed-department.mjs",
     "studio": "node node_modules/prisma/build/index.js studio --schema prisma/schema.prisma"
