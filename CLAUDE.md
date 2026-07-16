@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan:
-`specs/022-telegram-magic-link-login/plan.md`
+`specs/024-telegram-otp-login/plan.md`
 <!-- SPECKIT END -->
 
 ## Project Constitution

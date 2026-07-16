@@ -14,6 +14,7 @@ import simsLogo from './assets/sims-logo.png';
 import { APP_SHORT_NAME } from './utils/branding';
 
 import LoginPage          from './pages/auth/LoginPage';
+import PasswordLoginPage  from './pages/auth/PasswordLoginPage';
 import ChangePasswordPage from './pages/auth/ChangePasswordPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import UsersPage          from './pages/admin/UsersPage';
@@ -98,6 +99,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/login/password" element={<PasswordLoginPage />} />
 
       {/* Root redirect */}
       <Route path="/" element={
