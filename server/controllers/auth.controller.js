@@ -267,7 +267,7 @@ async function requestOtp(req, res) {
         status: true,
         deleted_at: true,
         otp_locked_until: true,
-        otp_login_codes: {
+        otpLoginCodes: {
           where: { used_at: null },
           orderBy: { created_at: 'desc' },
           take: 1,
@@ -287,7 +287,7 @@ async function requestOtp(req, res) {
         user.telegram_verified &&
         (!user.otp_locked_until || user.otp_locked_until <= now)) { // Not locked (or lock lapsed)
       // Check per-account throttle: 60s between requests
-      const lastCodeTime = user.otp_login_codes?.[0]?.created_at;
+      const lastCodeTime = user.otpLoginCodes?.[0]?.created_at;
       const timeSinceLastCode = lastCodeTime ? Date.now() - new Date(lastCodeTime).getTime() : Infinity;
       if (timeSinceLastCode >= OTP_REQUEST_THROTTLE_MS) {
         shouldIssueCode = true;
