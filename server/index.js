@@ -54,10 +54,10 @@ app.use(helmet({
     directives: {
       defaultSrc:    ["'self'"],
       scriptSrc:     ["'self'"],
-      styleSrc:      ["'self'", "'unsafe-inline'"],   // Tailwind inline styles
+      styleSrc:      ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],   // Tailwind inline styles + Google Fonts
       imgSrc:        ["'self'", "data:", "blob:"],
       connectSrc:    ["'self'"],
-      fontSrc:       ["'self'", "data:"],
+      fontSrc:       ["'self'", "data:", "https://fonts.gstatic.com"],   // Google Fonts
       objectSrc:     ["'none'"],
       frameSrc:      ["'none'"],
       frameAncestors:["'none'"],
