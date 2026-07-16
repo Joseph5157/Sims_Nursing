@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan:
-`specs/024-telegram-otp-login/plan.md`
+Feature 024 (Telegram OTP Login) is PRODUCTION LIVE as of 2026-07-16.
+See `specs/024-telegram-otp-login/handoff.md` for completion status.
+Next feature guidance: read the plan for the next feature in `specs/` folder.
 <!-- SPECKIT END -->
 
 ## Project Constitution

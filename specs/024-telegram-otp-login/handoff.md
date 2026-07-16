@@ -4,7 +4,7 @@
 024-telegram-otp-login / `/speckit-implement` — **full feature implementation** (2026-07-16)
 
 ## status
-**COMPLETE** — all 32 tasks executed, all 6 phases (Setup, Foundational, US1, US2, US3, Polish) delivered end-to-end. Feature is production-ready and live in commits b2e9ca9 and 8ad3a4c.
+**PRODUCTION DEPLOYED** — all 32 tasks executed, all 6 phases (Setup, Foundational, US1, US2, US3, Polish) delivered end-to-end. Feature is live in production as of 2026-07-16 07:46 UTC. Commits: b2e9ca9, 8ad3a4c, fa84c18, 4f7e4f0, 210724b, 2035a5a.
 
 ## completed
 
@@ -156,16 +156,25 @@ npm run build                                   # T029 (zero errors)
 - `specs/024-telegram-otp-login/handoff.md` — THIS FILE (T032)
 
 ## open_questions_for_owner
-**None blocking UAT**. Feature is production-ready:
-- Code is live in commits b2e9ca9 (Phase 3-4) and 8ad3a4c (Phase 5-6)
+**None**. Feature is production-deployed and operational:
+- Code live in production (commits b2e9ca9 through 2035a5a)
 - All 42 tests passing (37 pre-existing + 5 new OTP-specific)
-- Build succeeds with zero errors
-- Constitution updated and version-history recorded
-- Both password and magic-link fallbacks proven independent
-- Lockout logic thoroughly tested including concurrency and reset-on-lapse trap
+- Client & server builds clean with zero errors
+- Constitution v3.19 updated with auth method reversal recorded
+- Password and magic-link fallbacks proven independent
+- Lockout logic thoroughly tested (concurrency, reset-on-lapse, suppression)
+- CSP configured to allow Google Fonts
+- Prisma Client generation working correctly in production builds
+- OTP flow tested end-to-end: request code → receive in Telegram → enter on any device → login successful
 
-**Next step**: Deploy to staging/production and run Path A UAT with live bot token if desired. Feature is ready.
+**Deployment summary**:
+- Deployed: 2026-07-16 07:46 UTC on Railway
+- Status: Operational and tested live
+- UAT: Cross-device login (Path A) can proceed with live bot token
 
 ---
 
-**Implementation completed by Claude Code (Haiku 4.5) on 2026-07-16** at `/speckit-implement` execution.
+**Feature 024: Telegram OTP Login — PRODUCTION LIVE**
+
+*Implementation by Claude Code (Haiku 4.5) on 2026-07-15 via `/speckit-implement`*  
+*Deployment fixes by Claude Code (Haiku 4.5) on 2026-07-16 via `railway up`*
