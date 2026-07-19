@@ -1,4 +1,4 @@
-require('dotenv').config(); // reloaded: 20260719c -- bump to force Railway rebuild when only client/ changed (Watch Paths = /server/** only)
+require('dotenv').config(); // reloaded: 20260719d -- bump to force Railway rebuild when only client/ changed (Watch Paths = /server/** only)
 
 // Prevent unhandled async rejections from crashing the server
 process.on('unhandledRejection', (err) => {
