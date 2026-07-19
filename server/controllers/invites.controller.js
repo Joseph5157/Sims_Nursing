@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const prisma = require('../lib/prisma');
+const logger = require('../lib/logger');
 const { logAction } = require('../services/audit.service');
 const { allocateSimsId } = require('../lib/simsId');
 
@@ -119,7 +120,7 @@ async function createInvite(req, res) {
     targetType: 'pending_invite',
     metadata: { email: normalizedEmail, role, sims_id: invite.sims_id },
   }).catch((err) => {
-    console.error('Audit log error in createInvite:', err);
+    logger.error('Audit log error in createInvite:', err);
   });
 
   res.status(201).json({
