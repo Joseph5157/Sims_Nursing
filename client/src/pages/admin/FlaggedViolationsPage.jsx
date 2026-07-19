@@ -41,7 +41,9 @@ export default function FlaggedViolationsPage({ user }) {
     status: 'pending', duty_date: '', course: '', academic_year: '', recorder: '', violation_type: '',
   });
 
-  const rows = data?.data ?? [];
+  // Memoized so the array identity is stable across renders (otherwise the
+  // useMemo hooks below would recompute every render).
+  const rows = useMemo(() => data?.data ?? [], [data]);
 
   // Filter option lists come straight from the returned records so they only ever
   // offer values that actually exist in the flagged set.

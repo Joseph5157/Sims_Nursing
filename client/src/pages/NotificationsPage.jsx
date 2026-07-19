@@ -6,7 +6,7 @@ import { Button } from '@mantine/core';
 import { Table, Th, Td, EmptyRow } from '../components/ui/Table';
 import Pagination from '../components/ui/Pagination';
 import { useToast } from '../components/ui/Toast';
-import Skeleton, { TableRowSkeleton } from '../components/ui/Skeleton';
+import { TableRowSkeleton } from '../components/ui/Skeleton';
 import { ROUTES } from '../utils/constants';
 
 function getNotificationTypeLabel(type) {
@@ -103,7 +103,7 @@ export default function NotificationsPage({ user }) {
       await fetch(`/api/notifications/${notificationId}/read`, { method: 'PATCH' });
       toast({ message: 'Marked as read' });
       refetch();
-    } catch (err) {
+    } catch {
       toast({ message: 'Failed to mark as read', type: 'error' });
     }
   };
@@ -114,7 +114,7 @@ export default function NotificationsPage({ user }) {
       await fetch(`/api/notifications/${notificationId}`, { method: 'DELETE' });
       toast({ message: 'Notification deleted' });
       refetch();
-    } catch (err) {
+    } catch {
       toast({ message: 'Failed to delete notification', type: 'error' });
     }
   };
@@ -124,7 +124,7 @@ export default function NotificationsPage({ user }) {
       await fetch('/api/notifications/mark-all-read', { method: 'PATCH' });
       toast({ message: 'All marked as read' });
       refetch();
-    } catch (err) {
+    } catch {
       toast({ message: 'Failed to mark all as read', type: 'error' });
     }
   };
@@ -135,7 +135,7 @@ export default function NotificationsPage({ user }) {
       await fetch('/api/notifications/delete-read', { method: 'DELETE' });
       toast({ message: 'Read notifications deleted' });
       refetch();
-    } catch (err) {
+    } catch {
       toast({ message: 'Failed to delete notifications', type: 'error' });
     }
   };

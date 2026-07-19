@@ -21,7 +21,7 @@ function formatTime(isoString) {
   return date.toLocaleDateString();
 }
 
-export default function NotificationBell({ user, role }) {
+export default function NotificationBell({ role }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);

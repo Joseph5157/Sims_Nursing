@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { TextInput, NumberInput } from '@mantine/core';
 import BottomDrawer, { DrawerSpinner, cancelBtnStyle, primaryBtnStyle } from './ui/BottomDrawer';
 import { useCreateViolationType, useUpdateViolationType } from '../hooks/useViolationTypes';
@@ -8,17 +8,23 @@ export default function ViolationTypeDrawer({ open, editing, onClose }) {
   const toast = useToast();
   const create = useCreateViolationType();
   const update = useUpdateViolationType();
-  const [form, setForm] = useState({
+
+  const editingId = editing?.id ?? null;
+  const [prevEditingId, setPrevEditingId] = useState(editingId);
+  const [form, setForm] = useState(() => ({
     name: editing?.name ?? '',
     default_fine: editing?.default_fine ?? '',
-  });
+  }));
 
-  useEffect(() => {
+  // Re-seed the form whenever the edited type changes (render-phase adjustment,
+  // guarded so it can't loop — no effect needed).
+  if (editingId !== prevEditingId) {
+    setPrevEditingId(editingId);
     setForm({
       name: editing?.name ?? '',
       default_fine: editing?.default_fine ?? '',
     });
-  }, [editing?.id]);
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();

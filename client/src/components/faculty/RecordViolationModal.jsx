@@ -26,7 +26,8 @@ export default function RecordViolationModal({ open, onClose, adminMode = false 
   const isMobile = useMediaQuery('(max-width: 639px)');
   // Duty slots/sessions are scheduled on IST calendar dates — derive "today" from
   // IST wall-clock, not the browser's local timezone (see server/lib/time.js).
-  const now = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
+  // Lazy-initialized once (not recomputed each render) so it stays pure.
+  const [now] = useState(() => new Date(Date.now() + 5.5 * 60 * 60 * 1000));
 
   const { data: typesData }  = useViolationTypes();
   const { data: slotsData }  = useMonthSlots(now.getUTCFullYear(), now.getUTCMonth() + 1);

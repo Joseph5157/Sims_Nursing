@@ -3,17 +3,24 @@ import { useOnline } from '../hooks/useOnline';
 
 export default function OfflineBanner() {
   const { isOnline } = useOnline();
-  const [showBanner, setShowBanner] = useState(false);
+  const [showBanner, setShowBanner] = useState(!isOnline);
+  const [prevOnline, setPrevOnline] = useState(isOnline);
 
+  // Show the banner on any online/offline transition. This is the supported
+  // render-phase state adjustment (guarded so it can't loop) — "visible while
+  // offline" is derived state, not something to compute inside an effect.
+  if (isOnline !== prevOnline) {
+    setPrevOnline(isOnline);
+    setShowBanner(true);
+  }
+
+  // Once back online, keep the banner up for 2s, then hide it.
   useEffect(() => {
-    if (!isOnline) {
-      setShowBanner(true);
-    } else {
-      // Keep banner visible for 2 seconds after coming back online
+    if (isOnline && showBanner) {
       const timer = setTimeout(() => setShowBanner(false), 2000);
       return () => clearTimeout(timer);
     }
-  }, [isOnline]);
+  }, [isOnline, showBanner]);
 
   if (!showBanner) return null;
 

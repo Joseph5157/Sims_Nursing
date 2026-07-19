@@ -4,7 +4,7 @@ import { Button, TextInput, Select, NumberInput } from '@mantine/core';
 import Badge from '../../components/ui/Badge';
 import FormModal from '../../components/ui/FormModal';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
-import { Table, Th, Td, EmptyRow } from '../../components/ui/Table';
+import { Table, Th, Td } from '../../components/ui/Table';
 import { useToast } from '../../components/ui/Toast';
 import { useCalendar, useOpenWindow, useCloseWindow, useUpdateBlockedDates, useUpdateSessionsPerFaculty, useUnassignedFaculty, useAssignSlots } from '../../hooks/useCalendar';
 import Breadcrumb from '../../components/Breadcrumb';

@@ -8,7 +8,9 @@ function getCsrfToken() {
 }
 
 const api = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:3000',
+  // Same-origin in production; explicit localhost API in dev. `import.meta.env`
+  // is Vite's idiomatic build-time env (no Node `process` in the browser).
+  baseURL: import.meta.env.PROD ? undefined : 'http://localhost:3000',
   withCredentials: true,
 });
 

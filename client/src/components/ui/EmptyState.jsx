@@ -1,5 +1,4 @@
 import { Stack, Text, Center } from '@mantine/core';
-import { Inbox } from 'lucide-react';
 
 /**
  * EmptyState — "no data" placeholder. icon/emoji + title + message + optional action.

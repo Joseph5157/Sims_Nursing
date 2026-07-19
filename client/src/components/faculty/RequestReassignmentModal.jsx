@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Select, Modal, Textarea, Button } from '@mantine/core';
 import Badge from '../ui/Badge';
 import { useToast } from '../ui/Toast';
@@ -14,9 +14,13 @@ export default function RequestReassignmentModal({ slot, onClose }) {
   const { data: eligibleData, isLoading: eligibleLoading } = useEligibleFaculty(slot?.id);
   const create = useCreateReassignmentRequest();
 
-  useEffect(() => {
+  // Reset the form when a different slot is selected (render-phase adjustment,
+  // guarded so it can't loop — no effect needed).
+  const [prevSlot, setPrevSlot] = useState(slot);
+  if (slot !== prevSlot) {
+    setPrevSlot(slot);
     if (slot) { setToFacultyId(null); setReason(''); }
-  }, [slot]);
+  }
 
   const facultyOptions = (eligibleData?.data ?? []).map((f) => ({ value: f.id, label: f.name }));
 

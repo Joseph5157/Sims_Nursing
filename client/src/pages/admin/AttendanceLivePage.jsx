@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Layout, { PageHeader } from '../../components/Layout';
 import Badge from '../../components/ui/Badge';
 import FormModal from '../../components/ui/FormModal';
-import { Button, Select, TextInput } from '@mantine/core';
+import { Select, TextInput } from '@mantine/core';
 import { useToast } from '../../components/ui/Toast';
 import { useLiveAttendance, useOverrideAttendance } from '../../hooks/useAttendance';
 import Breadcrumb from '../../components/Breadcrumb';

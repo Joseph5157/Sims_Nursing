@@ -19,21 +19,27 @@ const ACCENTS = {
 
 export default function StatCard({ label, value, sub, accent = 'default', icon, onClick, compact = false, tonal = false }) {
   const c = ACCENTS[accent] ?? ACCENTS.default;
-  const isNumber = typeof value === 'number';
-  const [display, setDisplay] = useState(isNumber ? 0 : value);
+  // Only positive numbers get the count-up animation; anything else (strings,
+  // zero, null) is shown directly as derived state.
+  const isAnimated = typeof value === 'number' && value !== 0;
+  const [animated, setAnimated] = useState(0);
 
   useEffect(() => {
-    if (!isNumber || value === 0) { setDisplay(value ?? '—'); return; }
+    if (!isAnimated) return;
     const duration = 600;
     const start = performance.now();
+    let raf;
     function tick(now) {
       const t = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
-      setDisplay(Math.round(eased * value));
-      if (t < 1) requestAnimationFrame(tick);
+      setAnimated(Math.round(eased * value)); // setState inside rAF callback is fine
+      if (t < 1) raf = requestAnimationFrame(tick);
     }
-    requestAnimationFrame(tick);
-  }, [value, isNumber]);
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value, isAnimated]);
+
+  const display = isAnimated ? animated : (value ?? '—');
 
   return (
     <div

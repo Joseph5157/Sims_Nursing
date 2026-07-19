@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Users, AlignLeft, MessageSquare } from 'lucide-react';
 import BottomDrawer, { DrawerSpinner, cancelBtnStyle, primaryBtnStyle } from './ui/BottomDrawer';
 import { useSendMessage } from '../hooks/useMessages';
@@ -40,7 +40,10 @@ export default function ComposeDrawer({ open, onClose, prefill = null }) {
 
   // Seed the form each time the drawer opens: a plain compose opens empty, while
   // a pre-filled flow (e.g. "Request reassignment") opens with recipient/subject/body set.
-  useEffect(() => {
+  // Render-phase adjustment on the open transition (guarded) — no effect needed.
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
     if (open) {
       setForm({
         to_user_id: prefill?.to_user_id ?? '',
@@ -48,8 +51,7 @@ export default function ComposeDrawer({ open, onClose, prefill = null }) {
         body:       prefill?.body ?? '',
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();

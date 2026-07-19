@@ -130,7 +130,7 @@ export default function Layout({ user, children }) {
   const [profileOpen, setProfileOpen] = useState(false);
   const location = useLocation();
   const logout   = useLogout();
-  const [theme, setThemeState] = useState(() => getTheme());
+  const [, setThemeState] = useState(() => getTheme());
 
   useEffect(() => {
     function handleThemeChange() { setThemeState(getTheme()); }

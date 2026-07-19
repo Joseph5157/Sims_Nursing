@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Layout, { PageHeader } from '../../components/Layout';
 import Breadcrumb from '../../components/Breadcrumb';
 import { Table, Th, Td, Tr, EmptyRow, ErrorRow, ErrorBlock } from '../../components/ui/Table';
@@ -183,10 +183,14 @@ export default function StudentsPage({ user }) {
   const deleteStudent  = useDeleteStudent();
   const bulkDelete     = useBulkDeleteStudents();
 
-  // Selection is page-scoped — clear it whenever the visible row set changes
-  useEffect(() => {
+  // Selection is page-scoped — clear it whenever the visible row set changes.
+  // Render-phase adjustment on the filter/page key (guarded) — no effect needed.
+  const selectionKey = `${page}|${filterCourse}|${filterYear}|${debouncedSearch}`;
+  const [prevSelectionKey, setPrevSelectionKey] = useState(selectionKey);
+  if (selectionKey !== prevSelectionKey) {
+    setPrevSelectionKey(selectionKey);
     setSelectedIds(new Set());
-  }, [page, filterCourse, filterYear, debouncedSearch]);
+  }
 
   const pageIds     = (data?.data ?? []).map((s) => s.id);
   const allSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));

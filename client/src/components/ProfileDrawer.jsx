@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { User, Building2, IdCard, Tag, Mail, KeyRound, ChevronRight } from 'lucide-react';
 import BottomDrawer, { DrawerSpinner, cancelBtnStyle, primaryBtnStyle } from './ui/BottomDrawer';
@@ -28,7 +28,12 @@ export default function ProfileDrawer({ open, onClose, user }) {
   const [form, setForm] = useState({ name: '', department: '', designation: '', title: '', avatar: null });
 
   // Seed the form each time the drawer opens with the latest profile data.
-  useEffect(() => {
+  // Render-phase adjustment on the open transition (guarded) — no effect needed.
+  // Seeding only on open (not on every `user` change) also avoids clobbering
+  // in-progress edits if the profile query refetches while the drawer is open.
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
     if (open) {
       setForm({
         name:        user?.name ?? '',
@@ -38,7 +43,7 @@ export default function ProfileDrawer({ open, onClose, user }) {
         avatar:      user?.avatar ?? null,
       });
     }
-  }, [open, user]);
+  }
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 

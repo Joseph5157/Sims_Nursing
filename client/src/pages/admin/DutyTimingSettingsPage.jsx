@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Layout, { PageHeader } from '../../components/Layout';
 import { NumberInput, Button, Tooltip } from '@mantine/core';
 import { IconInfoCircle } from '@tabler/icons-react';
@@ -80,13 +80,14 @@ export default function DutyTimingSettingsPage({ user }) {
   const updateSettings = useUpdateDutyTimingSettings();
   const [form, setForm] = useState(null);
 
-  useEffect(() => {
-    if (settings && !form) {
-      const initial = {};
-      for (const key of FIELDS) initial[key] = settings[key];
-      setForm(initial);
-    }
-  }, [settings, form]);
+  // Seed the form once, the first time settings load. Render-phase adjustment
+  // guarded by `form === null` so it fires exactly once (and never clobbers
+  // in-progress edits on a background refetch) — no effect needed.
+  if (settings && form === null) {
+    const initial = {};
+    for (const key of FIELDS) initial[key] = settings[key];
+    setForm(initial);
+  }
 
   async function handleSave() {
     try {

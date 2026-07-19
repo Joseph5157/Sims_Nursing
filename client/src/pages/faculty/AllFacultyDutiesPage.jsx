@@ -31,7 +31,8 @@ export default function AllFacultyDutiesPage({ user }) {
   const [session, setSession] = useState('');
 
   const { data, isLoading, isError, refetch } = useAllFacultyDuties(year, month);
-  const slots = data?.data ?? [];
+  // Memoized so the array identity is stable for the useMemo below.
+  const slots = useMemo(() => data?.data ?? [], [data]);
 
   function prevMonth() {
     if (month === 1) { setYear((y) => y - 1); setMonth(12); }

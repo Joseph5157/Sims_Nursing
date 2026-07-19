@@ -13,7 +13,9 @@ export function TableRowSkeleton({ cols = 5 }) {
     <tr className="border-b border-[var(--divider)] hover:bg-[var(--surface-page)]">
       {Array.from({ length: cols }).map((_, i) => (
         <td key={i} className="px-4 py-3">
-          <Skeleton height="16px" width={Math.random() * 40 + 60 + '%'} />
+          {/* Deterministic per-column width (60–99%) — varied but pure, so it
+              doesn't change on every re-render. */}
+          <Skeleton height="16px" width={`${60 + ((i * 23) % 40)}%`} />
         </td>
       ))}
     </tr>

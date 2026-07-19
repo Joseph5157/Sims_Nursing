@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import { APP_SHORT_NAME } from '../../utils/branding';
@@ -136,7 +136,15 @@ export default function DashboardPage({ user }) {
   const [showRecordViolation, setShowRecordViolation] = useState(false);
   const [dismissedAlerts, setDismissedAlerts]         = useState(new Set());
 
-  const { data: slotsData, isLoading: slotsLoading, isError: slotsError, refetch: refetchSlots } = useMonthSlots(year, month);
+  // Ticking clock (30s) so the "minutes until auto clock-out" countdown stays
+  // live and is read from state (pure) rather than Date.now() during render.
+  const [nowMs, setNowMs] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNowMs(Date.now()), 30000);
+    return () => clearInterval(id);
+  }, []);
+
+  const { data: slotsData, isLoading: slotsLoading, isError: slotsError } = useMonthSlots(year, month);
   const { data: violationsData, isLoading: violationsLoading } = useMyViolations({ limit: 5 });
   const { data: inboxData, isLoading: inboxLoading }            = useInbox({ limit: 5 });
   const { data: reassignedAwayData, isLoading: reassignLoading } = useReassignedAway(year, month);
@@ -184,7 +192,7 @@ export default function DashboardPage({ user }) {
   }
 
   // Minutes until a given session's configured auto clock-out time (per session).
-  const nowIST = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
+  const nowIST = new Date(nowMs + 5.5 * 60 * 60 * 1000);
   function minsUntilSessionEnd(sessionType) {
     const h = timingSettings?.[`auto_checkout_${sessionType}_hour`];
     const m = timingSettings?.[`auto_checkout_${sessionType}_min`];
