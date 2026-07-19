@@ -385,7 +385,11 @@ export default function UsersPage({ user }) {
         <ConfirmDialog
           open
           title="Reactivate User"
-          message={`Reactivate ${reactivatingUser.name}?`}
+          message={
+            reactivatingUser.status === 'pending_telegram'
+              ? `${reactivatingUser.name}'s Telegram link is unresolved, so reactivation will be rejected. There's currently no in-app way to issue a new relink link for this account — contact the project owner to resolve it first.`
+              : `Reactivate ${reactivatingUser.name}?`
+          }
           confirmText="Reactivate"
           isLoading={reactivate.isPending}
           onConfirm={handleReactivate}
