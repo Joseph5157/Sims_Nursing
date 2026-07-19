@@ -1,41 +1,45 @@
 const prisma = require('../lib/prisma');
 const { buildWorkbook, sendWorkbook } = require('../lib/excel');
+const { nowInIST } = require('../lib/time');
+// Analytics filters violations by created_at (a timestamptz record time), so it
+// uses the IST-explicit *instant* ranges from the shared report-range utility —
+// the same source of truth the reports module uses — independent of server TZ.
+const { monthInstantRange, rangeInstantRange, parseIsoDate } = require('../lib/reportRange');
 
 const COURSE_LABELS = { b_pharm: 'B.Pharm', pharm_d: 'Pharm.D', m_pharm: 'M.Pharm' };
 
-function monthRange(year, month) {
-  return {
-    gte: new Date(year, month - 1, 1),
-    lte: new Date(year, month, 0, 23, 59, 59, 999),
-  };
+// Monday–Sunday IST week containing `now`, as a created_at instant range.
+function weekInstantRange(now = new Date()) {
+  const ist = nowInIST(now);
+  // Day-of-week of the current IST calendar date (0 = Sunday … 6 = Saturday).
+  const dow = new Date(Date.UTC(ist.year, ist.month - 1, ist.day)).getUTCDay();
+  const diffToMonday = (dow === 0 ? -6 : 1) - dow;
+  const monday = new Date(Date.UTC(ist.year, ist.month - 1, ist.day + diffToMonday));
+  const sunday = new Date(Date.UTC(monday.getUTCFullYear(), monday.getUTCMonth(), monday.getUTCDate() + 6));
+  return rangeInstantRange(
+    { year: monday.getUTCFullYear(), month: monday.getUTCMonth() + 1, day: monday.getUTCDate() },
+    { year: sunday.getUTCFullYear(), month: sunday.getUTCMonth() + 1, day: sunday.getUTCDate() },
+  );
 }
 
-// Monday–Sunday range containing `now`.
-function weekRange(now) {
-  const day = now.getDay();
-  const diffToMonday = (day === 0 ? -6 : 1) - day;
-  const monday = new Date(now);
-  monday.setDate(now.getDate() + diffToMonday);
-  monday.setHours(0, 0, 0, 0);
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-  sunday.setHours(23, 59, 59, 999);
-  return { gte: monday, lte: sunday };
-}
-
-// range preset (default this_month) or an explicit custom from/to pair.
+// range preset (default this_month) or an explicit custom from/to pair. All IST.
 function resolveDateRange({ range, from_date, to_date }) {
   const now = new Date();
   if (range === 'custom' && from_date && to_date) {
-    return { gte: new Date(`${from_date}T00:00:00`), lte: new Date(`${to_date}T23:59:59.999`) };
+    const from = parseIsoDate(from_date);
+    const to   = parseIsoDate(to_date);
+    if (from && to) return rangeInstantRange(from, to);
+    // Malformed dates fall through to the default (the query schema should
+    // already have rejected them before reaching here).
   }
-  if (range === 'this_week') return weekRange(now);
+  if (range === 'this_week') return weekInstantRange(now);
+  const ist = nowInIST(now);
   if (range === 'last_month') {
-    const y = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
-    const m = now.getMonth() === 0 ? 12 : now.getMonth();
-    return monthRange(y, m);
+    const y = ist.month === 1 ? ist.year - 1 : ist.year;
+    const m = ist.month === 1 ? 12 : ist.month - 1;
+    return monthInstantRange(y, m);
   }
-  return monthRange(now.getFullYear(), now.getMonth() + 1);
+  return monthInstantRange(ist.year, ist.month);
 }
 
 // The dynamic, non-date filters shared by every endpoint — dynamic per the P24
@@ -87,14 +91,16 @@ async function summary(req, res) {
 async function trend(req, res) {
   const months = req.query.months ?? 6;
   const base   = extraFilters(req.query);
-  const now    = new Date();
+  const ist    = nowInIST();
 
   const data = [];
   for (let i = months - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const year = d.getFullYear(), month = d.getMonth() + 1;
+    // Anchor the month walk on the current IST month; Date.UTC handles negative
+    // month overflow into the previous year.
+    const d = new Date(Date.UTC(ist.year, ist.month - 1 - i, 1));
+    const year = d.getUTCFullYear(), month = d.getUTCMonth() + 1;
     const count = await prisma.violation.count({
-      where: { ...base, record_status: 'active', deleted_at: null, created_at: monthRange(year, month) },
+      where: { ...base, record_status: 'active', deleted_at: null, created_at: monthInstantRange(year, month) },
     });
     data.push({ year, month, count });
   }

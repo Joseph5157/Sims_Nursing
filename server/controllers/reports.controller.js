@@ -1,33 +1,21 @@
 const prisma = require('../lib/prisma');
 const { buildWorkbook, sendWorkbook } = require('../lib/excel');
 const { buildReportPdf, sendPdf } = require('../lib/pdf');
+// All report date boundaries come from this one IST-explicit utility so month,
+// year, day and week windows are constructed identically and independently of
+// the server TZ / Postgres session timezone. See lib/reportRange.js.
+const {
+  monthDutyDateRange,
+  monthInstantRange,
+  monthPeriod,
+  yearPeriod,
+  dayPeriod,
+  weekPeriod,
+  violationInPeriod,
+  parseIsoDate,
+} = require('../lib/reportRange');
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-function monthRange(year, month) {
-  return {
-    gte: new Date(year, month - 1, 1),
-    lte: new Date(year, month, 0, 23, 59, 59, 999),
-  };
-}
-
-function yearRange(year) {
-  return {
-    gte: new Date(year, 0, 1),
-    lte: new Date(year, 11, 31, 23, 59, 59, 999),
-  };
-}
-
-// A violation's effective date is its duty slot's duty_date, but admin ad-hoc
-// records have no slot (duty_slot_id = null) — for those the effective date is
-// created_at (the record time). This filter matches both so admin-recorded
-// violations are never silently dropped from date-scoped reports/exports.
-function violationInRange(range) {
-  return { OR: [
-    { dutySlot: { duty_date: range } },
-    { duty_slot_id: null, created_at: range },
-  ] };
-}
 
 // Recorder label — a violation is recorded by a faculty member on duty OR by an
 // admin directly. Admin recorders surface as "Admin"; faculty as their name.
@@ -55,8 +43,8 @@ function studentViolationWhere({ student_id, year, month, course, student_year, 
       ...(student_year && { year: student_year }),
     };
   }
-  if (year && month) Object.assign(where, violationInRange(monthRange(parseInt(year, 10), parseInt(month, 10))));
-  else if (year)     Object.assign(where, violationInRange(yearRange(parseInt(year, 10))));
+  if (year && month) Object.assign(where, violationInPeriod(monthPeriod(parseInt(year, 10), parseInt(month, 10))));
+  else if (year)     Object.assign(where, violationInPeriod(yearPeriod(parseInt(year, 10))));
   return where;
 }
 
@@ -64,7 +52,7 @@ function studentViolationWhere({ student_id, year, month, course, student_year, 
 async function monthlyAttendanceSummary(req, res) {
   const year  = parseInt(req.query.year  ?? new Date().getFullYear(),  10);
   const month = parseInt(req.query.month ?? new Date().getMonth() + 1, 10);
-  const range = monthRange(year, month);
+  const range = monthDutyDateRange(year, month);
 
   const slots = await prisma.dutySlot.findMany({
     where: { duty_date: range },
@@ -95,7 +83,7 @@ async function lateArrivalReport(req, res) {
   const month = parseInt(req.query.month ?? new Date().getMonth() + 1, 10);
 
   const records = await prisma.dutyAttendance.findMany({
-    where: { in_status: 'late', dutySlot: { duty_date: monthRange(year, month) } },
+    where: { in_status: 'late', dutySlot: { duty_date: monthDutyDateRange(year, month) } },
     include: {
       faculty:  { select: { id: true, name: true, department: true } },
       dutySlot: { select: { duty_date: true, session_type: true } },
@@ -113,7 +101,7 @@ async function absentFacultyReport(req, res) {
 
   const slots = await prisma.dutySlot.findMany({
     where: {
-      duty_date: monthRange(year, month),
+      duty_date: monthDutyDateRange(year, month),
       OR: [{ status: 'absent' }, { attendance: { in_status: 'absent' } }],
     },
     include: { faculty: { select: { id: true, name: true, department: true } } },
@@ -129,7 +117,7 @@ async function autoClockOutReport(req, res) {
   const month = parseInt(req.query.month ?? new Date().getMonth() + 1, 10);
 
   const records = await prisma.dutyAttendance.findMany({
-    where: { auto_out: true, dutySlot: { duty_date: monthRange(year, month) } },
+    where: { auto_out: true, dutySlot: { duty_date: monthDutyDateRange(year, month) } },
     include: {
       faculty:  { select: { id: true, name: true } },
       dutySlot: { select: { duty_date: true, session_type: true } },
@@ -146,7 +134,7 @@ async function attendanceOverrideLog(req, res) {
   const month = parseInt(req.query.month ?? new Date().getMonth() + 1, 10);
 
   const records = await prisma.dutyAttendance.findMany({
-    where: { overridden_by: { not: null }, dutySlot: { duty_date: monthRange(year, month) } },
+    where: { overridden_by: { not: null }, dutySlot: { duty_date: monthDutyDateRange(year, month) } },
     include: {
       faculty:     { select: { id: true, name: true } },
       dutySlot:    { select: { duty_date: true, session_type: true } },
@@ -230,53 +218,47 @@ async function studentViolationHistoryExport(req, res) {
   sendWorkbook(res, buffer, `student-violations-${dateSuffix(req.query)}.xlsx`);
 }
 
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+// Parse the :date route param into IST calendar parts, or send a 422. Returns
+// null (and responds) on malformed/impossible dates so callers can bail early.
+function parseDailyDateParam(req, res) {
+  const parts = parseIsoDate(req.params.date);
+  if (!parts) {
+    res.status(422).json({ error: true, code: 'VALIDATION_ERROR', message: 'date must be a valid YYYY-MM-DD date.' });
+    return null;
+  }
+  return parts;
+}
 
 // 6c. Daily Violation Report
 async function dailyViolationReport(req, res) {
-  const { date } = req.params; // YYYY-MM-DD format
-  if (!DATE_RE.test(date)) {
-    return res.status(422).json({ error: true, code: 'VALIDATION_ERROR', message: 'date must be in YYYY-MM-DD format.' });
-  }
-  const d = new Date(`${date}T00:00:00Z`);
-  const range = {
-    gte: d,
-    lte: new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999),
-  };
+  const parts = parseDailyDateParam(req, res);
+  if (!parts) return;
 
-  const where = { ...studentViolationWhere(req.query), ...violationInRange(range) };
+  const where = { ...studentViolationWhere(req.query), ...violationInPeriod(dayPeriod(parts)) };
   const violations = await _getStudentViolations(where);
 
-  res.json({ date, data: violations, total: violations.length });
+  res.json({ date: req.params.date, data: violations, total: violations.length });
 }
 
 // 6c-export. Daily Violation Report — Export (.xlsx, NO fine amounts)
 async function dailyViolationReportExport(req, res) {
-  const { date } = req.params;
-  if (!DATE_RE.test(date)) {
-    return res.status(422).json({ error: true, code: 'VALIDATION_ERROR', message: 'date must be in YYYY-MM-DD format.' });
-  }
-  const d = new Date(`${date}T00:00:00Z`);
-  const range = {
-    gte: d,
-    lte: new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999),
-  };
-  const where = { ...studentViolationWhere(req.query), ...violationInRange(range) };
+  const parts = parseDailyDateParam(req, res);
+  if (!parts) return;
+
+  const where = { ...studentViolationWhere(req.query), ...violationInPeriod(dayPeriod(parts)) };
   const violations = await _getStudentViolations(where);
 
   const buffer = await buildWorkbook('Student Violations', STUDENT_VIOLATION_EXPORT_COLUMNS, violations.map(mapViolationExportRow));
-  sendWorkbook(res, buffer, `student-violations-daily-${date}.xlsx`);
+  sendWorkbook(res, buffer, `student-violations-daily-${req.params.date}.xlsx`);
 }
 
 // 6d. Weekly Violation Report
 async function weeklyViolationReport(req, res) {
-  const { from_date, to_date, ...filters } = req.query; // YYYY-MM-DD format
-  const fromDate = new Date(`${from_date}T00:00:00Z`);
-  const toDate = new Date(`${to_date}T23:59:59Z`);
+  const { from_date, to_date, ...filters } = req.query; // YYYY-MM-DD (validated by schema)
+  const from = parseIsoDate(from_date);
+  const to   = parseIsoDate(to_date);
 
-  const range = { gte: fromDate, lte: toDate };
-
-  const where = { ...studentViolationWhere(filters), ...violationInRange(range) };
+  const where = { ...studentViolationWhere(filters), ...violationInPeriod(weekPeriod(from, to)) };
   const violations = await _getStudentViolations(where);
 
   res.json({ from_date, to_date, data: violations, total: violations.length });
@@ -285,10 +267,10 @@ async function weeklyViolationReport(req, res) {
 // 6d-export. Weekly Violation Report — Export (.xlsx, NO fine amounts)
 async function weeklyViolationReportExport(req, res) {
   const { from_date, to_date, ...filters } = req.query;
-  const fromDate = new Date(`${from_date}T00:00:00Z`);
-  const toDate = new Date(`${to_date}T23:59:59Z`);
+  const from = parseIsoDate(from_date);
+  const to   = parseIsoDate(to_date);
 
-  const where = { ...studentViolationWhere(filters), ...violationInRange({ gte: fromDate, lte: toDate }) };
+  const where = { ...studentViolationWhere(filters), ...violationInPeriod(weekPeriod(from, to)) };
   const violations = await _getStudentViolations(where);
 
   const buffer = await buildWorkbook('Student Violations', STUDENT_VIOLATION_EXPORT_COLUMNS, violations.map(mapViolationExportRow));
@@ -371,26 +353,20 @@ async function studentViolationReportPdfExport(req, res) {
 
 // 6c-pdf. Daily Violation Report — PDF
 async function dailyViolationReportPdfExport(req, res) {
-  const { date } = req.params;
-  if (!DATE_RE.test(date)) {
-    return res.status(422).json({ error: true, code: 'VALIDATION_ERROR', message: 'date must be in YYYY-MM-DD format.' });
-  }
-  const d = new Date(`${date}T00:00:00Z`);
-  const range = {
-    gte: d,
-    lte: new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999),
-  };
-  const where = { ...studentViolationWhere(req.query), ...violationInRange(range) };
+  const parts = parseDailyDateParam(req, res);
+  if (!parts) return;
 
-  await _sendStudentViolationPdf(where, { title: 'Student Violation Report', subtitle: `Daily — ${date}`, filenameSuffix: `daily-${date}` }, res);
+  const where = { ...studentViolationWhere(req.query), ...violationInPeriod(dayPeriod(parts)) };
+
+  await _sendStudentViolationPdf(where, { title: 'Student Violation Report', subtitle: `Daily — ${req.params.date}`, filenameSuffix: `daily-${req.params.date}` }, res);
 }
 
 // 6d-pdf. Weekly Violation Report — PDF
 async function weeklyViolationReportPdfExport(req, res) {
   const { from_date, to_date, ...filters } = req.query;
-  const fromDate = new Date(`${from_date}T00:00:00Z`);
-  const toDate = new Date(`${to_date}T23:59:59Z`);
-  const where = { ...studentViolationWhere(filters), ...violationInRange({ gte: fromDate, lte: toDate }) };
+  const from = parseIsoDate(from_date);
+  const to   = parseIsoDate(to_date);
+  const where = { ...studentViolationWhere(filters), ...violationInPeriod(weekPeriod(from, to)) };
 
   await _sendStudentViolationPdf(where, { title: 'Student Violation Report', subtitle: `Weekly — ${from_date} to ${to_date}`, filenameSuffix: `weekly-${from_date}-to-${to_date}` }, res);
 }
@@ -402,7 +378,7 @@ async function facultyViolationActivity(req, res) {
 
   const grouped = await prisma.violation.groupBy({
     by: ['faculty_id'],
-    where: { created_at: monthRange(year, month), record_status: 'active', deleted_at: null },
+    where: { created_at: monthInstantRange(year, month), record_status: 'active', deleted_at: null },
     _count: { id: true },
     _sum:   { fine_amount: true },
   });
@@ -430,7 +406,7 @@ async function violationTypeBreakdown(req, res) {
 
   const grouped = await prisma.violation.groupBy({
     by: ['violation_type_id'],
-    where: { created_at: monthRange(year, month), record_status: 'active', deleted_at: null },
+    where: { created_at: monthInstantRange(year, month), record_status: 'active', deleted_at: null },
     _count: { id: true },
     _sum:   { fine_amount: true },
   });
@@ -498,7 +474,7 @@ async function monthlyDutyCoverage(req, res) {
   const month = parseInt(req.query.month ?? new Date().getMonth() + 1, 10);
 
   const slots = await prisma.dutySlot.findMany({
-    where: { duty_date: monthRange(year, month) },
+    where: { duty_date: monthDutyDateRange(year, month) },
     select: { status: true, session_type: true },
   });
 
@@ -529,7 +505,7 @@ async function unassignedFacultyReport(req, res) {
 
   const counts = await prisma.dutySlot.groupBy({
     by: ['faculty_id'],
-    where: { duty_date: monthRange(year, month) },
+    where: { duty_date: monthDutyDateRange(year, month) },
     _count: { id: true },
   });
   const countMap = new Map(counts.map(c => [c.faculty_id, c._count.id]));
@@ -545,7 +521,7 @@ async function unassignedFacultyReport(req, res) {
 async function dutyReassignmentReport(req, res) {
   const year  = parseInt(req.query.year  ?? new Date().getFullYear(),  10);
   const month = parseInt(req.query.month ?? new Date().getMonth() + 1, 10);
-  const range = monthRange(year, month);
+  const range = monthDutyDateRange(year, month);
 
   const reassignments = await prisma.dutyReassignment.findMany({
     where: { duty_date: range },
@@ -628,7 +604,7 @@ async function sessionCompletionRate(req, res) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const y = d.getFullYear();
     const m = d.getMonth() + 1;
-    const range = monthRange(y, m);
+    const range = monthDutyDateRange(y, m);
 
     const [total, completed] = await Promise.all([
       prisma.dutySlot.count({ where: { duty_date: range } }),
