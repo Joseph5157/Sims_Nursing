@@ -149,7 +149,10 @@ User (Desktop - different device):
 - Constants: `server/lib/otp.js` (generateOtpCode, OTP_TTL_MS, thresholds)
 - Controllers: `server/controllers/auth.controller.js` → `requestOtp()`, `verifyOtp()`
 - Routes: `server/routes/auth.routes.js` → both `/otp/*`
-- Client: `LoginPage.jsx` (2-step flow), `PasswordLoginPage.jsx` (fallback)
+- Client: `LoginPage.jsx` (2-step flow), `PasswordLoginPage.jsx` (fallback).
+  OTP request/verify go through the `useRequestOtp()` / `useVerifyOtp()`
+  mutations in `hooks/useAuth.js`; `useVerifyOtp` seeds the auth cache on
+  success, exactly like `useLogin` (see Bug #9).
 - Tests: `server/tests/auth.test.mjs` (42 tests total, 5 OTP-specific)
 
 ---
@@ -300,12 +303,18 @@ User (Desktop - different device):
      * Atomically claim: updateMany({id, used_at: null}, {used_at: now})
      * Check count === 1
      * Issue JWT + CSRF cookies
+     * Return user JSON (safeUser + must_change_password)
    - If no match:
      * Increment otp_failed_attempts
      * If count === 5: set otp_locked_until = now + 15min
      * Return 401 INVALID_OTP
    ↓
-8. User logged in OR locked until cool-off expires ✅
+8. Client (LoginPage → useVerifyOtp) seeds auth state from the response:
+   saveUserToStorage() + queryClient.setQueryData(['currentUser'], user).
+   REQUIRED: without this the cookie is set but the SPA still sees "no user"
+   and ProtectedRoute bounces back to /login (see Bug #9).
+   ↓
+9. User logged in OR locked until cool-off expires ✅
 ```
 
 ---
@@ -595,6 +604,39 @@ because it violates Content Security Policy directive
 **Impact**: All response paths take ~250-300ms (bcrypt cost dominates), so timing doesn't leak information.
 
 **Lesson**: For security-sensitive endpoints, run expensive operations unconditionally to prevent timing-based attacks.
+
+---
+
+### Bug #9: OTP Login Didn't Log In — Bounced Back to /login
+
+**Issue**: After entering a valid OTP code, the user was returned to the login screen instead of the dashboard. The server session was actually created correctly (cookies set), but the app never registered the user as logged in.
+
+**Root Cause**: The SPA gates every protected route on the `['currentUser']` React Query cache (`useCurrentUser` in `AppRoutes`). On `/login` that query had already run `GET /users/me`, received a 401 (no session yet), and settled — and it does **not** auto-refetch on a client-side `navigate()`. Password login seeds the cache in `useLogin.onSuccess` (`queryClient.setQueryData(['currentUser'], user)`), but the OTP path called `api.post('/auth/otp/verify')` **directly** and skipped that step. So after a successful verify, `user` was still empty and `ProtectedRoute` immediately did `<Navigate to="/login" />`.
+
+Magic-link login was unaffected because it's a full-page redirect that reloads the app and refetches `/users/me` with the new cookie.
+
+**Fix**: Route OTP request/verify through mutations that seed client auth state, mirroring `useLogin`:
+```javascript
+// hooks/useAuth.js
+export function useVerifyOtp() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ sims_id, code }) => api.post('/auth/otp/verify', { sims_id, code }),
+    onSuccess: (res) => {
+      saveUserToStorage(res.data);
+      qc.setQueryData(['currentUser'], res.data); // <-- the missing step
+      if ('caches' in window) caches.delete('sims-api').catch(() => {});
+    },
+  });
+}
+// LoginPage.jsx now calls verifyOtp.mutateAsync(...) instead of api.post(...) directly.
+```
+
+**Impact**: Fresh OTP logins (no previously-cached user in localStorage) failed to log in on every attempt. Fixed 2026-07-19.
+
+**Deployment note**: This is a **client-only** change. Railway Watch Paths are scoped to `/server/**`, so a client-only push does **not** trigger a rebuild — bump the marker comment at the top of `server/index.js` (or redeploy) to force Railway to rebuild the client. See Phase 4 / Railway gotchas.
+
+**Lesson**: Any new login path must seed the `['currentUser']` cache (or trigger a full reload) — setting the session cookie server-side is necessary but not sufficient for a client-routed SPA.
 
 ---
 

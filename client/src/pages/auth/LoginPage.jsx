@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import simsLogo from '../../assets/sims-logo.png';
 import { INSTITUTION_NAME } from '../../utils/branding';
 import { ROLES } from '../../utils/constants';
-import api from '../../utils/api';
+import { useRequestOtp, useVerifyOtp } from '../../hooks/useAuth';
 
 // Plain-language messages for a failed Telegram magic-link login
 // (022-telegram-magic-link-login) — see
@@ -20,6 +20,8 @@ const TELEGRAM_BOT_USERNAME = import.meta.env.VITE_TELEGRAM_BOT_USERNAME;
 export default function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const requestOtp = useRequestOtp();
+  const verifyOtp = useVerifyOtp();
 
   // Step management: 'id' = SIMS ID entry; 'code' = code entry
   const [step, setStep] = useState('id');
@@ -45,7 +47,7 @@ export default function LoginPage() {
 
     setIsLoading(true);
     try {
-      await api.post('/auth/otp/request', { sims_id: simsId });
+      await requestOtp.mutateAsync({ sims_id: simsId });
       // On success, advance to Step 2 (code entry)
       setStep('code');
       setCode('');
@@ -79,8 +81,8 @@ export default function LoginPage() {
 
     setIsLoading(true);
     try {
-      const res = await api.post('/auth/otp/verify', { sims_id: simsId, code });
-      const userData = res.data || res;
+      const res = await verifyOtp.mutateAsync({ sims_id: simsId, code });
+      const userData = res.data;
 
       if (userData.must_change_password) {
         navigate('/change-password', { replace: true });

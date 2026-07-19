@@ -42,6 +42,29 @@ export function useLogin() {
   });
 }
 
+export function useRequestOtp() {
+  return useMutation({
+    mutationFn: ({ sims_id }) => api.post('/auth/otp/request', { sims_id }),
+  });
+}
+
+export function useVerifyOtp() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ sims_id, code }) => api.post('/auth/otp/verify', { sims_id, code }),
+    // Mirror useLogin: the server has set the session cookies, but the client
+    // must also seed the auth cache/storage — otherwise ProtectedRoute still
+    // sees no user and bounces straight back to /login after a successful OTP.
+    onSuccess: (res) => {
+      saveUserToStorage(res.data);
+      qc.setQueryData(['currentUser'], res.data);
+      if ('caches' in window) {
+        caches.delete('sims-api').catch(() => {});
+      }
+    },
+  });
+}
+
 export function useChangePassword() {
   const qc = useQueryClient();
   return useMutation({
