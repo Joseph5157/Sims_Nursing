@@ -1,0 +1,11 @@
+-- Telegram magic-link login (022-telegram-magic-link-login) was removed
+-- 2026-07-19 — GET /auth/telegram/:token, the /login bot command, and the
+-- "Log in via Telegram" button are all gone from the app. This table backed
+-- that feature exclusively and had been left dormant (no writer, no reader)
+-- since the code removal; dropping it now retires it for good.
+--
+-- No other table has a foreign key into telegram_login_tokens, so dropping it
+-- is a leaf-table removal — nothing else is affected. Password login and the
+-- Telegram OTP code-entry login (024-telegram-otp-login, otp_login_codes)
+-- are unaffected and remain fully intact.
+DROP TABLE IF EXISTS "telegram_login_tokens";

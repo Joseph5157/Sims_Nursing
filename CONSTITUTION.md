@@ -121,9 +121,10 @@ These are non-negotiable rules encoded in the planning document. Every feature m
   022-telegram-magic-link-login). The single-use link flow, its `/login` bot command, the
   `t.me/<bot>?start=login` deep-link, and the login-page "Log in via Telegram" entry point were
   all removed at the owner's request. Email/SIMS-ID + password and the OTP code are the remaining
-  login methods; `TELEGRAM_LOGIN` audit actions are no longer produced. The `telegram_login_tokens`
-  table (§5) is retained but now dormant (no writer, no reader) pending a later drop migration.
-  `specs/022-telegram-magic-link-login/` stays as historical record.
+  login methods; `TELEGRAM_LOGIN` audit actions are no longer produced. Its backing table,
+  `telegram_login_tokens`, was dropped the same day via migration
+  `20260719200000_drop_telegram_login_tokens` once confirmed dormant (no writer, no reader) — see
+  §5. `specs/022-telegram-magic-link-login/` stays as historical record.
 - **SIMS ID login**: every user (and pending invite) also has a permanent 4-digit SIMS ID —
   `1000`–`1099` for admin/super_admin, `1100`–`9999` for faculty — allocated sequentially by an
   atomic `sims_id_counters` row per role series (`server/lib/simsId.js`), assigned at invite
@@ -306,7 +307,7 @@ whose date has not passed and that has no recorded attendance can be reassigned.
 
 ---
 
-## 5. Database — 19 Tables
+## 5. Database — 18 Tables
 
 All migrations must match this schema exactly. Full column definitions in `SIMS_Database_Schema_v2.1.md`.
 
@@ -329,11 +330,10 @@ All migrations must match this schema exactly. Full column definitions in `SIMS_
 | `student_upload_log` | History of Excel uploads including error rows |
 | `pending_invites` | Temporary invite tokens for new account activation via Telegram |
 | `telegram_relink_tokens` | Temporary tokens for relinking an existing user to a new Telegram account |
-| `telegram_login_tokens` | **Retained but dormant** — backed the magic-link login (022), removed 2026-07-19 (§4). No code writes or reads it anymore; kept pending a drop migration. No `deleted_at` |
-| `otp_login_codes` | Single-use, 5-minute code-entry OTP login tokens (024-telegram-otp-login). No `deleted_at` — mirrors `telegram_login_tokens`'s lifecycle (rows persist, `used_at` is the only mutation, no purge job). Code is bcrypt-hashed, not fast-hash (1M keyspace does not survive SHA-256) |
+| `otp_login_codes` | Single-use, 5-minute code-entry OTP login tokens (024-telegram-otp-login). No `deleted_at` — rows persist, `used_at` is the only mutation, no purge job. Code is bcrypt-hashed, not fast-hash (1M keyspace does not survive SHA-256) |
 | `sims_id_counters` | Two rows (`admin`, `faculty`) — atomic `last_value` counters backing SIMS ID allocation on `users.sims_id` / `pending_invites.sims_id`. No FK to either table; purely a sequence generator |
 
-> **Removed**: `correction_requests` (replaced by `violations.is_flagged`), `reschedule_requests` then `cover_requests` (the Need Cover / Volunteer workflow was built and then removed in favor of Admin Duty Reassignment — `duty_reassignments`, see §4), `otp_sessions` (Telegram OTP login was built and then abandoned in 2026-05, then rebuilt in 2026-07 as `otp_login_codes` with bcrypt hashing — see §4 Authentication and §3.19 version history)
+> **Removed**: `correction_requests` (replaced by `violations.is_flagged`), `reschedule_requests` then `cover_requests` (the Need Cover / Volunteer workflow was built and then removed in favor of Admin Duty Reassignment — `duty_reassignments`, see §4), `otp_sessions` (Telegram OTP login was built and then abandoned in 2026-05, then rebuilt in 2026-07 as `otp_login_codes` with bcrypt hashing — see §4 Authentication and §3.19 version history), `telegram_login_tokens` (backed the magic-link login, 022 — feature removed 2026-07-19, table dropped the same day via migration `20260719200000_drop_telegram_login_tokens` — see §4 Authentication and §3.20/§3.21 version history)
 
 ### Key Schema Rules
 - `admin_audit_log` — system-level actions only (password resets, account changes, hard deletes). Never mix with `violation_audit_log`
@@ -492,6 +492,15 @@ PORT=3000
 
 ---
 
+*Constitution version: 3.21 — Updated: July 2026 (**Dropped `telegram_login_tokens` table** — the
+table backing the magic-link login (022, removed in v3.20 below) had been left dormant with no
+writer or reader since that removal; migration `20260719200000_drop_telegram_login_tokens`
+(`DROP TABLE IF EXISTS "telegram_login_tokens"`) retires it for good, same day as the code
+removal. No other table has a foreign key into it, so this is a leaf-table removal with no
+cascading impact. §5: total tables 19→18, `telegram_login_tokens` moved from the main table list
+into the `> **Removed**` summary line. Prisma Client regenerated; server test suite unaffected
+(143 passing). Password login and the Telegram OTP code-entry login (024, `otp_login_codes`) are
+completely unaffected.)*
 *Constitution version: 3.20 — Updated: July 2026 (**Removed Telegram magic-link login** —
 022-telegram-magic-link-login. §2 Infrastructure, §4 Authentication, §5, §6: deleted the
 `GET /auth/telegram/:token` endpoint + `telegramLogin` controller + its rate limiter and Zod

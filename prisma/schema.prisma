@@ -98,7 +98,6 @@ model User {
   issuedInvites            PendingInvite[]           @relation("IssuedInvites")
   relinkTokens             TelegramRelinkToken[]     @relation("RelinkTokens")
   createdRelinkTokens      TelegramRelinkToken[]     @relation("CreatedRelinkTokens")
-  loginTokens              TelegramLoginToken[]      @relation("LoginTokens")
   otpLoginCodes            OtpLoginCode[]            @relation("OtpLoginCodes")
   dutySlots                DutySlot[]                @relation("FacultyDutySlots")
   createdDutySlots         DutySlot[]                @relation("CreatedDutySlots")
@@ -165,31 +164,10 @@ model TelegramRelinkToken {
   @@map("telegram_relink_tokens")
 }
 
-// ─── 2b. Telegram Login Tokens ────────────────────────────────────────────
-// Single-use, short-lived magic-link tokens for passwordless Telegram login
-// (022-telegram-magic-link-login). Self-issued by the user via the bot — no
-// created_by, unlike telegram_relink_tokens which an admin creates on a
-// user's behalf. No deleted_at: mirrors telegram_relink_tokens's lifecycle
-// (used_at is the only mutation; rows persist, no purge job).
-
-model TelegramLoginToken {
-  id         String    @id @default(uuid())
-  user_id    String
-  token      String    @unique @db.VarChar(100)
-  expires_at DateTime
-  used_at    DateTime?
-  created_at DateTime  @default(now())
-
-  user User @relation("LoginTokens", fields: [user_id], references: [id])
-
-  @@index([user_id])
-  @@map("telegram_login_tokens")
-}
-
-// ─── 2b-i. Telegram OTP Login Codes ──────────────────────────────────────
+// ─── 2b. Telegram OTP Login Codes ────────────────────────────────────────
 // Short-lived, single-use 6-digit codes delivered over Telegram
-// (024-telegram-otp-login). Mirrors TelegramLoginToken's lifecycle
-// (used_at is the only mutation, no deleted_at, no purge job).
+// (024-telegram-otp-login). No deleted_at, no purge job — used_at is the
+// only mutation, rows persist.
 //
 // code_hash is bcrypt, NOT a fast hash: a 6-digit code has only 1,000,000
 // possible values, so SHA-256 of it is recoverable instantly from a DB

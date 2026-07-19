@@ -92,10 +92,11 @@ await bot.setWebhook(`${APP_URL}/bot/webhook/${TELEGRAM_WEBHOOK_SECRET}`);
 
 > **This feature has been removed.** The `GET /auth/telegram/:token` endpoint, the `/login`
 > (and `/start login` deep-link) bot command, the `handleLoginRequest` token issuer, and the
-> login page's "Log in via Telegram" button were all deleted at the owner's request. The
-> `telegram_login_tokens` table is retained but dormant, pending a drop migration. Remaining
-> login methods: email/SIMS-ID + password, and the OTP code (Feature 024). The section below is
-> kept as historical record of how it worked.
+> login page's "Log in via Telegram" button were all deleted at the owner's request. Its backing
+> `telegram_login_tokens` table was dropped the same day (migration
+> `20260719200000_drop_telegram_login_tokens`, once confirmed dormant — no writer, no reader).
+> Remaining login methods: email/SIMS-ID + password, and the OTP code (Feature 024). The section
+> below is kept as historical record of how it worked.
 
 **What it did**: Users sent `/login` to the bot → received a time-limited deep-link → tapped it on their device → logged in instantly (same-device only).
 
@@ -679,7 +680,7 @@ export function useVerifyOtp() {
 - [ ] ~~Magic-link login~~ — removed 2026-07-19 (no longer applicable)
 - [ ] OTP login: Request code, receive in Telegram, enter on different device
 - [ ] Notifications: Trigger event (e.g., record violation), check Telegram
-- [ ] Database: Verify rows in `telegram_login_tokens`, `otp_login_codes`, audit_log
+- [ ] Database: Verify rows in `otp_login_codes`, audit_log (`telegram_login_tokens` was dropped 2026-07-19 — see Feature 022)
 - [ ] Logs: Check `server/logs/` for no errors during testing
 
 ### User Acceptance Testing (UAT)
