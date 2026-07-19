@@ -10,7 +10,7 @@ const _require   = createRequire(import.meta.url);
 const prisma   = _require('../lib/prisma');
 const bcrypt   = _require('bcryptjs');
 const jwt      = _require('jsonwebtoken');
-const { login, changePassword, telegramLogin, requestOtp, verifyOtp } = _require('../controllers/auth.controller');
+const { login, changePassword, requestOtp, verifyOtp } = _require('../controllers/auth.controller');
 const audit    = _require('../services/audit.service');
 
 function makeReq(body = {}) { return { body, cookies: {}, headers: {} }; }
@@ -272,120 +272,6 @@ describe('changePassword', () => {
     expect(prisma.user.findUnique).toHaveBeenCalledWith({
       where: { id: userWithPassword.id }, // Must use req.user.id
     });
-  });
-});
-
-// 022-telegram-magic-link-login
-describe('telegramLogin', () => {
-  function makeTelegramReq(token) { return { params: { token } }; }
-  function makeTelegramRes() {
-    const res = { _redirect: null, _cookies: {} };
-    res.cookie = (n, v) => { res._cookies[n] = v; return res; };
-    res.redirect = (loc) => { res._redirect = loc; return res; };
-    return res;
-  }
-
-  const activeUser = {
-    id: 'user-1',
-    role: 'faculty',
-    session_version: 1,
-    status: 'active',
-    deleted_at: null,
-  };
-
-  function tokenRow({ used_at = null, expires_at = new Date(Date.now() + 5 * 60 * 1000), user = activeUser } = {}) {
-    return { token: 'abc123', expires_at, used_at, user };
-  }
-
-  beforeEach(() => {
-    vi.spyOn(prisma.telegramLoginToken, 'findUnique').mockResolvedValue(tokenRow());
-    vi.spyOn(prisma.telegramLoginToken, 'updateMany').mockResolvedValue({ count: 1 });
-    vi.spyOn(jwt, 'sign').mockReturnValue('test-jwt-token');
-    vi.spyOn(audit, 'logAction').mockResolvedValue(undefined);
-  });
-  afterEach(() => vi.restoreAllMocks());
-
-  it('redirects to / and sets cookies on a valid, unused, unexpired token', async () => {
-    const res = makeTelegramRes();
-    await telegramLogin(makeTelegramReq('abc123'), res);
-    expect(res._redirect).toBe('/');
-    expect(res._cookies['sims_token']).toBe('test-jwt-token');
-    expect(typeof res._cookies['sims_csrf']).toBe('string');
-    expect(res._cookies['sims_csrf'].length).toBeGreaterThan(0);
-  });
-
-  it('logs a TELEGRAM_LOGIN audit action on success', async () => {
-    const res = makeTelegramRes();
-    await telegramLogin(makeTelegramReq('abc123'), res);
-    expect(audit.logAction).toHaveBeenCalledWith(
-      expect.objectContaining({ actorId: activeUser.id, action: 'TELEGRAM_LOGIN', targetId: activeUser.id, targetType: 'user' }),
-    );
-  });
-
-  it('redirects with telegram_error=expired for an expired token', async () => {
-    prisma.telegramLoginToken.findUnique.mockResolvedValue(tokenRow({ expires_at: new Date(Date.now() - 1000) }));
-    prisma.telegramLoginToken.updateMany.mockResolvedValue({ count: 0 });
-    const res = makeTelegramRes();
-    await telegramLogin(makeTelegramReq('abc123'), res);
-    expect(res._redirect).toBe('/login?telegram_error=expired');
-    expect(res._cookies['sims_token']).toBeUndefined();
-  });
-
-  it('redirects with telegram_error=used for an already-used token', async () => {
-    prisma.telegramLoginToken.findUnique.mockResolvedValue(tokenRow({ used_at: new Date() }));
-    prisma.telegramLoginToken.updateMany.mockResolvedValue({ count: 0 });
-    const res = makeTelegramRes();
-    await telegramLogin(makeTelegramReq('abc123'), res);
-    expect(res._redirect).toBe('/login?telegram_error=used');
-  });
-
-  it('redirects with telegram_error=inactive_account for a deactivated user, even though the token is unexpired and unused', async () => {
-    prisma.telegramLoginToken.findUnique.mockResolvedValue(
-      tokenRow({ user: { ...activeUser, status: 'inactive' } }),
-    );
-    prisma.telegramLoginToken.updateMany.mockResolvedValue({ count: 0 });
-    const res = makeTelegramRes();
-    await telegramLogin(makeTelegramReq('abc123'), res);
-    expect(res._redirect).toBe('/login?telegram_error=inactive_account');
-    expect(res._cookies['sims_token']).toBeUndefined();
-  });
-
-  it('redirects with telegram_error=inactive_account for a soft-deleted user', async () => {
-    prisma.telegramLoginToken.findUnique.mockResolvedValue(
-      tokenRow({ user: { ...activeUser, deleted_at: new Date() } }),
-    );
-    prisma.telegramLoginToken.updateMany.mockResolvedValue({ count: 0 });
-    const res = makeTelegramRes();
-    await telegramLogin(makeTelegramReq('abc123'), res);
-    expect(res._redirect).toBe('/login?telegram_error=inactive_account');
-  });
-
-  it('redirects with telegram_error=not_found for a nonexistent token', async () => {
-    prisma.telegramLoginToken.findUnique.mockResolvedValue(null);
-    prisma.telegramLoginToken.updateMany.mockResolvedValue({ count: 0 });
-    const res = makeTelegramRes();
-    await telegramLogin(makeTelegramReq('does-not-exist'), res);
-    expect(res._redirect).toBe('/login?telegram_error=not_found');
-  });
-
-  it('only allows one of two concurrent claims on the same token to succeed', async () => {
-    prisma.telegramLoginToken.updateMany
-      .mockResolvedValueOnce({ count: 1 })
-      .mockResolvedValueOnce({ count: 0 });
-    // The winner's UPDATE commits used_at before the loser's diagnostic lookup
-    // runs (real Postgres ordering) — reflect that so the loser correctly
-    // reports "used" rather than a stale "not_found".
-    prisma.telegramLoginToken.findUnique.mockResolvedValue(tokenRow({ used_at: new Date() }));
-
-    const res1 = makeTelegramRes();
-    const res2 = makeTelegramRes();
-    await Promise.all([
-      telegramLogin(makeTelegramReq('abc123'), res1),
-      telegramLogin(makeTelegramReq('abc123'), res2),
-    ]);
-
-    const redirects = [res1._redirect, res2._redirect].sort();
-    expect(redirects).toEqual(['/', '/login?telegram_error=used']);
   });
 });
 

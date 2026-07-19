@@ -52,7 +52,7 @@ These decisions are locked. Do not suggest alternatives or use different tools.
 |---|---|
 | Database | PostgreSQL — hosted on Railway |
 | Hosting | Railway — both staging and production |
-| Auth | Email + password → JWT stored in httpOnly cookie + CSRF token. Every user also has a permanent 4-digit SIMS ID (`1000`–`1099` admin/super_admin, `1100`–`9999` faculty, allocated by an atomic DB counter) usable as an alternative login identifier in place of email — email is now optional, kept for contact and legacy login (see §4 Authentication). **Additionally**, a linked/verified user may log in via a Telegram magic link (single-use, 10-minute token; issues the identical cookie session) — see §4 Authentication. Telegram remains the sole notification channel otherwise |
+| Auth | Email + password → JWT stored in httpOnly cookie + CSRF token. Every user also has a permanent 4-digit SIMS ID (`1000`–`1099` admin/super_admin, `1100`–`9999` faculty, allocated by an atomic DB counter) usable as an alternative login identifier in place of email — email is now optional, kept for contact and legacy login (see §4 Authentication). **Additionally**, a linked/verified user may log in via a typed 6-digit Telegram OTP code (single-use, 5-minute; enables cross-device login) — see §4 Authentication. (The Telegram magic-link login was removed 2026-07-19 — see §4.) Telegram remains the sole notification channel otherwise |
 | Real-time | 30-second polling — no WebSockets, no SSE |
 | API style | REST — no GraphQL |
 | App structure | Monolithic — single repo, single deploy |
@@ -109,21 +109,21 @@ There are exactly 3 roles. Do not add, merge, or rename roles.
 These are non-negotiable rules encoded in the planning document. Every feature must respect them.
 
 ### Authentication
-- Login is via registered email + password, **or** via a Telegram magic link for users with a
-  linked, verified Telegram account (022-telegram-magic-link-login), **or** via a typed 6-digit
-  Telegram OTP code (024-telegram-otp-login) — all three methods remain fully available side by
-  side; none replaces the others. The OTP code method (user-typed credential, not a magic link)
-  enables cross-device login: a code delivered to Telegram on one device can be entered on any
-  other device (the gap the magic link cannot fill, since it logs in only the device that tapped
-  it). See §5 and §6 below for OTP tables and endpoints. This deliberately reverses an earlier
-  version of this constitution's §4 sentence "No Telegram OTP (the code-entry kind), no SMS, no
-  email OTP" — the project previously built and abandoned a Telegram-OTP table (`otp_sessions`)
-  in 2026-05, then decided to reopen and build the feature again in 2026-07, following an
-  explicit owner request before spec work began. Both the magic-link login (additive to
-  password-only) and the OTP login (additive to both prior methods) were deliberately designed
-  as additions, not replacements, so password login remains the unbreakable fallback for when
-  Telegram is unavailable. See `specs/022-telegram-magic-link-login/` and
-  `specs/024-telegram-otp-login/` for the full specs/plans/research/contracts.
+- Login is via registered email/SIMS ID + password, **or** via a typed 6-digit Telegram OTP code
+  for users with a linked, verified Telegram account (024-telegram-otp-login) — both methods
+  remain fully available side by side; neither replaces the other. The OTP code method
+  (user-typed credential) enables cross-device login: a code delivered to Telegram on one device
+  can be entered on any other device. See §5 and §6 below for OTP tables and endpoints. The OTP
+  login is additive, not a replacement, so password login remains the unbreakable fallback for
+  when Telegram is unavailable. See `specs/024-telegram-otp-login/` for the full
+  spec/plan/research/contracts.
+- **Removed (2026-07-19): Telegram magic-link login** (`GET /auth/telegram/:token`,
+  022-telegram-magic-link-login). The single-use link flow, its `/login` bot command, the
+  `t.me/<bot>?start=login` deep-link, and the login-page "Log in via Telegram" entry point were
+  all removed at the owner's request. Email/SIMS-ID + password and the OTP code are the remaining
+  login methods; `TELEGRAM_LOGIN` audit actions are no longer produced. The `telegram_login_tokens`
+  table (§5) is retained but now dormant (no writer, no reader) pending a later drop migration.
+  `specs/022-telegram-magic-link-login/` stays as historical record.
 - **SIMS ID login**: every user (and pending invite) also has a permanent 4-digit SIMS ID —
   `1000`–`1099` for admin/super_admin, `1100`–`9999` for faculty — allocated sequentially by an
   atomic `sims_id_counters` row per role series (`server/lib/simsId.js`), assigned at invite
@@ -132,22 +132,7 @@ These are non-negotiable rules encoded in the planning document. Every feature m
   password check and all other login behavior is unchanged. This makes email optional —
   Telegram-first users (invited without an email address) can still log in and be identified
   purely by SIMS ID. Linked users can recover their SIMS ID any time via `/myid` on the Telegram
-  bot. This is additive to, not a replacement for, the Telegram magic-link login above — both
-  remain available side by side.
-- **Telegram magic-link login**: a linked user sends `/login` to the bot (or taps "Log in via
-  Telegram" on the login page, which deep-links to `t.me/<bot>?start=login` — no server call
-  needed to trigger this). The bot issues a random, single-use `telegram_login_tokens` row
-  (10-minute expiry) and sends back a link (`{APP_URL}/auth/telegram/:token`). Requesting a new
-  link invalidates any previous still-unused one; requests are throttled to 1 per 30 seconds per
-  user (independent of the `/resetpassword` 1-per-hour limit below). Opening a valid link
-  atomically claims the token (a single conditional `updateMany` — no raw SQL, no explicit row
-  lock; Postgres's own atomicity on the `used_at IS NULL` predicate prevents any token from ever
-  granting two sessions, including near-simultaneous clicks) and, only if the token is unexpired,
-  unused, and the linked account is still active and not deleted, issues the exact same
-  httpOnly-cookie JWT + CSRF session `POST /auth/login` issues, including `session_version`. Users
-  without linked Telegram are unaffected and cannot obtain a link. Logged in `admin_audit_log` as
-  `TELEGRAM_LOGIN`, distinct from `PASSWORD_LOGIN`. See
-  `specs/022-telegram-magic-link-login/` for the full spec/plan/contracts.
+  bot.
 - Passwords are hashed with bcrypt (cost factor 12) — plaintext is never stored or logged.
 - JWT stored in httpOnly cookie — never in localStorage. A CSRF token (`sims_csrf` cookie +
   `X-CSRF-Token` header) is required on every mutating *authenticated* request. **Exception:**
@@ -344,7 +329,7 @@ All migrations must match this schema exactly. Full column definitions in `SIMS_
 | `student_upload_log` | History of Excel uploads including error rows |
 | `pending_invites` | Temporary invite tokens for new account activation via Telegram |
 | `telegram_relink_tokens` | Temporary tokens for relinking an existing user to a new Telegram account |
-| `telegram_login_tokens` | Single-use, 10-minute magic-link login tokens (022-telegram-magic-link-login). No `deleted_at` — mirrors `telegram_relink_tokens`'s lifecycle (rows persist, `used_at` is the only mutation, no purge job) |
+| `telegram_login_tokens` | **Retained but dormant** — backed the magic-link login (022), removed 2026-07-19 (§4). No code writes or reads it anymore; kept pending a drop migration. No `deleted_at` |
 | `otp_login_codes` | Single-use, 5-minute code-entry OTP login tokens (024-telegram-otp-login). No `deleted_at` — mirrors `telegram_login_tokens`'s lifecycle (rows persist, `used_at` is the only mutation, no purge job). Code is bcrypt-hashed, not fast-hash (1M keyspace does not survive SHA-256) |
 | `sims_id_counters` | Two rows (`admin`, `faculty`) — atomic `last_value` counters backing SIMS ID allocation on `users.sims_id` / `pending_invites.sims_id`. No FK to either table; purely a sequence generator |
 
@@ -373,7 +358,7 @@ Counts verified directly against `server/routes/*.routes.js`. The Need Cover mod
 
 | Module | Count | Base Path |
 |---|---|---|
-| Authentication | 6 | `/auth` |
+| Authentication | 5 | `/auth` |
 | Users & Accounts | 13 | `/users`, `/admin` |
 | Students | 10 | `/students` |
 | Duty Calendar | 8 | `/calendar` |
@@ -398,9 +383,10 @@ Duty Reassignment Requests (6): `POST /`, `GET /`, `GET /sent`, `GET /eligible-f
 
 Not counted above: `POST /bot/webhook/:secret` (`server/routes/bot.routes.js`) — a Telegram-facing webhook receiver, not part of the client-facing API surface this table describes.
 
-**Authentication** grew 3→4→6: `GET /auth/telegram/:token` (022-telegram-magic-link-login),
-`POST /auth/otp/request`, and `POST /auth/otp/verify` (024-telegram-otp-login) added alongside
-the existing `POST /auth/login`, `/change-password`, `/logout`.
+**Authentication** is 5 endpoints: `POST /auth/login`, `/change-password`, `/logout`, and the OTP
+pair `POST /auth/otp/request` + `POST /auth/otp/verify` (024-telegram-otp-login). The magic-link
+endpoint `GET /auth/telegram/:token` (022-telegram-magic-link-login) was **removed 2026-07-19**
+(§4), dropping the module 6→5 and the overall total 119→118.
 
 Full endpoint definitions in `SIMS_API_Endpoints_v2.0.md` (v2.2) — **this file is now stale against the counts above and should be regenerated/updated to match.**
 
@@ -506,6 +492,18 @@ PORT=3000
 
 ---
 
+*Constitution version: 3.20 — Updated: July 2026 (**Removed Telegram magic-link login** —
+022-telegram-magic-link-login. §2 Infrastructure, §4 Authentication, §5, §6: deleted the
+`GET /auth/telegram/:token` endpoint + `telegramLogin` controller + its rate limiter and Zod
+param schema, the `/login` (and `/start login` deep-link) bot command and `handleLoginRequest`
+token issuer, and the login page's "Log in via Telegram" button + `telegram_error` banner. No
+schema migration: the `telegram_login_tokens` table is retained but now dormant (no writer/reader)
+pending a later drop. Password / SIMS-ID + password and the 6-digit OTP code (024) are the
+remaining login methods; `TELEGRAM_LOGIN` audit actions are no longer produced. Authentication
+module 6→5, total 119→118. Removed the 8 `telegramLogin` unit tests (server suite 151→143, still
+green). Owner-requested; `specs/022-telegram-magic-link-login/` kept as historical record. Both
+password and OTP logins are fully intact — this removes a redundant third method, it does not
+weaken the password fallback.)*
 *Constitution version: 3.19 — Updated: July 2026 (Telegram OTP code-entry login —
 024-telegram-otp-login. §2 Infrastructure, §4 Authentication: a linked/verified user may now
 log in via a typed 6-digit OTP code delivered to Telegram, enabling cross-device login (code

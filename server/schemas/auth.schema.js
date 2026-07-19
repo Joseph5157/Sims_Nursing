@@ -15,12 +15,6 @@ const changePasswordSchema = z.object({
   new_password: z.string().min(8, 'New password must be at least 8 characters.'),
 });
 
-// Telegram magic-link login token — a 32-byte crypto.randomBytes hex string is 64 hex chars,
-// but bound generously to stay compatible if the generation scheme changes.
-const telegramLoginTokenParamSchema = z.object({
-  token: z.string().min(16).max(100).regex(/^[a-f0-9]+$/i, 'Invalid token format.'),
-});
-
 // OTP login request — 4-digit SIMS ID only
 // sims_id is a string to preserve leading zeros if they ever occur (defensive, unlikely).
 const otpRequestSchema = z.object({
@@ -36,4 +30,4 @@ const otpVerifySchema = z.object({
   code: z.string().regex(/^\d{6}$/, 'Code must be a 6-digit number.'),
 });
 
-module.exports = { loginSchema, changePasswordSchema, telegramLoginTokenParamSchema, otpRequestSchema, otpVerifySchema };
+module.exports = { loginSchema, changePasswordSchema, otpRequestSchema, otpVerifySchema };

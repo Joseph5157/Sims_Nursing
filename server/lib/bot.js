@@ -12,10 +12,6 @@ const { APP_SHORT_NAME } = require('./branding');
 const APP_URL = process.env.APP_URL || 'https://sims-dms.railway.app';
 const OPEN_APP_BUTTON = { reply_markup: { inline_keyboard: [[{ text: `Open in ${APP_SHORT_NAME}`, url: `${APP_URL}/faculty/slots` }]] } };
 
-// Telegram magic-link login (022-telegram-magic-link-login).
-const LOGIN_TOKEN_TTL_MS = 10 * 60 * 1000;
-const LOGIN_TOKEN_RATE_LIMIT_MS = 30 * 1000;
-
 /**
  * Handle Telegram webhook callback
  * Processes /start invite_TOKEN (new account activation)
@@ -137,28 +133,6 @@ async function handleWebhook(req, res) {
         logger.error(`[TELEGRAM] Failed to send /myid response to ${chatId}:`, err);
       });
       return res.status(200).json({ ok: true });
-    } else if (text === '/login' || text === '/start login') {
-      // Handle /login command (or the web login page's "Log in via Telegram"
-      // deep link, which arrives as /start login) — issues a one-time magic
-      // login link for a linked, active account.
-      const result = await handleLoginRequest(chatId);
-
-      let replyText;
-      if (result.success) {
-        return res.status(200).json({ ok: true }); // message already sent inside handleLoginRequest
-      } else if (result.error === 'NOT_LINKED') {
-        replyText = `No active ${APP_SHORT_NAME} account is linked to this Telegram. Use your SIMS ID and password, or contact your admin to link Telegram first.`;
-      } else if (result.error === 'RATE_LIMITED') {
-        replyText = `You already have a login link — check the message above. Try again in ${result.secondsWait}s if you need a new one.`;
-      } else {
-        replyText = 'An error occurred. Please try again or contact your admin.';
-        logger.warn(`[TELEGRAM] Login-link error: ${result.error}`);
-      }
-
-      sendTelegramMessage(chatId, replyText).catch((err) => {
-        logger.error(`[TELEGRAM] Failed to send /login response to ${chatId}:`, err);
-      });
-      return res.status(200).json({ ok: true });
     } else if (text === '/resetpassword') {
       // Handle /resetpassword command — reset password for linked user
       const result = await handlePasswordReset(chatId);
@@ -194,7 +168,7 @@ async function handleWebhook(req, res) {
       });
       return res.status(200).json({ ok: true });
     } else {
-      // Not an invite, relink, /myid, /login, or /resetpassword command — ignore
+      // Not an invite, relink, /myid, or /resetpassword command — ignore
       return res.status(200).json({ ok: true });
     }
   } catch (error) {
@@ -638,69 +612,6 @@ async function handlePasswordReset(chatId) {
   }
 }
 
-/**
- * Handle /login (or /start login) — issue a one-time Telegram magic-link
- * login token for a linked, active account. Rate-limited to 1 request per
- * 30 seconds per user; requesting a new link invalidates any previous
- * still-unused one (022-telegram-magic-link-login).
- */
-async function handleLoginRequest(chatId) {
-  try {
-    const telegramId = String(chatId);
-
-    const user = await prisma.user.findUnique({
-      where: { telegram_id: telegramId },
-      select: { id: true, status: true, deleted_at: true, telegram_verified: true },
-    });
-
-    if (!user || user.deleted_at || user.status !== 'active' || !user.telegram_verified) {
-      return { success: false, error: 'NOT_LINKED' };
-    }
-
-    // Rate limit: refuse a new link within 30s of the last one requested,
-    // regardless of whether that one was used — reuses the token table's own
-    // created_at instead of a dedicated column (research.md §3).
-    const mostRecent = await prisma.telegramLoginToken.findFirst({
-      where: { user_id: user.id },
-      orderBy: { created_at: 'desc' },
-      select: { created_at: true },
-    });
-
-    if (mostRecent) {
-      const msSince = Date.now() - new Date(mostRecent.created_at).getTime();
-      if (msSince < LOGIN_TOKEN_RATE_LIMIT_MS) {
-        const secondsWait = Math.ceil((LOGIN_TOKEN_RATE_LIMIT_MS - msSince) / 1000);
-        return { success: false, error: 'RATE_LIMITED', secondsWait };
-      }
-    }
-
-    // Superseding: any still-unused token for this user is no longer valid
-    // once a new one is requested (research.md §2).
-    await prisma.telegramLoginToken.deleteMany({ where: { user_id: user.id, used_at: null } });
-
-    const token = crypto.randomBytes(32).toString('hex');
-    await prisma.telegramLoginToken.create({
-      data: {
-        user_id: user.id,
-        token,
-        expires_at: new Date(Date.now() + LOGIN_TOKEN_TTL_MS),
-      },
-    });
-
-    const loginUrl = `${APP_URL}/auth/telegram/${token}`;
-    await telegram.sendMessage(
-      chatId,
-      `🔐 Log in to ${APP_SHORT_NAME}\n\nTap the button below to log in — this link works once and expires in 10 minutes.`,
-      { reply_markup: { inline_keyboard: [[{ text: 'Log in', url: loginUrl }]] } },
-    );
-
-    return { success: true };
-  } catch (error) {
-    logger.error('[TELEGRAM] Error in handleLoginRequest:', error);
-    return { success: false, error: 'SYSTEM_ERROR' };
-  }
-}
-
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
@@ -802,7 +713,6 @@ module.exports = {
   handleInviteActivation,
   handleRelinkActivation,
   handlePasswordReset,
-  handleLoginRequest,
   sendTelegramMessage,
   buildMySlotsReply,
   buildNextDutyReply,

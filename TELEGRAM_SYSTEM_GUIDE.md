@@ -24,9 +24,9 @@
 
 The SIMS Telegram system is the **central notification and authentication backbone** for the discipline management platform. It handles:
 
-- **Authentication**: Magic-link login + OTP code-entry login
+- **Authentication**: OTP code-entry login (magic-link login was removed 2026-07-19)
 - **Notifications**: Faculty duty reminders, violations, flags, messages
-- **Commands**: User self-service (/login, /resetpassword, /myid)
+- **Commands**: User self-service (/resetpassword, /myid)
 - **Bot Management**: Linking, verification, invite deep-links
 
 **Scale**: Tested with ~20-30 faculty, 100+ students per month  
@@ -88,9 +88,16 @@ await bot.setWebhook(`${APP_URL}/bot/webhook/${TELEGRAM_WEBHOOK_SECRET}`);
 
 ## Features Implemented
 
-### Feature 022: Telegram Magic-Link Login
+### Feature 022: Telegram Magic-Link Login — ⛔ REMOVED (2026-07-19)
 
-**What it does**: Users send `/login` to the bot → receive a time-limited deep-link → tap it on their device → logged in instantly (same-device only).
+> **This feature has been removed.** The `GET /auth/telegram/:token` endpoint, the `/login`
+> (and `/start login` deep-link) bot command, the `handleLoginRequest` token issuer, and the
+> login page's "Log in via Telegram" button were all deleted at the owner's request. The
+> `telegram_login_tokens` table is retained but dormant, pending a drop migration. Remaining
+> login methods: email/SIMS-ID + password, and the OTP code (Feature 024). The section below is
+> kept as historical record of how it worked.
+
+**What it did**: Users sent `/login` to the bot → received a time-limited deep-link → tapped it on their device → logged in instantly (same-device only).
 
 **Flow**:
 ```
@@ -192,7 +199,7 @@ User (Desktop - different device):
 
 | Command | Purpose | Response |
 |---------|---------|----------|
-| `/login` | Request magic-link login | Deep-link to app |
+| `/login` | ⛔ Removed 2026-07-19 (magic-link login) — command now ignored | — |
 | `/resetpassword` | Self-service password reset | Temporary password + "must change on next login" |
 | `/myid` | Retrieve your 4-digit SIMS ID | "Your SIMS ID: 1234" |
 | `/menu` | Show available commands | Command list with descriptions |
@@ -241,7 +248,7 @@ User (Desktop - different device):
  └──────────────┘    └──────────────┘
 ```
 
-### Message Flow: Magic-Link Login
+### Message Flow: Magic-Link Login — ⛔ REMOVED 2026-07-19 (historical)
 
 ```
 1. User sends /login to bot
@@ -613,7 +620,7 @@ because it violates Content Security Policy directive
 
 **Root Cause**: The SPA gates every protected route on the `['currentUser']` React Query cache (`useCurrentUser` in `AppRoutes`). On `/login` that query had already run `GET /users/me`, received a 401 (no session yet), and settled — and it does **not** auto-refetch on a client-side `navigate()`. Password login seeds the cache in `useLogin.onSuccess` (`queryClient.setQueryData(['currentUser'], user)`), but the OTP path called `api.post('/auth/otp/verify')` **directly** and skipped that step. So after a successful verify, `user` was still empty and `ProtectedRoute` immediately did `<Navigate to="/login" />`.
 
-Magic-link login was unaffected because it's a full-page redirect that reloads the app and refetches `/users/me` with the new cookie.
+(Magic-link login was unaffected because it was a full-page redirect that reloaded the app and refetched `/users/me` with the new cookie — but that login method has since been removed, 2026-07-19.)
 
 **Fix**: Route OTP request/verify through mutations that seed client auth state, mirroring `useLogin`:
 ```javascript
@@ -669,7 +676,7 @@ export function useVerifyOtp() {
 
 ### Post-Deployment Verification
 
-- [ ] Magic-link login: Send `/login`, tap link, should log in
+- [ ] ~~Magic-link login~~ — removed 2026-07-19 (no longer applicable)
 - [ ] OTP login: Request code, receive in Telegram, enter on different device
 - [ ] Notifications: Trigger event (e.g., record violation), check Telegram
 - [ ] Database: Verify rows in `telegram_login_tokens`, `otp_login_codes`, audit_log
